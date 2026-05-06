@@ -2,7 +2,7 @@
 
 En liten statisk sida som leder vidare till den riktiga adminpanelen, som körs i Google Apps Script (HtmlService).
 
-URL: https://stockholmsmoske.se/bajram-admin/
+URL: https://stockholmsmoske.karimkhalil.se/bajram-admin/
 
 ## Varför en launcher istället för riktig admin på One.com?
 

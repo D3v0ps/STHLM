@@ -1,7 +1,7 @@
 # bajram-basar/ – Publik landningssida
 
 Statiska filer som laddas upp till One.com via SFTP. Sidan körs på:
-https://stockholmsmoske.se/bajram-basar/
+https://stockholmsmoske.karimkhalil.se/bajram-basar/
 
 ## Filer i denna mapp
 
@@ -22,7 +22,7 @@ Använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit) eller kommandorad.
 
 **SFTP-uppgifter:** Förvara dem i en lösenordshanterare eller GitHub Actions Secrets — ALDRIG i denna kod.
 
-Hosta hela mappens innehåll på One.com under sökvägen `/bajram-basar/` i webroot (eller motsvarande sökväg som ger URL:en `stockholmsmoske.se/bajram-basar/`).
+Hosta hela mappens innehåll på One.com under sökvägen `/bajram-basar/` i webroot (eller motsvarande sökväg som ger URL:en `stockholmsmoske.karimkhalil.se/bajram-basar/`).
 
 **Exempel med rsync över SSH:**
 

@@ -4,8 +4,8 @@ Publik landningssida + adminpanel för Stockholms Moskés sommarfestival (bazaar
 
 **Live-URL:er** (efter deploy):
 
-- 🌐 Publik: `https://stockholmsmoske.se/bajram-basar/`
-- 🔒 Admin: `https://stockholmsmoske.se/bajram-admin/` → leder till Apps Script
+- 🌐 Publik: `https://stockholmsmoske.karimkhalil.se/bajram-basar/`
+- 🔒 Admin: `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → leder till Apps Script
 
 ## Översikt
 
@@ -61,25 +61,46 @@ Följ instruktionerna i `google-apps-script/README.md` steg 1–5. Det innefatta
 
 ### Steg 3: Ladda upp till One.com via SFTP
 
-> SFTP-credentials förvaras i en lösenordshanterare eller GitHub Secrets — ALDRIG i denna kod.
+> SFTP-credentials förvaras i GitHub Secrets eller en lösenordshanterare — ALDRIG i denna kod.
 
-Använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit) eller kommandorad:
+#### Auto-deploy via GitHub Actions (rekommenderas)
+
+Workflow-filen `.github/workflows/deploy.yml` mirrorar `bajram-basar/` och `bajram-admin/` till One.com via SFTP. Triggers:
+
+- **Automatiskt:** push till `main` som rör `bajram-basar/`, `bajram-admin/` eller workflow-filen.
+- **Manuellt:** GitHub → fliken `Actions` → `Deploy to One.com` → `Run workflow`.
+
+**Engångsuppsättning — lägg till fyra repository secrets:**
+
+GitHub → repo → `Settings` → `Secrets and variables` → `Actions` → `New repository secret`.
+
+| Secret | Värde | Var hittar jag det? |
+|---|---|---|
+| `SFTP_HOST` | One.coms SSH-server, oftast `ssh.<account-id>.service.one` | One.com kontrollpanel → `Filhantering` → `SFTP/SSH` |
+| `SFTP_USER` | SFTP-användarnamn (oftast samma som inloggningen) | Samma vy som ovan |
+| `SFTP_PASSWORD` | SFTP-lösenord | Samma vy som ovan (`Visa/skapa lösenord`) |
+| `SFTP_WEBROOT` | Sökväg till webroot på servern, t.ex. `/httpd.www` eller `/<din-domän>` — UTAN trailing slash | Samma vy. One.coms standard är `/httpd.www`. |
+
+Workflow:n exkluderar `README.md`, `.gitkeep` och `.DS_Store`. Den använder `--delete`, så filer i `<webroot>/bajram-basar/` och `<webroot>/bajram-admin/` som inte finns i repot raderas vid deploy.
+
+#### Manuell SFTP (fallback)
+
+Om Actions inte är konfigurerat eller du behöver deploya direkt:
 
 ```bash
-# Exempel med rsync (värdena hämtas från lösenordshanteraren):
-rsync -avz --delete bajram-basar/ <user>@<host>:/<webroot>/bajram-basar/
-rsync -avz --delete bajram-admin/ <user>@<host>:/<webroot>/bajram-admin/
+rsync -avz --delete --exclude README.md --exclude .gitkeep \
+  bajram-basar/ <user>@<host>:<webroot>/bajram-basar/
+rsync -avz --delete --exclude README.md --exclude .gitkeep \
+  bajram-admin/ <user>@<host>:<webroot>/bajram-admin/
 ```
 
-Vi versionshanterar SFTP-uppgifter via:
-- **Lokal utveckling:** spara i 1Password / Bitwarden / motsvarande.
-- **CI/CD (om vi sätter upp GitHub Actions):** lägg som repo Secrets med namn `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD`, `SFTP_WEBROOT`.
+Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 ### Steg 4: Smoke-test
 
-1. Öppna `https://stockholmsmoske.se/bajram-basar/` — ska visa hero, intro, info-kort, formulär.
+1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-basar/` — ska visa hero, intro, info-kort, formulär.
 2. Skicka en testanmälan. Kontrollera att raden hamnar i Sheetets `Submissions`-flik.
-3. Öppna `https://stockholmsmoske.se/bajram-admin/` → klicka `Öppna adminpanelen` → logga in.
+3. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → klicka `Öppna adminpanelen` → logga in.
 4. Gå till `Översikt` — antalsiffror ska matcha Sheetet.
 5. Ändra något i `Eventinformation`, spara, vänta 5 min eller hård-refresha publika sidan — ändringen ska synas.
 
@@ -89,7 +110,7 @@ Vi versionshanterar SFTP-uppgifter via:
 
 Du ska sällan behöva röra koden. Allt innehåll redigeras via adminpanelen:
 
-1. Öppna `https://stockholmsmoske.se/bajram-admin/`
+1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/`
 2. Logga in med adminlösenordet (få från Karim).
 3. Använd flikarna:
    - **Översikt** — se status, öppna/stänga formulär

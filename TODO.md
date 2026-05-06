@@ -19,13 +19,14 @@
 
 ## Tekniskt – behöver göras före launch
 
-- [ ] **Skapa Google Sheet + Apps Script-projekt** (se `google-apps-script/README.md`)
-- [ ] **Kör `setupSpreadsheet()`** för att initiera flikar
-- [ ] **Kör `setupAdminPassword('...')`** med långt slumpat lösenord
-- [ ] **Publicera Apps Script som Web App** (åtkomst: Alla)
-- [ ] **Klistra in Web App-URL** i `bajram-basar/config.js` och `bajram-admin/config.js`
+- [x] **Skapa Google Sheet + Apps Script-projekt** (se `google-apps-script/README.md`)
+- [x] **Kör `setupSpreadsheet()`** för att initiera flikar
+- [x] **Kör `setupAdminPassword('...')`** med långt slumpat lösenord
+- [x] **Publicera Apps Script som Web App** (åtkomst: Alla)
+- [x] **Klistra in Web App-URL** i `bajram-basar/config.js` och `bajram-admin/config.js`
 - [ ] **Beställ subdomän eller subkatalog** på One.com (rekommendation: subkatalog `/bajram-basar/` och `/bajram-admin/`)
-- [ ] **Ladda upp via SFTP** till One.com webroot
+- [ ] **Lägg till GitHub Secrets** för SFTP-deploy: `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD`, `SFTP_WEBROOT` (se README §Steg 3)
+- [ ] **Första deployen** — pusha till `main` eller kör workflow manuellt (Actions → `Deploy to One.com` → `Run workflow`)
 - [ ] **Smoke-test:** skicka testanmälan, godkänn i admin, byt formulär av/på, verifiera utställarvy
 - [ ] **Lägg till sajten i Google Search Console** (verifiera via DNS eller HTML-fil)
 - [ ] **Lighthouse-audit:** mobil, mål Performance > 90, Accessibility > 95
@@ -40,7 +41,7 @@
 
 ## Framtida förbättringar (post-launch)
 
-- [ ] **GitHub Actions för auto-deploy via SFTP** (när det finns en stabil main-branch)
+- [x] **GitHub Actions för auto-deploy via SFTP** — workflow finns i `.github/workflows/deploy.yml`
 - [ ] **Sport-sidor:** fotboll och basket 3v3 — bygg när Pamass har info
 - [ ] **Multi-event-stöd:** om föreningen vill köra fler tillfällen per år, refaktorera Settings till per-event
 - [ ] **Bättre admin-auth:** byt från lösenord till Google OAuth med email-allowlist
