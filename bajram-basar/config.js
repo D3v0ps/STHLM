@@ -1,7 +1,7 @@
 // Klistra in Apps Script Web App-URL nedan när Apps Script är deployat.
 // Exempel: https://script.google.com/macros/s/AKfyc.../exec
 window.APP_CONFIG = {
-  appsScriptUrl: "PASTE_APPS_SCRIPT_URL_HERE",
+  appsScriptUrl: "https://script.google.com/macros/s/AKfycbwYXgZ6PirSdCa8aKTpyT0RLnw8TkCpk4zwdSZWSvTD2ENy1Vqh26nxS6u0m7xVF_nP7g/exec",
   adminUrl: "../bajram-admin/",
   // Fallback-data används om Apps Script inte svarar inom 8 sekunder.
   // Innehållet ska matcha det som senare lagras i Google Sheets-fliken Settings,
