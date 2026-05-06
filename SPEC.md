@@ -139,7 +139,7 @@ Google Fonts-länk att inkludera i `<head>`:
 |---|---|---|---|
 | `eventTitle` | `Stockholms Moské Festival` | text | Hero-rubrik |
 | `eventSubtitle` | `Bazaar, öppet hus & familjeaktiviteter` | text | Hero-undertitel |
-| `eventDate` | `Lördag 13 juni` | text | Datumvisning |
+| `eventDate` | `Lördag 30 maj` | text | Datumvisning |
 | `eventTime` | `12:00–19:00` | text | Eventets totaltid |
 | `bazaarTime` | `13:00–17:00` | text | Bazarens specifika tid |
 | `eventLocation` | `Stockholms Moské & Björns trädgård, Medborgarplatsen` | text | Plats |
@@ -165,17 +165,17 @@ Tillåtna `Type`: `text`, `email`, `tel`, `textarea`, `checkbox`, `select`.
 
 | Order | Field ID | Label | Type | Required |
 |---|---|---|---|---|
-| 1 | `name` | Namn och efternamn / Ime i prezime | text | TRUE |
-| 2 | `company` | Företagsnamn, om tillämpligt / Naziv firme, ako postoji | text | FALSE |
+| 1 | `name` | Namn och efternamn | text | TRUE |
+| 2 | `company` | Företagsnamn, om tillämpligt | text | FALSE |
 | 3 | `email` | Email | email | TRUE |
 | 4 | `phone` | Telefon | tel | TRUE |
 | 5 | `websiteSocials` | Webbsida och sociala medier | text | FALSE |
-| 6 | `offering` | Vad planerar du att sälja eller presentera? / Šta planirate prodavati ili predstavljati? | textarea | TRUE |
-| 7 | `standNeeds` | Behov för stånd / Potrebe za štandom | textarea | TRUE |
-| 8 | `consentAccepted` | Jag godkänner villkoren och ansvarar för mitt eget stånd. / Saglasan/na sam sa pravilima događaja i preuzimam odgovornost za svoj štand | checkbox | TRUE |
+| 6 | `offering` | Vad planerar du att sälja eller presentera? | textarea | TRUE |
+| 7 | `standNeeds` | Behov för stånd | textarea | TRUE |
+| 8 | `consentAccepted` | Jag godkänner villkoren och ansvarar för mitt eget stånd. | checkbox | TRUE |
 
 Helper-texter:
-- `offering`: `Beskriv så detaljerat som möjligt. / Molimo opišite što detaljnije.`
+- `offering`: `Beskriv så detaljerat som möjligt.`
 - `standNeeds`: `Behöver du bord? Behöver du el? Hur mycket plats behöver du? Övriga behov?`
 - `websiteSocials` placeholder: `Instagram, TikTok, hemsida eller annan länk`
 
@@ -475,7 +475,7 @@ UX-krav (idiotsäker checklist):
 | Fält | Underlag-text | Flyer-text | Status |
 |---|---|---|---|
 | Eventnamn | Bajramfirande | Festival / Bazaar | ✋ Använd `Festival` som default i Settings |
-| Datum | Sön 31 maj | Lör 13 juni | ✋ Använd `Lördag 13 juni` som default |
+| Datum | Sön 31 maj | Lör 13 juni | ✅ Beslutad: `Lördag 30 maj` |
 | Tid | 13:00–17:00 | 12:00–19:00 | ✋ Använd `12:00–19:00` (event), `13:00–17:00` (bazar) |
 | Plats | Stockholms Moské | Stockholms Moské + Björns trädgård | ✋ Använd kombinerade |
 | Bazaar-pris | Fast / 10 % | – | ✋ Visa INGET pris förrän Yasser bestämt |
