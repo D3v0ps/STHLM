@@ -10,7 +10,7 @@ Bygg en publik landningssida + adminpanel för **Stockholms Moské Festival** (b
 
 **Hybrid-arkitektur:**
 
-- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `stockholmsmoske.se`).
+- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `stockholmsmoske.karimkhalil.se`).
 - **Adminpanel:** Apps Script HtmlService – körs på Google, undviker CORS, säkrare än JWT-i-localStorage på statisk host.
 - **Backend:** Google Apps Script Web App.
 - **Databas/CMS:** Google Sheets (innehåll redigerbart både via admin-UI och direkt i arket).
@@ -23,12 +23,12 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 
 | URL | Innehåll |
 |---|---|
-| `https://stockholmsmoske.se/bajram-basar/` | Publik landningssida + bazaar-formulär |
-| `https://stockholmsmoske.se/bajram-admin/` | Statisk admin-launcher (länkar till Apps Script) |
+| `https://stockholmsmoske.karimkhalil.se/bajram-basar/` | Publik landningssida + bazaar-formulär |
+| `https://stockholmsmoske.karimkhalil.se/bajram-admin/` | Statisk admin-launcher (länkar till Apps Script) |
 | `https://script.google.com/macros/s/.../exec` | Apps Script Web App (backend) |
 | `https://script.google.com/macros/s/.../exec?view=admin` | Riktig adminpanel (HtmlService) |
-| `https://stockholmsmoske.se/bajram-fotboll/` | Framtida (placeholder) |
-| `https://stockholmsmoske.se/bajram-basket-3vs3/` | Framtida (placeholder) |
+| `https://stockholmsmoske.karimkhalil.se/bajram-fotboll/` | Framtida (placeholder) |
+| `https://stockholmsmoske.karimkhalil.se/bajram-basket-3vs3/` | Framtida (placeholder) |
 
 ---
 

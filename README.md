@@ -4,8 +4,8 @@ Publik landningssida + adminpanel för Stockholms Moskés sommarfestival (bazaar
 
 **Live-URL:er** (efter deploy):
 
-- 🌐 Publik: `https://stockholmsmoske.se/bajram-basar/`
-- 🔒 Admin: `https://stockholmsmoske.se/bajram-admin/` → leder till Apps Script
+- 🌐 Publik: `https://stockholmsmoske.karimkhalil.se/bajram-basar/`
+- 🔒 Admin: `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → leder till Apps Script
 
 ## Översikt
 
@@ -76,7 +76,7 @@ GitHub → repo → `Settings` → `Secrets and variables` → `Actions` → `Ne
 
 | Secret | Värde | Var hittar jag det? |
 |---|---|---|
-| `SFTP_HOST` | One.coms SSH-server, t.ex. `ssh.stockholmsmoske.se` | One.com kontrollpanel → `Filhantering` → `SFTP/SSH` |
+| `SFTP_HOST` | One.coms SSH-server, oftast `ssh.<account-id>.service.one` | One.com kontrollpanel → `Filhantering` → `SFTP/SSH` |
 | `SFTP_USER` | SFTP-användarnamn (oftast samma som inloggningen) | Samma vy som ovan |
 | `SFTP_PASSWORD` | SFTP-lösenord | Samma vy som ovan (`Visa/skapa lösenord`) |
 | `SFTP_WEBROOT` | Sökväg till webroot på servern, t.ex. `/httpd.www` eller `/<din-domän>` — UTAN trailing slash | Samma vy. One.coms standard är `/httpd.www`. |
@@ -98,9 +98,9 @@ Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 ### Steg 4: Smoke-test
 
-1. Öppna `https://stockholmsmoske.se/bajram-basar/` — ska visa hero, intro, info-kort, formulär.
+1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-basar/` — ska visa hero, intro, info-kort, formulär.
 2. Skicka en testanmälan. Kontrollera att raden hamnar i Sheetets `Submissions`-flik.
-3. Öppna `https://stockholmsmoske.se/bajram-admin/` → klicka `Öppna adminpanelen` → logga in.
+3. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → klicka `Öppna adminpanelen` → logga in.
 4. Gå till `Översikt` — antalsiffror ska matcha Sheetet.
 5. Ändra något i `Eventinformation`, spara, vänta 5 min eller hård-refresha publika sidan — ändringen ska synas.
 
@@ -110,7 +110,7 @@ Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 Du ska sällan behöva röra koden. Allt innehåll redigeras via adminpanelen:
 
-1. Öppna `https://stockholmsmoske.se/bajram-admin/`
+1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/`
 2. Logga in med adminlösenordet (få från Karim).
 3. Använd flikarna:
    - **Översikt** — se status, öppna/stänga formulär
