@@ -1,0 +1,85 @@
+name: Deploy to One.com
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'bajram-basar/**'
+      - 'bajram-admin/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-onecom
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Mirror static sites to One.com SFTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install lftp
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends lftp
+
+      - name: Validate required secrets
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_WEBROOT: ${{ secrets.SFTP_WEBROOT }}
+        run: |
+          missing=()
+          [ -z "$SFTP_HOST" ]     && missing+=(SFTP_HOST)
+          [ -z "$SFTP_USER" ]     && missing+=(SFTP_USER)
+          [ -z "$SFTP_PASSWORD" ] && missing+=(SFTP_PASSWORD)
+          [ -z "$SFTP_WEBROOT" ]  && missing+=(SFTP_WEBROOT)
+          if [ ${#missing[@]} -ne 0 ]; then
+            echo "::error::Missing repository secrets: ${missing[*]}"
+            echo "Add them under: Settings -> Secrets and variables -> Actions -> New repository secret"
+            exit 1
+          fi
+
+      - name: Mirror bajram-basar/
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_WEBROOT: ${{ secrets.SFTP_WEBROOT }}
+        run: |
+          lftp -u "$SFTP_USER",dummy --env-password "sftp://$SFTP_HOST" <<LFTP_EOF
+          set sftp:auto-confirm yes
+          set net:max-retries 3
+          set net:timeout 30
+          set net:reconnect-interval-base 10
+          set mirror:set-permissions no
+          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store bajram-basar/ "$SFTP_WEBROOT/bajram-basar/"
+          bye
+          LFTP_EOF
+
+      - name: Mirror bajram-admin/
+        env:
+          SFTP_HOST: ${{ secrets.SFTP_HOST }}
+          SFTP_USER: ${{ secrets.SFTP_USER }}
+          LFTP_PASSWORD: ${{ secrets.SFTP_PASSWORD }}
+          SFTP_WEBROOT: ${{ secrets.SFTP_WEBROOT }}
+        run: |
+          lftp -u "$SFTP_USER",dummy --env-password "sftp://$SFTP_HOST" <<LFTP_EOF
+          set sftp:auto-confirm yes
+          set net:max-retries 3
+          set net:timeout 30
+          set net:reconnect-interval-base 10
+          set mirror:set-permissions no
+          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store bajram-admin/ "$SFTP_WEBROOT/bajram-admin/"
+          bye
+          LFTP_EOF
+
+      - name: Summary
+        run: |
+          echo "### Deployed to One.com :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "- bajram-basar/ -> \`\${SFTP_WEBROOT}/bajram-basar/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- bajram-admin/ -> \`\${SFTP_WEBROOT}/bajram-admin/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
