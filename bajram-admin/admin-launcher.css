@@ -1,0 +1,293 @@
+/* Admin-launcher – Stockholms Moské Festival
+   Liten statisk sida som leder vidare till Apps Script-adminpanelen.
+   Använder samma designtokens som publika sidan (se SPEC §4). */
+
+:root {
+  /* Navy / royal blue – primärfärg */
+  --sm-blue-900: #0f1e4a;
+  --sm-blue-800: #172554;
+  --sm-blue-700: #1e3a8a;
+  --sm-blue-600: #1d4ed8;
+  --sm-blue-500: #3b82f6;
+  --sm-blue-50:  #eff6ff;
+
+  /* Innehållssektioner */
+  --sm-cream: #faf7f2;
+  --sm-white: #ffffff;
+  --sm-text: #0f1e4a;
+  --sm-text-muted: #475569;
+  --sm-border: #e2e8f0;
+
+  /* Accenter (sparsamt) */
+  --sm-brass: #c9a961;
+  --sm-success: #16a34a;
+  --sm-error: #dc2626;
+  --sm-warning: #d97706;
+
+  /* Layout */
+  --sm-radius-sm: 8px;
+  --sm-radius-md: 12px;
+  --sm-radius-lg: 20px;
+  --sm-shadow-sm: 0 1px 2px rgba(15,30,74,0.06);
+  --sm-shadow-md: 0 4px 12px rgba(15,30,74,0.08);
+  --sm-shadow-lg: 0 12px 32px rgba(15,30,74,0.12);
+
+  /* Typografi */
+  --sm-font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --sm-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--sm-font-body);
+  background-color: var(--sm-cream);
+  color: var(--sm-text);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header – mörkblå band */
+.admin-launcher__header {
+  background-color: var(--sm-blue-900);
+  color: var(--sm-white);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.admin-launcher__brand {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.admin-launcher__title {
+  margin: 0;
+  font-family: var(--sm-font-display);
+  font-weight: 600;
+  font-size: 1.625rem;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+/* Main – centrerad kort-layout */
+.admin-launcher__main {
+  flex: 1;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 64px 24px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.admin-launcher__card {
+  width: 100%;
+  background-color: var(--sm-white);
+  border: 1px solid var(--sm-border);
+  border-radius: var(--sm-radius-lg);
+  box-shadow: var(--sm-shadow-md);
+  padding: 40px;
+}
+
+.admin-launcher__heading {
+  margin: 0 0 14px;
+  font-family: var(--sm-font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--sm-text);
+  line-height: 1.25;
+}
+
+.admin-launcher__lede {
+  margin: 0 0 28px;
+  color: var(--sm-text-muted);
+  font-size: 1rem;
+}
+
+/* Primär CTA-knapp */
+.admin-launcher__cta {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background-color: var(--sm-blue-600);
+  color: var(--sm-white);
+  text-decoration: none;
+  font-family: var(--sm-font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 14px 28px;
+  border: 1px solid var(--sm-blue-600);
+  border-radius: var(--sm-radius-md);
+  box-shadow: var(--sm-shadow-sm);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.admin-launcher__cta:hover,
+.admin-launcher__cta:focus-visible {
+  background-color: var(--sm-blue-700);
+  border-color: var(--sm-blue-700);
+  box-shadow: var(--sm-shadow-md);
+}
+
+.admin-launcher__cta:focus-visible {
+  outline: 3px solid var(--sm-blue-500);
+  outline-offset: 2px;
+}
+
+.admin-launcher__cta:active {
+  transform: translateY(1px);
+}
+
+.admin-launcher__cta--disabled {
+  background-color: #94a3b8;
+  border-color: #94a3b8;
+  cursor: not-allowed;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Varningsblock när URL saknas */
+.admin-launcher__warning {
+  margin-top: 24px;
+  background-color: #fef3c7;
+  border-left: 4px solid var(--sm-warning);
+  border-radius: var(--sm-radius-sm);
+  padding: 16px;
+  color: #78350f;
+  font-size: 0.9375rem;
+}
+
+.admin-launcher__warning strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #78350f;
+}
+
+.admin-launcher__warning p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.admin-launcher__warning code {
+  background-color: rgba(120, 53, 15, 0.1);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.875em;
+}
+
+.admin-launcher__warning a {
+  color: #78350f;
+  font-weight: 600;
+}
+
+/* Sekundär-länk */
+.admin-launcher__back {
+  display: inline-block;
+  margin-top: 28px;
+  color: var(--sm-text-muted);
+  text-decoration: none;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: color 160ms ease;
+}
+
+.admin-launcher__back:hover,
+.admin-launcher__back:focus-visible {
+  color: var(--sm-blue-700);
+  text-decoration: underline;
+}
+
+.admin-launcher__back:focus-visible {
+  outline: 2px solid var(--sm-blue-500);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Footer */
+.admin-launcher__footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--sm-text-muted);
+  font-size: 0.875rem;
+}
+
+.admin-launcher__footer p {
+  margin: 0;
+}
+
+.admin-launcher__footer a {
+  color: var(--sm-blue-700);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.admin-launcher__footer a:hover,
+.admin-launcher__footer a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Mobile-anpassningar */
+@media (max-width: 480px) {
+  .admin-launcher__header {
+    padding: 22px 18px;
+  }
+
+  .admin-launcher__title {
+    font-size: 1.375rem;
+  }
+
+  .admin-launcher__main {
+    padding: 32px 16px;
+  }
+
+  .admin-launcher__card {
+    padding: 28px 22px;
+    border-radius: var(--sm-radius-md);
+  }
+
+  .admin-launcher__heading {
+    font-size: 1.3125rem;
+  }
+
+  .admin-launcher__lede {
+    font-size: 0.9375rem;
+  }
+
+  .admin-launcher__cta {
+    padding: 13px 22px;
+    font-size: 0.9375rem;
+  }
+
+  .admin-launcher__footer {
+    padding: 20px 16px;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Reduced motion-stöd */
+@media (prefers-reduced-motion: reduce) {
+  .admin-launcher__cta,
+  .admin-launcher__back {
+    transition: none;
+  }
+
+  .admin-launcher__cta:active {
+    transform: none;
+  }
+}
