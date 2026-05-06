@@ -10,16 +10,17 @@ Publik landningssida + adminpanel för Stockholms Moskés sommarfestival (bazaar
 ## Översikt
 
 - **Publik sida** är vanilla HTML/CSS/JS. Inga build-steg. Laddas upp via SFTP till One.com.
-- **Adminpanel** körs i Google Apps Script (HtmlService) — undviker CORS, säkrare än lösenord på statisk host.
-- **Backend** är Apps Script Web App.
+- **Adminpanel** är en static SPA (vanilla HTML/CSS/JS) på One.com. Pratar med Apps Script via `fetch` POST med `Content-Type: text/plain` (för att undvika CORS-preflight).
+- **Backend** är Apps Script Web App. `doPost` dispatchar admin-actions via `adminDispatch_` i `Code.gs`.
 - **Databas/CMS** är Google Sheets — admin redigerar antingen via panelen eller direkt i arket.
 
 ```
 Browser ──HTTP──▶ One.com (statiska filer)
                        │
-                       │  JSONP / fetch
+                       │  JSONP (publik läs) / fetch POST (publik submit + admin)
                        ▼
               Google Apps Script Web App
+                  (doGet + doPost)
                        │
                        ▼
                  Google Sheets
@@ -33,7 +34,7 @@ Browser ──HTTP──▶ One.com (statiska filer)
 ├── README.md                       # Denna fil
 ├── TODO.md                         # Öppna punkter
 ├── bajram-basar/                   # Publik sida → SFTP till One.com
-├── bajram-admin/                   # Admin-launcher → SFTP till One.com
+├── bajram-admin/                   # Adminpanel (static SPA) → SFTP till One.com
 └── google-apps-script/             # Backend-källkod, kopieras manuellt till Apps Script-editorn
 ```
 
@@ -145,7 +146,7 @@ Du sätter upp systemet och underhåller koden. Se `google-apps-script/README.md
 ## Tekniska val — varför hybrid-arkitektur?
 
 - **Vanilla JS på One.com** istället för React/Vite: överlevnadsbart för framtida ägare som inte kan moderna build-pipelines. Inga `npm install`, inga `dist/`-mappar, inga deployment-bekymmer. Bara filer.
-- **Apps Script HtmlService för admin** istället för React-admin på One.com: lösenord/token bor på Google, inte på vår statiska host. CORS-problem upphör eftersom admin och backend är samma origin.
+- **Static SPA på One.com för admin** med fetch-anrop till Apps Script: hela panelen körs på samma domän som publika sidan, ingen mellansida som öppnar Apps Script i ny flik. Lösenordet hashas server-side i Apps Script — bara hash + salt lagras (i Script Properties). Token bor i `sessionStorage` (försvinner när fliken stängs). Apps Script `doPost` dispatchar `adminAction` via en whitelistad mappning i `adminDispatch_`.
 - **Google Sheets som CMS** istället för en riktig databas: föreningens medlemmar kan redigera direkt i arket även när panelen är nere. Audit-trail är gratis (versionshistorik). Backup är gratis (Drive). Ingen DB-server att underhålla.
 - **JSONP för publika läsningar** istället för fetch: Apps Script svarar fragmenterat på CORS-preflight; JSONP funkar överallt. Det är gammalt men robust.
 - **`Content-Type: text/plain` för POST** istället för `application/json`: undviker CORS-preflight som Apps Script inte hanterar väl.

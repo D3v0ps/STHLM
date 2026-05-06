@@ -11,8 +11,8 @@ Bygg en publik landningssida + adminpanel för **Stockholms Moské Festival** (b
 **Hybrid-arkitektur:**
 
 - **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `stockholmsmoske.karimkhalil.se`).
-- **Adminpanel:** Apps Script HtmlService – körs på Google, undviker CORS, säkrare än JWT-i-localStorage på statisk host.
-- **Backend:** Google Apps Script Web App.
+- **Adminpanel:** Vanilla HTML/CSS/JS static SPA på One.com (subkatalog `/bajram-admin/`). Pratar med backend via fetch POST med `Content-Type: text/plain`.
+- **Backend:** Google Apps Script Web App. `doPost` dispatchar admin-actions via whitelistad mappning i `adminDispatch_`. `requireAuth_` validerar token mot CacheService för varje skyddad operation.
 - **Databas/CMS:** Google Sheets (innehåll redigerbart både via admin-UI och direkt i arket).
 
 Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
