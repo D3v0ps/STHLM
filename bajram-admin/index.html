@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin – Stockholms Moské Festival</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300..700&display=swap">
+
+  <link rel="stylesheet" href="admin-launcher.css">
+</head>
+<body>
+  <header class="admin-launcher__header">
+    <p class="admin-launcher__brand">Islamiska Förbundet · Stockholms Moské</p>
+    <h1 class="admin-launcher__title">Admin – Stockholms Moské Festival</h1>
+  </header>
+
+  <main class="admin-launcher__main">
+    <section class="admin-launcher__card" aria-labelledby="launcher-heading">
+      <h2 id="launcher-heading" class="admin-launcher__heading">Logga in i adminpanelen</h2>
+      <p class="admin-launcher__lede">
+        Adminpanelen öppnas i ett säkert gränssnitt kopplat till Google Sheets.
+        Klicka på knappen nedan för att logga in.
+      </p>
+
+      <a id="adminCta"
+         class="admin-launcher__cta"
+         href="#"
+         target="_blank"
+         rel="noopener noreferrer">
+        Öppna adminpanelen
+      </a>
+
+      <div id="adminWarning" class="admin-launcher__warning" hidden>
+        <strong>Adminpanel inte konfigurerad ännu</strong>
+        <p>
+          Filen <code>config.js</code> innehåller fortfarande en platshållare.
+          Klistra in Apps Script Web App-URL:en innan du laddar upp mappen.
+          Se <a href="README.md">README.md</a> för instruktioner.
+        </p>
+      </div>
+
+      <a class="admin-launcher__back" href="https://stockholmsmoske.se">
+        ← Tillbaka till stockholmsmoske.se
+      </a>
+    </section>
+  </main>
+
+  <footer class="admin-launcher__footer">
+    <p>Saknar du behörighet? Kontakta <a href="mailto:info@stockholmsmoske.se">info@stockholmsmoske.se</a></p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script>
+    (function () {
+      var PLACEHOLDER = "PASTE_ADMIN_WEB_APP_URL_HERE";
+      var cfg = (window.ADMIN_CONFIG || {});
+      var url = (cfg.adminWebAppUrl || "").trim();
+      var cta = document.getElementById("adminCta");
+      var warning = document.getElementById("adminWarning");
+
+      if (!url || url === PLACEHOLDER) {
+        if (cta) {
+          cta.setAttribute("aria-disabled", "true");
+          cta.classList.add("admin-launcher__cta--disabled");
+          cta.removeAttribute("href");
+          cta.addEventListener("click", function (e) { e.preventDefault(); });
+        }
+        if (warning) warning.hidden = false;
+        return;
+      }
+
+      if (cta) cta.setAttribute("href", url);
+    })();
+  </script>
+</body>
+</html>
