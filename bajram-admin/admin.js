@@ -1,11 +1,11 @@
-<script>
 /**
- * AdminJS – klient-side JS för adminpanelen.
- * Körs inuti Apps Script HtmlService. Kommunicerar med Code.gs via google.script.run.
+ * admin.js – klient-side JS för adminpanelen.
+ * Körs som static SPA på One.com. Pratar med Apps Script Web App via fetch POST
+ * (Content-Type: text/plain för att undvika CORS-preflight).
  *
  * Innehåll:
  *  - State + token-hantering (sessionStorage)
- *  - google.script.run Promise-wrapper
+ *  - fetch Promise-wrapper (runServer)
  *  - Login / logout
  *  - Tab-navigation
  *  - Render: översikt, eventform, frågor, anmälningar, utställare, sociala medier, sport-sidor
@@ -80,28 +80,60 @@
   };
 
   // ============================================================
-  // GOOGLE.SCRIPT.RUN PROMISE-WRAPPER
+  // FETCH-WRAPPER MOT APPS SCRIPT WEB APP
   // ============================================================
 
   /**
-   * Anropar en backend-funktion via google.script.run och returnerar Promise.
-   * @param {string} fnName  Namn på server-funktionen.
-   * @param {...*}   args    Argument till server-funktionen.
+   * POST:ar { adminAction, args } till Apps Script Web App och returnerar
+   * svaret som JSON. Använder text/plain Content-Type så Apps Script kan
+   * läsa kroppen utan att browsern utlöser CORS-preflight.
+   *
+   * @param {string} fnName  Namn på server-funktion (måste finnas i adminDispatch_).
+   * @param {...*}   args    Argument som vidarebefordras till server-funktionen.
+   * @return {Promise<*>}    Svaret deserialiserat från JSON.
    */
   function runServer(fnName, ...args) {
-    return new Promise(function(resolve, reject) {
-      try {
-        if (typeof google === 'undefined' || !google.script || !google.script.run) {
-          reject(new Error('google.script.run är inte tillgänglig.'));
-          return;
-        }
-        google.script.run
-          .withSuccessHandler(function(result) { resolve(result); })
-          .withFailureHandler(function(err) { reject(err); })
-          [fnName].apply(null, args);
-      } catch (e) {
-        reject(e);
+    const cfg = window.ADMIN_CONFIG || {};
+    const url = (cfg.adminWebAppUrl || '').trim();
+    if (!url) {
+      return Promise.reject(new Error('ADMIN_CONFIG.adminWebAppUrl saknas i config.js.'));
+    }
+    const body = JSON.stringify({ adminAction: fnName, args: args });
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: body,
+      redirect: 'follow',
+      cache: 'no-store',
+      credentials: 'omit'
+    }).then(function(res) {
+      if (!res.ok) {
+        throw new Error('HTTP ' + res.status + ' från Apps Script.');
       }
+      return res.json();
+    }).then(function(json) {
+      if (!json || typeof json !== 'object') {
+        throw new Error('invalid_response');
+      }
+      if (json.ok === false) {
+        const code = json.error || 'unknown_error';
+        const err = new Error(code + (json.message ? ': ' + json.message : ''));
+        err.code = code;
+        err.userMessage = json.message || '';
+        throw err;
+      }
+      // Plocka ut json.data om det finns, annars returnera hela objektet utan ok-fältet
+      // så att t.ex. validateSession kan läsa res.valid direkt.
+      if (Object.prototype.hasOwnProperty.call(json, 'data')) {
+        return json.data;
+      }
+      const out = {};
+      for (const k in json) {
+        if (k !== 'ok' && Object.prototype.hasOwnProperty.call(json, k)) {
+          out[k] = json[k];
+        }
+      }
+      return out;
     });
   }
 
@@ -273,16 +305,9 @@
 
     try {
       const result = await runServer('loginAdmin', password);
-      if (!result || !result.ok) {
-        const code = (result && result.error) || 'unknown';
-        const msg = {
-          invalid_password: 'Fel lösenord. Försök igen.',
-          rate_limited: 'För många misslyckade försök. Försök igen om 15 minuter.',
-          not_configured: 'Adminlösenord är inte satt. Kontakta utvecklaren.',
-          missing_password: 'Skriv in lösenordet.'
-        }[code] || 'Något gick fel. Försök igen.';
+      if (!result || !result.token) {
         if (errEl) {
-          errEl.textContent = msg;
+          errEl.textContent = 'Inget token från servern. Kontakta utvecklaren.';
           errEl.hidden = false;
         }
         return;
@@ -292,8 +317,15 @@
       showDashboard();
       await loadData();
     } catch (err) {
+      const code = (err && err.code) || 'unknown';
+      const msg = {
+        invalid_password: 'Fel lösenord. Försök igen.',
+        rate_limited: 'För många misslyckade försök. Försök igen om 15 minuter.',
+        not_configured: 'Adminlösenord är inte satt. Kontakta utvecklaren.',
+        missing_password: 'Skriv in lösenordet.'
+      }[code] || (err && err.userMessage) || 'Tekniskt fel: kunde inte nå servern. Kontakta utvecklaren.';
       if (errEl) {
-        errEl.textContent = 'Tekniskt fel: kunde inte nå servern. Kontakta utvecklaren.';
+        errEl.textContent = msg;
         errEl.hidden = false;
       }
     } finally {
@@ -332,8 +364,11 @@
    * Hanterar både Error-objekt och vanliga strängar.
    */
   function isAuthError(err) {
+    if (err && err.code === 'unauthorized') return true;
     const msg = err && err.message ? String(err.message) : String(err || '');
-    return msg.indexOf('invalid_token') !== -1 || msg.indexOf('expired_token') !== -1;
+    return msg.indexOf('unauthorized') !== -1
+        || msg.indexOf('invalid_token') !== -1
+        || msg.indexOf('expired_token') !== -1;
   }
 
   async function handleAuthError() {
@@ -2053,4 +2088,3 @@
   }
 
 })();
-</script>

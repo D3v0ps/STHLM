@@ -381,14 +381,67 @@ function doPost(e) {
   try {
     const body = parseRequestBody_(e);
     const action = (body && body.action) || '';
+    const adminAction = (body && body.adminAction) || '';
+
     if (action === 'submit') {
-      const result = handleSubmit_(body);
-      return jsonResponse_(result);
+      return jsonResponse_(handleSubmit_(body));
     }
+
+    if (adminAction) {
+      return jsonResponse_(adminDispatch_(adminAction, body));
+    }
+
     return jsonResponse_({ ok: false, error: 'unknown_action' });
   } catch (err) {
     console.error('doPost error: ' + err + '\n' + (err && err.stack));
     return jsonResponse_({ ok: false, error: 'internal_error' });
+  }
+}
+
+/**
+ * Dispatcher för adminoperationer som anropas från static admin-SPA på
+ * One.com via fetch POST. Whitelistar exakt vilka funktioner som får anropas
+ * och mappar inkommande args-array till deras signaturer.
+ *
+ * @param {string} action  Namn på admin-funktion.
+ * @param {Object} body    Hela request-body. body.args är arrayen med argument.
+ * @return {Object}
+ */
+function adminDispatch_(action, body) {
+  const args = (body && body.args) || [];
+  switch (action) {
+    case 'loginAdmin':
+      return loginAdmin(args[0]);
+    case 'logoutAdmin':
+      return logoutAdmin(args[0]);
+    case 'validateSession':
+      return validateSession(args[0]);
+    case 'getAdminData':
+      return getAdminData(args[0]);
+    case 'getOverview':
+      return getOverview(args[0]);
+    case 'saveSettings':
+      return saveSettings(args[0], args[1]);
+    case 'saveFormQuestions':
+      return saveFormQuestions(args[0], args[1]);
+    case 'saveExhibitors':
+      return saveExhibitors(args[0], args[1]);
+    case 'saveSocialLinks':
+      return saveSocialLinks(args[0], args[1]);
+    case 'saveSportsPages':
+      return saveSportsPages(args[0], args[1]);
+    case 'getSubmissions':
+      return getSubmissions(args[0], args[1]);
+    case 'updateSubmissionStatus':
+      return updateSubmissionStatus(args[0], args[1], args[2], args[3]);
+    case 'createExhibitorFromSubmission':
+      return createExhibitorFromSubmission(args[0], args[1], args[2]);
+    case 'deleteExhibitor':
+      return deleteExhibitor(args[0], args[1]);
+    case 'exportSubmissionsCsv':
+      return exportSubmissionsCsv(args[0]);
+    default:
+      return { ok: false, error: 'unknown_admin_action' };
   }
 }
 
@@ -1589,7 +1642,7 @@ const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är
 const DEFAULT_SETTINGS = [
   ['eventTitle', 'Stockholms Moské Festival', 'text', 'Eventets titel', 'Hero-rubrik på publika sidan.'],
   ['eventSubtitle', 'Bazaar, öppet hus & familjeaktiviteter', 'text', 'Undertitel', 'Visas under huvudrubriken.'],
-  ['eventDate', 'Lördag 13 juni', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
+  ['eventDate', 'Lördag 30 maj', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],
   ['bazaarTime', '13:00–17:00', 'text', 'Bazarens tid', 'Specifik tid för bazaren.'],
   ['eventLocation', 'Stockholms Moské & Björns trädgård, Medborgarplatsen', 'text', 'Plats', 'Visas i hero och info-kort.'],
@@ -1610,14 +1663,14 @@ const DEFAULT_SETTINGS = [
  * FormQuestions-rader: [Order, Field ID, Label, Helper Text, Placeholder, Type, Required, Active, Options].
  */
 const DEFAULT_FORM_QUESTIONS = [
-  [1, 'name', 'Namn och efternamn / Ime i prezime', '', 'För- och efternamn', 'text', 'TRUE', 'TRUE', ''],
-  [2, 'company', 'Företagsnamn, om tillämpligt / Naziv firme, ako postoji', '', 'Lämna tomt om du anmäler dig privat', 'text', 'FALSE', 'TRUE', ''],
+  [1, 'name', 'Namn och efternamn', '', 'För- och efternamn', 'text', 'TRUE', 'TRUE', ''],
+  [2, 'company', 'Företagsnamn, om tillämpligt', '', 'Lämna tomt om du anmäler dig privat', 'text', 'FALSE', 'TRUE', ''],
   [3, 'email', 'Email', '', 'din@epost.se', 'email', 'TRUE', 'TRUE', ''],
   [4, 'phone', 'Telefon', '', '+46 70 123 45 67', 'tel', 'TRUE', 'TRUE', ''],
   [5, 'websiteSocials', 'Webbsida och sociala medier', '', 'Instagram, TikTok, hemsida eller annan länk', 'text', 'FALSE', 'TRUE', ''],
-  [6, 'offering', 'Vad planerar du att sälja eller presentera? / Šta planirate prodavati ili predstavljati?', 'Beskriv så detaljerat som möjligt. / Molimo opišite što detaljnije.', '', 'textarea', 'TRUE', 'TRUE', ''],
-  [7, 'standNeeds', 'Behov för stånd / Potrebe za štandom', 'Behöver du bord? Behöver du el? Hur mycket plats behöver du? Övriga behov?', '', 'textarea', 'TRUE', 'TRUE', ''],
-  [8, 'consentAccepted', 'Jag godkänner villkoren och ansvarar för mitt eget stånd. / Saglasan/na sam sa pravilima događaja i preuzimam odgovornost za svoj štand', '', '', 'checkbox', 'TRUE', 'TRUE', '']
+  [6, 'offering', 'Vad planerar du att sälja eller presentera?', 'Beskriv så detaljerat som möjligt.', '', 'textarea', 'TRUE', 'TRUE', ''],
+  [7, 'standNeeds', 'Behov för stånd', 'Behöver du bord? Behöver du el? Hur mycket plats behöver du? Övriga behov?', '', 'textarea', 'TRUE', 'TRUE', ''],
+  [8, 'consentAccepted', 'Jag godkänner villkoren och ansvarar för mitt eget stånd.', '', '', 'checkbox', 'TRUE', 'TRUE', '']
 ];
 
 /**

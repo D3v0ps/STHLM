@@ -10,7 +10,7 @@ window.APP_CONFIG = {
     settings: {
       eventTitle: "Stockholms Moské Festival",
       eventSubtitle: "Bazaar, öppet hus & familjeaktiviteter",
-      eventDate: "Lördag 13 juni",
+      eventDate: "Lördag 30 maj",
       eventTime: "12:00–19:00",
       bazaarTime: "13:00–17:00",
       eventLocation: "Stockholms Moské & Björns trädgård, Medborgarplatsen",
@@ -30,7 +30,7 @@ window.APP_CONFIG = {
       {
         order: 1,
         fieldId: "name",
-        label: "Namn och efternamn / Ime i prezime",
+        label: "Namn och efternamn",
         helperText: "",
         placeholder: "",
         type: "text",
@@ -41,7 +41,7 @@ window.APP_CONFIG = {
       {
         order: 2,
         fieldId: "company",
-        label: "Företagsnamn, om tillämpligt / Naziv firme, ako postoji",
+        label: "Företagsnamn, om tillämpligt",
         helperText: "",
         placeholder: "",
         type: "text",
@@ -85,8 +85,8 @@ window.APP_CONFIG = {
       {
         order: 6,
         fieldId: "offering",
-        label: "Vad planerar du att sälja eller presentera? / Šta planirate prodavati ili predstavljati?",
-        helperText: "Beskriv så detaljerat som möjligt. / Molimo opišite što detaljnije.",
+        label: "Vad planerar du att sälja eller presentera?",
+        helperText: "Beskriv så detaljerat som möjligt.",
         placeholder: "",
         type: "textarea",
         required: true,
@@ -96,7 +96,7 @@ window.APP_CONFIG = {
       {
         order: 7,
         fieldId: "standNeeds",
-        label: "Behov för stånd / Potrebe za štandom",
+        label: "Behov för stånd",
         helperText: "Behöver du bord? Behöver du el? Hur mycket plats behöver du? Övriga behov?",
         placeholder: "",
         type: "textarea",
@@ -107,7 +107,7 @@ window.APP_CONFIG = {
       {
         order: 8,
         fieldId: "consentAccepted",
-        label: "Jag godkänner villkoren och ansvarar för mitt eget stånd. / Saglasan/na sam sa pravilima događaja i preuzimam odgovornost za svoj štand",
+        label: "Jag godkänner villkoren och ansvarar för mitt eget stånd.",
         helperText: "",
         placeholder: "",
         type: "checkbox",

@@ -5,7 +5,7 @@
 ## Innehåll – behöver beslut/leverans
 
 - [ ] **Eventnamn:** Festival vs Bajramfirande – Yasser bekräftar slutgiltigt namn (default i koden: "Stockholms Moské Festival")
-- [ ] **Datum:** Lör 13 juni vs Sön 31 maj – Yasser bekräftar (default: "Lördag 13 juni")
+- [x] **Datum:** Lördag 30 maj 2026
 - [ ] **Tid:** 12:00–19:00 (event) + 13:00–17:00 (bazaar) — Yasser bekräftar
 - [ ] **Plats:** "Stockholms Moské & Björns trädgård" — Yasser bekräftar
 - [ ] **Bazaar-pris:** Yasser bestämmer fast pris (eller om gratis). Sätts senare i adminpanelen, ingen kodändring.
