@@ -23,24 +23,55 @@
    * Settings-fält i ordningen från SPEC §5. Type styr renderingen.
    * help = hjälptext under inputen.
    */
+  const EVENT_SECTIONS = [
+    { id: 'identity', title: 'Eventets identitet', subtitle: 'Texten som dominerar publika sidans hero-sektion.' },
+    { id: 'dateplace', title: 'Datum, tid & plats', subtitle: 'Visas i hero-strippen och i info-blocket längre ner.' },
+    { id: 'visitors', title: 'Förväntade besökare', subtitle: 'Siffrorna visas som info till anmälare så de förstår skalan på eventet.' },
+    { id: 'visibility', title: 'Anmälan & synlighet', subtitle: 'Slå av/på funktioner på publika sidan utan att behöva röra något annat.' },
+    { id: 'descriptions', title: 'Basarens beskrivningar', subtitle: 'Texter som visas tillsammans med anmälningsformuläret.' },
+    { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' }
+  ];
+
   const SETTINGS_FIELDS = [
-    { key: 'eventTitle',         label: 'Eventets titel',                         type: 'text',     help: 'Stor rubrik längst upp på publika sidan.' },
-    { key: 'eventSubtitle',      label: 'Undertitel',                             type: 'text',     help: 'Visas under titeln. Kort beskrivning av eventet.' },
-    { key: 'eventDate',          label: 'Datum',                                  type: 'text',     help: 'T.ex. "Lördag 30 maj".' },
-    { key: 'eventTime',          label: 'Tid (hela eventet)',                     type: 'text',     help: 'T.ex. "12:00–19:00".' },
-    { key: 'bazaarTime',         label: 'Basarens tid',                           type: 'text',     help: 'T.ex. "13:00–17:00".' },
-    { key: 'eventLocation',      label: 'Plats',                                  type: 'text',     help: 'Visas i hero-sektionen och i info-kort.' },
-    { key: 'expectedChildren',   label: 'Förväntat antal barn',                   type: 'number',   help: 'Visas som info till anmälare.' },
-    { key: 'expectedAdults',     label: 'Förväntat antal vuxna',                  type: 'number',   help: 'Visas som info till anmälare.' },
-    { key: 'registrationOpen',   label: 'Anmälan öppen',                          type: 'boolean',  help: 'Av: utställarlistan visas istället för formuläret.' },
-    { key: 'showExhibitors',     label: 'Visa utställarlistan',                   type: 'boolean',  help: 'Av: dölj listan helt på publika sidan.' },
-    { key: 'heroButtonText',     label: 'Knapptext (primär CTA)',                 type: 'text',     help: 'Texten på den stora knappen i hero-sektionen.' },
-    { key: 'introText',          label: 'Introtext',                              type: 'textarea', help: 'Inledande beskrivning av eventet.' },
-    { key: 'whoCanApplyText',    label: 'Vem kan anmäla sig?',                    type: 'textarea', help: 'Förklaring av vem som får ansöka.' },
-    { key: 'selectionText',      label: 'Så görs urvalet',                        type: 'textarea', help: 'Förklaring av urvalsprocessen.' },
-    { key: 'importantInfoText',  label: 'Viktigt att känna till',                 type: 'textarea', help: 'Punktlista med viktiga villkor (en punkt per rad).' },
-    { key: 'successMessage',     label: 'Tackmeddelande efter anmälan',           type: 'text',     help: 'Visas när anmälan har skickats.' },
-    { key: 'closedMessage',      label: 'Meddelande när anmälan är stängd',       type: 'text',     help: 'Visas ovanför utställarlistan när anmälan är avstängd.' }
+    { key: 'eventTitle',       label: 'Eventets titel',                   type: 'text',     section: 'identity',    span: 6,
+      help: 'Stor rubrik längst upp på publika sidan.' },
+    { key: 'eventSubtitle',    label: 'Undertitel (kursiv)',              type: 'text',     section: 'identity',    span: 6,
+      help: 'Visas under titeln i kursiv mässing-färg.' },
+    { key: 'introText',        label: 'Introtext',                        type: 'textarea', section: 'identity',    span: 12,
+      help: 'Inledande beskrivning under hero-rubriken. Cirka 1–2 meningar.', rows: 3 },
+
+    { key: 'eventDate',        label: 'Datum (visning)',                  type: 'text',     section: 'dateplace',   span: 4,
+      help: 'T.ex. "Lördag 30 maj". Skriv som du vill att besökaren ska läsa det.' },
+    { key: 'eventTime',        label: 'Tid (hela eventet)',               type: 'text',     section: 'dateplace',   span: 4,
+      help: 'T.ex. "12:00–19:00".' },
+    { key: 'bazaarTime',       label: 'Basarens tid',                     type: 'text',     section: 'dateplace',   span: 4,
+      help: 'T.ex. "13:00–17:00".' },
+    { key: 'eventLocation',    label: 'Plats',                            type: 'text',     section: 'dateplace',   span: 12,
+      help: 'Visas i hero-sektionen och i info-blocket.' },
+
+    { key: 'expectedChildren', label: 'Förväntat antal barn',             type: 'number',   section: 'visitors',    span: 6 },
+    { key: 'expectedAdults',   label: 'Förväntat antal vuxna',            type: 'number',   section: 'visitors',    span: 6 },
+
+    { key: 'registrationOpen', label: 'Anmälan öppen',                    type: 'boolean',  section: 'visibility',
+      help: 'När påslaget visas anmälningsformuläret. När avstängd visas utställarlistan istället.',
+      badgeOn: 'Öppen', badgeOff: 'Stängd' },
+    { key: 'showExhibitors',   label: 'Visa utställarlistan',             type: 'boolean',  section: 'visibility',
+      help: 'När avstängd döljs utställarlistan helt på publika sidan.',
+      badgeOn: 'Synlig', badgeOff: 'Dold' },
+    { key: 'heroButtonText',   label: 'Knapptext (primär CTA)',           type: 'text',     section: 'visibility',  span: 12,
+      help: 'Texten på den stora knappen i hero-sektionen.' },
+
+    { key: 'whoCanApplyText',  label: 'Vem kan anmäla sig?',              type: 'textarea', section: 'descriptions', span: 12,
+      help: 'Förklaring av vem som får ansöka.', rows: 3 },
+    { key: 'selectionText',    label: 'Så görs urvalet',                  type: 'textarea', section: 'descriptions', span: 12,
+      help: 'Förklaring av urvalsprocessen.', rows: 3 },
+    { key: 'importantInfoText',label: 'Viktigt att känna till',           type: 'textarea', section: 'descriptions', span: 12,
+      help: 'Punktlista med viktiga villkor (en punkt per rad).', rows: 4 },
+
+    { key: 'successMessage',   label: 'Tackmeddelande efter anmälan',     type: 'text',     section: 'messages',    span: 12,
+      help: 'Visas när anmälan har skickats.' },
+    { key: 'closedMessage',    label: 'Meddelande när anmälan är stängd', type: 'text',     section: 'messages',    span: 12,
+      help: 'Visas ovanför utställarlistan när anmälan är avstängd.' }
   ];
 
   const QUESTION_TYPES = [
@@ -200,7 +231,20 @@
     const saveSportsBtn = document.getElementById('save-sports-btn');
     if (saveSportsBtn) saveSportsBtn.addEventListener('click', handleSportsSave);
 
-    // Submissions
+    // Submissions filter pills (Alla / Nya / Granskar / Godkända / Kontaktade / Nekade)
+    document.querySelectorAll('.filter-tab').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const value = btn.getAttribute('data-filter') || 'all';
+        document.querySelectorAll('.filter-tab').forEach(function(other) {
+          const isActive = other === btn;
+          other.classList.toggle('is-active', isActive);
+          other.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        state.submissionsFilter.status = value;
+        renderSubmissionsTable();
+      });
+    });
+    // Behåll dropdown-fallback för kompatibilitet
     const subFilter = document.getElementById('submissions-filter');
     if (subFilter) subFilter.addEventListener('change', function() {
       state.submissionsFilter.status = subFilter.value;
@@ -289,10 +333,37 @@
     const dashView = document.getElementById('dashboard-view');
     if (loginView) loginView.hidden = true;
     if (dashView) dashView.hidden = false;
+    // Visa user-pill
+    const userPill = document.getElementById('user-pill');
+    if (userPill) userPill.hidden = false;
+    updateLastSaved();
     // Återställ senast aktiv flik
     const savedTab = sessionStorage.getItem('smf_admin_tab') || 'overview';
     activateTab(savedTab);
   }
+
+  // ============================================================
+  // Topbar live-chip — uppdateras efter varje sparning
+  // ============================================================
+  let lastSavedAt = null;
+  function updateLastSaved() {
+    lastSavedAt = Date.now();
+    renderLastSaved();
+  }
+  function renderLastSaved() {
+    const el = document.getElementById('last-saved');
+    if (!el) return;
+    if (!lastSavedAt) { el.textContent = 'just nu'; return; }
+    const sec = Math.floor((Date.now() - lastSavedAt) / 1000);
+    let text;
+    if (sec < 30) text = 'just nu';
+    else if (sec < 60) text = 'för någon minut sedan';
+    else if (sec < 3600) text = 'för ' + Math.floor(sec / 60) + ' min sedan';
+    else if (sec < 86400) text = 'för ' + Math.floor(sec / 3600) + ' h sedan';
+    else text = 'för ' + Math.floor(sec / 86400) + ' dagar sedan';
+    el.textContent = text;
+  }
+  setInterval(renderLastSaved, 30000);
 
   function clearToken() {
     state.token = null;
@@ -580,89 +651,230 @@
 
     const settings = (state.data && state.data.settings) || {};
 
-    SETTINGS_FIELDS.forEach(function(field) {
-      const wrap = document.createElement('div');
-      wrap.className = 'form-row form-row--' + field.type;
+    EVENT_SECTIONS.forEach(function(section) {
+      const fields = SETTINGS_FIELDS.filter(function(f) { return f.section === section.id; });
+      if (!fields.length) return;
 
-      const labelEl = document.createElement('label');
-      labelEl.setAttribute('for', 'set-' + field.key);
-      labelEl.textContent = field.label;
+      const card = document.createElement('section');
+      card.className = 'section-card';
 
-      let inputEl;
-      const value = settings[field.key];
+      const head = document.createElement('div');
+      head.className = 'section-card__head';
+      const headInner = document.createElement('div');
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'section-card__title';
+      titleEl.textContent = section.title;
+      headInner.appendChild(titleEl);
+      if (section.subtitle) {
+        const subEl = document.createElement('p');
+        subEl.className = 'section-card__subtitle';
+        subEl.textContent = section.subtitle;
+        headInner.appendChild(subEl);
+      }
+      head.appendChild(headInner);
+      card.appendChild(head);
 
-      if (field.type === 'boolean') {
-        const toggleWrap = document.createElement('label');
-        toggleWrap.className = 'toggle';
+      const body = document.createElement('div');
+      body.className = 'section-card__body';
 
-        inputEl = document.createElement('input');
-        inputEl.type = 'checkbox';
-        inputEl.id = 'set-' + field.key;
-        inputEl.dataset.settingKey = field.key;
-        inputEl.dataset.settingType = 'boolean';
-        inputEl.checked = !!value;
+      const toggles = fields.filter(function(f) { return f.type === 'boolean'; });
+      const grids = fields.filter(function(f) { return f.type !== 'boolean'; });
 
-        const track = document.createElement('span');
-        track.className = 'toggle__track';
-        const thumb = document.createElement('span');
-        thumb.className = 'toggle__thumb';
-        track.appendChild(thumb);
-        const onLabel = document.createElement('span');
-        onLabel.className = 'toggle__label';
-        onLabel.textContent = inputEl.checked ? 'På' : 'Av';
+      toggles.forEach(function(f) { body.appendChild(buildToggleField(f, settings)); });
 
-        inputEl.addEventListener('change', function() {
-          state.unsavedChanges.event = true;
-          onLabel.textContent = inputEl.checked ? 'På' : 'Av';
-        });
-
-        toggleWrap.appendChild(inputEl);
-        toggleWrap.appendChild(track);
-        toggleWrap.appendChild(onLabel);
-
-        wrap.appendChild(labelEl);
-        wrap.appendChild(toggleWrap);
-      } else if (field.type === 'textarea') {
-        inputEl = document.createElement('textarea');
-        inputEl.id = 'set-' + field.key;
-        inputEl.dataset.settingKey = field.key;
-        inputEl.dataset.settingType = 'textarea';
-        inputEl.rows = 6;
-        inputEl.value = value != null ? String(value) : '';
-        inputEl.addEventListener('input', function() { state.unsavedChanges.event = true; });
-        wrap.appendChild(labelEl);
-        wrap.appendChild(inputEl);
-      } else if (field.type === 'number') {
-        inputEl = document.createElement('input');
-        inputEl.type = 'number';
-        inputEl.id = 'set-' + field.key;
-        inputEl.dataset.settingKey = field.key;
-        inputEl.dataset.settingType = 'number';
-        inputEl.value = value != null && value !== '' ? Number(value) : '';
-        inputEl.addEventListener('input', function() { state.unsavedChanges.event = true; });
-        wrap.appendChild(labelEl);
-        wrap.appendChild(inputEl);
-      } else {
-        // text
-        inputEl = document.createElement('input');
-        inputEl.type = 'text';
-        inputEl.id = 'set-' + field.key;
-        inputEl.dataset.settingKey = field.key;
-        inputEl.dataset.settingType = 'text';
-        inputEl.value = value != null ? String(value) : '';
-        inputEl.addEventListener('input', function() { state.unsavedChanges.event = true; });
-        wrap.appendChild(labelEl);
-        wrap.appendChild(inputEl);
+      if (grids.length) {
+        const grid = document.createElement('div');
+        grid.className = 'form-grid';
+        if (toggles.length) grid.style.marginTop = '12px';
+        grids.forEach(function(f) { grid.appendChild(buildSettingField(f, settings)); });
+        body.appendChild(grid);
       }
 
-      if (field.help) {
-        const helpEl = document.createElement('p');
-        helpEl.className = 'help';
-        helpEl.textContent = field.help;
-        wrap.appendChild(helpEl);
-      }
+      card.appendChild(body);
+      container.appendChild(card);
+    });
 
-      container.appendChild(wrap);
+    // Sticky save-bar (uppdaterar status-chip + knapptext)
+    container.appendChild(buildSaveBar('event', 'Spara eventinfo'));
+    updateSaveBar();
+  }
+
+  function buildSettingField(field, settings) {
+    const cell = document.createElement('div');
+    cell.className = 'form-cell' + (field.span ? ' form-cell--' + field.span : '');
+
+    const label = document.createElement('label');
+    label.className = 'field-label';
+    label.setAttribute('for', 'set-' + field.key);
+    label.textContent = field.label;
+    cell.appendChild(label);
+
+    const value = settings[field.key];
+    let input;
+    if (field.type === 'textarea') {
+      input = document.createElement('textarea');
+      input.className = 'textarea';
+      input.rows = field.rows || 3;
+      input.value = value != null ? String(value) : '';
+    } else if (field.type === 'number') {
+      input = document.createElement('input');
+      input.type = 'number';
+      input.className = 'input';
+      input.value = (value != null && value !== '') ? Number(value) : '';
+    } else {
+      input = document.createElement('input');
+      input.type = 'text';
+      input.className = 'input';
+      input.value = value != null ? String(value) : '';
+    }
+    input.id = 'set-' + field.key;
+    input.dataset.settingKey = field.key;
+    input.dataset.settingType = field.type;
+    if (field.placeholder) input.placeholder = field.placeholder;
+    input.addEventListener('input', markEventDirty);
+    cell.appendChild(input);
+
+    if (field.help) {
+      const help = document.createElement('p');
+      help.className = 'field-help';
+      help.textContent = field.help;
+      cell.appendChild(help);
+    }
+    return cell;
+  }
+
+  function buildToggleField(field, settings) {
+    const wrap = document.createElement('div');
+    wrap.className = 'toggle-field';
+
+    const main = document.createElement('div');
+    main.className = 'toggle-field__main';
+
+    const head = document.createElement('div');
+    head.className = 'toggle-field__head';
+
+    const title = document.createElement('span');
+    title.className = 'toggle-field__title';
+    title.textContent = field.label;
+    head.appendChild(title);
+
+    const value = !!settings[field.key];
+    const chip = document.createElement('span');
+    chip.className = value ? 'chip ok' : 'chip muted';
+    renderToggleChip(chip, value, field);
+    head.appendChild(chip);
+    main.appendChild(head);
+
+    if (field.help) {
+      const help = document.createElement('p');
+      help.className = 'toggle-field__help';
+      help.textContent = field.help;
+      main.appendChild(help);
+    }
+
+    const toggleLabel = document.createElement('label');
+    toggleLabel.className = 'toggle';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.id = 'set-' + field.key;
+    input.dataset.settingKey = field.key;
+    input.dataset.settingType = 'boolean';
+    input.checked = value;
+
+    const track = document.createElement('span');
+    track.className = 'toggle__track';
+    const thumb = document.createElement('span');
+    thumb.className = 'toggle__thumb';
+    track.appendChild(thumb);
+
+    toggleLabel.appendChild(input);
+    toggleLabel.appendChild(track);
+
+    input.addEventListener('change', function() {
+      markEventDirty();
+      chip.className = input.checked ? 'chip ok' : 'chip muted';
+      renderToggleChip(chip, input.checked, field);
+    });
+
+    wrap.appendChild(main);
+    wrap.appendChild(toggleLabel);
+    return wrap;
+  }
+
+  function renderToggleChip(chip, on, field) {
+    while (chip.firstChild) chip.removeChild(chip.firstChild);
+    const dot = document.createElement('span');
+    dot.className = on ? 'dot ok' : 'dot';
+    chip.appendChild(dot);
+    chip.appendChild(document.createTextNode(' ' + (on ? (field.badgeOn || 'På') : (field.badgeOff || 'Av'))));
+  }
+
+  function markEventDirty() {
+    state.unsavedChanges.event = true;
+    updateSaveBar();
+  }
+
+  function buildSaveBar(scope, saveLabel) {
+    const bar = document.createElement('div');
+    bar.className = 'save-bar is-clean';
+    bar.dataset.scope = scope;
+
+    const left = document.createElement('div');
+    left.className = 'save-bar__left';
+
+    const chip = document.createElement('span');
+    chip.className = 'chip save-bar__chip';
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+    chip.appendChild(dot);
+    chip.appendChild(document.createTextNode(' '));
+    const chipText = document.createElement('span');
+    chipText.className = 'save-bar__chip-text';
+    chipText.textContent = 'Sparat';
+    chip.appendChild(chipText);
+    left.appendChild(chip);
+
+    const hint = document.createElement('span');
+    hint.className = 'save-bar__hint';
+    hint.textContent = 'Förhandsgranska sidan för att se hur ändringarna ser ut.';
+    left.appendChild(hint);
+
+    bar.appendChild(left);
+
+    const actions = document.createElement('div');
+    actions.className = 'save-bar__actions';
+
+    const undo = document.createElement('button');
+    undo.type = 'button';
+    undo.className = 'btn btn-ghost';
+    undo.textContent = 'Ångra';
+    undo.addEventListener('click', function() {
+      if (scope === 'event') renderEventForm();
+    });
+    actions.appendChild(undo);
+
+    const save = document.createElement('button');
+    save.type = 'button';
+    save.className = 'btn btn--primary';
+    save.textContent = saveLabel || 'Spara';
+    save.addEventListener('click', function() {
+      const form = document.getElementById(scope + '-form');
+      if (form) form.requestSubmit ? form.requestSubmit() : form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    });
+    actions.appendChild(save);
+
+    bar.appendChild(actions);
+    return bar;
+  }
+
+  function updateSaveBar() {
+    document.querySelectorAll('.save-bar').forEach(function(bar) {
+      const scope = bar.dataset.scope;
+      const isDirty = !!(state.unsavedChanges && state.unsavedChanges[scope]);
+      bar.classList.toggle('is-clean', !isDirty);
+      const text = bar.querySelector('.save-bar__chip-text');
+      if (text) text.textContent = isDirty ? 'Osparade ändringar' : 'Sparat';
     });
   }
 
@@ -696,6 +908,8 @@
       await runServer('saveSettings', state.token, settings);
       state.data.settings = settings;
       state.unsavedChanges.event = false;
+      updateSaveBar();
+      updateLastSaved();
       showSavedMsg('event-saved-msg');
       renderOverview();
       toast('Inställningarna är sparade. Syns publikt inom 5 minuter.', 'success');
@@ -1144,6 +1358,16 @@
       return tb - ta;
     });
 
+    // Uppdatera filter-tab-räknare
+    updateFilterTabCounts(subs);
+    // Uppdatera page-header subtitle
+    const sub = document.getElementById('submissions-subtitle');
+    if (sub) {
+      const total = subs.length;
+      sub.textContent = total + (total === 1 ? ' anmälan' : ' anmälningar') +
+        ' totalt. Klicka på en rad för att se hela formuläret och uppdatera status.';
+    }
+
     const filtered = subs.filter(function(s) {
       const status = (s.status || '').toLowerCase();
       if (state.submissionsFilter.status !== 'all' && status !== state.submissionsFilter.status) return false;
@@ -1210,6 +1434,18 @@
       tr.appendChild(actTd);
 
       tbody.appendChild(tr);
+    });
+  }
+
+  function updateFilterTabCounts(subs) {
+    const counts = { all: subs.length, new: 0, reviewed: 0, approved: 0, rejected: 0, contacted: 0 };
+    subs.forEach(function(s) {
+      const status = (s.status || 'new').toLowerCase();
+      if (counts.hasOwnProperty(status)) counts[status]++;
+    });
+    Object.keys(counts).forEach(function(key) {
+      const el = document.querySelector('.filter-tab__count[data-count="' + key + '"]');
+      if (el) el.textContent = String(counts[key]);
     });
   }
 

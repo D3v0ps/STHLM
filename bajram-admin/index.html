@@ -4,13 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#0f1e4a">
+  <meta name="theme-color" content="#0f1e3d">
   <title>Admin – Stockholms Moské Festival</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300..700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300..700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&family=Inter:wght@400;500;600&display=swap">
 
   <link rel="stylesheet" href="admin.css">
 </head>
@@ -47,32 +46,82 @@
           <span class="topbar__name">Stockholms Moské</span>
           <span class="topbar__sub">Admin · Festival 2026</span>
         </div>
+        <span class="topbar__divider" aria-hidden="true"></span>
+        <span id="live-chip" class="chip ok topbar__live"><span class="dot ok"></span>Live · senast sparad <span id="last-saved">just nu</span></span>
       </div>
       <div class="topbar__actions">
-        <a id="preview-public-link" href="../bajram-basar/" target="_blank" rel="noopener" class="btn btn--ghost-light">Förhandsgranska publik sida</a>
+        <a id="preview-public-link" href="../bajram-basar/" target="_blank" rel="noopener" class="btn btn--ghost-light">Förhandsgranska sidan ↗</a>
+        <div id="user-pill" class="topbar__user-pill" hidden>
+          <span class="topbar__avatar" aria-hidden="true">YA</span>
+          <span class="topbar__user-name">Yasser A.</span>
+        </div>
         <button id="logout-btn" class="btn btn--ghost-light">Logga ut</button>
       </div>
     </header>
 
+    <!-- Banner ersätter toasts: live-meddelande direkt i layouten -->
+    <div id="banner" class="banner" role="status" aria-live="polite" hidden></div>
+
     <div class="dashboard-layout">
 
-      <!-- Tab-navigation -->
-      <nav class="tab-nav" aria-label="Adminnavigering" role="tablist">
-        <button class="tab-nav__btn is-active" data-tab="overview" type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true" tabindex="0">Översikt</button>
-        <button class="tab-nav__btn" data-tab="event" type="button" role="tab" id="tab-event" aria-controls="panel-event" aria-selected="false" tabindex="-1">Eventinformation</button>
-        <button class="tab-nav__btn" data-tab="questions" type="button" role="tab" id="tab-questions" aria-controls="panel-questions" aria-selected="false" tabindex="-1">Formulärfrågor</button>
-        <button class="tab-nav__btn" data-tab="submissions" type="button" role="tab" id="tab-submissions" aria-controls="panel-submissions" aria-selected="false" tabindex="-1">Anmälningar<span id="tab-badge-submissions" class="tab-nav__badge" hidden></span></button>
-        <button class="tab-nav__btn" data-tab="exhibitors" type="button" role="tab" id="tab-exhibitors" aria-controls="panel-exhibitors" aria-selected="false" tabindex="-1">Utställare</button>
-        <button class="tab-nav__btn" data-tab="social" type="button" role="tab" id="tab-social" aria-controls="panel-social" aria-selected="false" tabindex="-1">Sociala medier</button>
-        <button class="tab-nav__btn" data-tab="sports" type="button" role="tab" id="tab-sports" aria-controls="panel-sports" aria-selected="false" tabindex="-1">Fotboll &amp; basket</button>
+      <!-- Sidebar-navigation -->
+      <nav class="tab-nav" aria-label="Adminnavigering">
+        <p class="tab-nav__group-label">Översikt</p>
+        <button class="tab-nav__btn is-active" data-tab="overview" type="button" id="tab-overview" aria-selected="true">
+          <span class="tab-nav__icon" aria-hidden="true">◐</span>
+          <span class="tab-nav__label">Översikt</span>
+        </button>
+
+        <p class="tab-nav__group-label">Innehåll</p>
+        <button class="tab-nav__btn" data-tab="event" type="button" id="tab-event" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">✦</span>
+          <span class="tab-nav__label">Eventinformation</span>
+        </button>
+        <button class="tab-nav__btn" data-tab="questions" type="button" id="tab-questions" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">⊞</span>
+          <span class="tab-nav__label">Formulärfrågor</span>
+        </button>
+        <button class="tab-nav__btn" data-tab="submissions" type="button" id="tab-submissions" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">✺</span>
+          <span class="tab-nav__label">Anmälningar</span>
+          <span id="tab-badge-submissions" class="tab-nav__badge" hidden></span>
+        </button>
+        <button class="tab-nav__btn" data-tab="exhibitors" type="button" id="tab-exhibitors" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">✧</span>
+          <span class="tab-nav__label">Utställare</span>
+          <span id="tab-badge-exhibitors" class="tab-nav__badge" hidden></span>
+        </button>
+        <button class="tab-nav__btn" data-tab="sports" type="button" id="tab-sports" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">◇</span>
+          <span class="tab-nav__label">Fotboll &amp; basket</span>
+        </button>
+
+        <p class="tab-nav__group-label">Inställningar</p>
+        <button class="tab-nav__btn" data-tab="social" type="button" id="tab-social" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">⌖</span>
+          <span class="tab-nav__label">Sociala medier</span>
+        </button>
+
+        <div class="tab-nav__help">
+          <p class="tab-nav__help-title">Behöver du hjälp?</p>
+          <p class="tab-nav__help-text">Ring Karim på<br><a href="tel:+46739314033">073 931 40 33</a></p>
+        </div>
       </nav>
 
       <!-- Innehållsområde -->
       <main class="tab-content" id="main-content">
 
         <!-- ---------- ÖVERSIKT ---------- -->
-        <section data-tab-panel="overview" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
-          <h2>Översikt</h2>
+        <section data-tab-panel="overview" id="panel-overview" tabindex="0">
+          <div class="page-header">
+            <p class="page-header__crumbs">Översikt</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Översikt</h1>
+                <p class="page-header__sub">Status för festivalen och senaste anmälningar.</p>
+              </div>
+            </div>
+          </div>
           <div class="status-cards">
             <div class="status-card status-card--registration">
               <span class="label">Anmälan</span>
@@ -100,24 +149,34 @@
         </section>
 
         <!-- ---------- EVENTINFORMATION ---------- -->
-        <section data-tab-panel="event" id="panel-event" role="tabpanel" aria-labelledby="tab-event" tabindex="0" hidden>
-          <h2>Eventinformation</h2>
-          <p class="help">Ändringarna syns på publika sidan inom ~5 minuter (eller direkt om besökaren öppnar sidan i ny flik).</p>
+        <section data-tab-panel="event" id="panel-event" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Eventinformation</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Eventinformation</h1>
+                <p class="page-header__sub">Ändringarna syns på publika sidan inom ~5 minuter (eller direkt om besökaren öppnar sidan i ny flik).</p>
+              </div>
+            </div>
+          </div>
           <form id="event-form">
             <div id="event-fields"></div>
-            <div class="form-actions">
-              <button type="submit" class="btn btn--primary">Spara eventinfo</button>
-              <span id="event-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
-            </div>
           </form>
         </section>
 
         <!-- ---------- FORMULÄRFRÅGOR ---------- -->
-        <section data-tab-panel="questions" id="panel-questions" role="tabpanel" aria-labelledby="tab-questions" tabindex="0" hidden>
-          <h2>Formulärfrågor</h2>
-          <p class="help">Drag och släpp för att ändra ordning. Klicka på <strong>Ny fråga</strong> längst ned för att lägga till.</p>
+        <section data-tab-panel="questions" id="panel-questions" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Bazaar → Formulärfrågor</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Formulärfrågor</h1>
+                <p class="page-header__sub">Drag och släpp för att ändra ordning. Klicka på <strong>Ny fråga</strong> längst ned för att lägga till.</p>
+              </div>
+            </div>
+          </div>
           <ul id="questions-list" class="questions-list"></ul>
-          <button id="add-question-btn" class="btn">+ Ny fråga</button>
+          <button id="add-question-btn" class="btn btn-add">+ Ny fråga</button>
           <div class="form-actions">
             <button id="save-questions-btn" class="btn btn--primary">Spara frågor</button>
             <span id="questions-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
@@ -125,11 +184,30 @@
         </section>
 
         <!-- ---------- ANMÄLNINGAR ---------- -->
-        <section data-tab-panel="submissions" id="panel-submissions" role="tabpanel" aria-labelledby="tab-submissions" tabindex="0" hidden>
-          <h2>Anmälningar</h2>
+        <section data-tab-panel="submissions" id="panel-submissions" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Bazaar → Anmälningar</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Anmälningar</h1>
+                <p class="page-header__sub" id="submissions-subtitle">Klicka på en rad för att se hela formuläret och uppdatera status.</p>
+              </div>
+              <button id="export-csv-btn" class="btn btn-ghost">Exportera CSV ↓</button>
+            </div>
+          </div>
+
+          <div class="filter-tabs" role="tablist" aria-label="Filtrera anmälningar på status">
+            <button class="filter-tab is-active" data-filter="all" type="button" role="tab" aria-selected="true">Alla <span class="filter-tab__count" data-count="all">0</span></button>
+            <button class="filter-tab" data-filter="new" type="button" role="tab" aria-selected="false">Nya <span class="filter-tab__count" data-count="new">0</span></button>
+            <button class="filter-tab" data-filter="reviewed" type="button" role="tab" aria-selected="false">Granskar <span class="filter-tab__count" data-count="reviewed">0</span></button>
+            <button class="filter-tab" data-filter="approved" type="button" role="tab" aria-selected="false">Godkända <span class="filter-tab__count" data-count="approved">0</span></button>
+            <button class="filter-tab" data-filter="contacted" type="button" role="tab" aria-selected="false">Kontaktade <span class="filter-tab__count" data-count="contacted">0</span></button>
+            <button class="filter-tab" data-filter="rejected" type="button" role="tab" aria-selected="false">Nekade <span class="filter-tab__count" data-count="rejected">0</span></button>
+          </div>
+
           <div class="toolbar">
             <input type="search" id="submissions-search" placeholder="Sök anmälningar…" aria-label="Sök anmälningar">
-            <select id="submissions-filter" aria-label="Filtrera på status">
+            <select id="submissions-filter" hidden aria-hidden="true">
               <option value="all">Alla statusar</option>
               <option value="new">Nya</option>
               <option value="reviewed">Granskade</option>
@@ -137,7 +215,6 @@
               <option value="rejected">Nekade</option>
               <option value="contacted">Kontaktade</option>
             </select>
-            <button id="export-csv-btn" class="btn btn--small">Exportera CSV</button>
           </div>
           <table id="submissions-table" class="data-table">
             <thead>
@@ -154,11 +231,18 @@
         </section>
 
         <!-- ---------- UTSTÄLLARE ---------- -->
-        <section data-tab-panel="exhibitors" id="panel-exhibitors" role="tabpanel" aria-labelledby="tab-exhibitors" tabindex="0" hidden>
-          <h2>Utställare</h2>
-          <p class="help">Bara utställare med <strong>Publicerad</strong> = på syns på publika sidan.</p>
+        <section data-tab-panel="exhibitors" id="panel-exhibitors" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Utställare</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Utställare</h1>
+                <p class="page-header__sub">Bara utställare med <strong>Publicerad</strong> = på syns på publika sidan.</p>
+              </div>
+            </div>
+          </div>
           <ul id="exhibitors-list"></ul>
-          <button id="add-exhibitor-btn" class="btn">+ Lägg till utställare</button>
+          <button id="add-exhibitor-btn" class="btn btn-add">+ Lägg till utställare</button>
           <div class="form-actions">
             <button id="save-exhibitors-btn" class="btn btn--primary">Spara utställare</button>
             <span id="exhibitors-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
@@ -166,10 +250,18 @@
         </section>
 
         <!-- ---------- SOCIALA MEDIER ---------- -->
-        <section data-tab-panel="social" id="panel-social" role="tabpanel" aria-labelledby="tab-social" tabindex="0" hidden>
-          <h2>Sociala medier</h2>
+        <section data-tab-panel="social" id="panel-social" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Inställningar → Sociala medier</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Sociala medier</h1>
+                <p class="page-header__sub">Länkar som visas i pop-up:en på publika sidan.</p>
+              </div>
+            </div>
+          </div>
           <ul id="social-list"></ul>
-          <button id="add-social-btn" class="btn">+ Lägg till länk</button>
+          <button id="add-social-btn" class="btn btn-add">+ Lägg till länk</button>
           <div class="form-actions">
             <button id="save-social-btn" class="btn btn--primary">Spara länkar</button>
             <span id="social-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
@@ -177,9 +269,16 @@
         </section>
 
         <!-- ---------- FOTBOLL & BASKET ---------- -->
-        <section data-tab-panel="sports" id="panel-sports" role="tabpanel" aria-labelledby="tab-sports" tabindex="0" hidden>
-          <h2>Fotboll &amp; basket</h2>
-          <p class="help">Hantera kommande sport-anmälningar.</p>
+        <section data-tab-panel="sports" id="panel-sports" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Fotboll &amp; basket</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Fotboll &amp; basket</h1>
+                <p class="page-header__sub">Hantera kommande sport-anmälningar.</p>
+              </div>
+            </div>
+          </div>
           <div id="sports-list"></div>
           <div class="form-actions">
             <button id="save-sports-btn" class="btn btn--primary">Spara sport-sidor</button>
@@ -190,9 +289,6 @@
       </main>
     </div>
   </div>
-
-  <!-- Banner ersätter toasts: live-meddelande direkt i layouten -->
-  <div id="banner" class="banner" role="status" aria-live="polite" hidden></div>
 
   <!-- ========================================================== -->
   <!-- BEKRÄFTELSE-MODAL                                           -->
