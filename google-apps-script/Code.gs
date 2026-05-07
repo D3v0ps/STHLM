@@ -1628,7 +1628,7 @@ function setupAdminPassword(password) {
 // SECTION 9 — DEFAULT-DATA
 // =============================================================================
 
-const DEFAULT_INTRO_TEXT = 'Föreningen arrangerar en festival med basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns trädgård vid Medborgarplatsen. Vi bjuder in företagare, kreativa personer och föreningar som vill sälja eller presentera produkter och tjänster vid ett stånd att anmäla sig.';
+const DEFAULT_INTRO_TEXT = 'Basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.';
 
 const DEFAULT_WHO_CAN_APPLY_TEXT = 'Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.';
 
@@ -1640,8 +1640,8 @@ const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är
  * Settings-rader: [Key, Value, Type, Label, Description].
  */
 const DEFAULT_SETTINGS = [
-  ['eventTitle', 'Stockholms Moské Festival', 'text', 'Eventets titel', 'Hero-rubrik på publika sidan.'],
-  ['eventSubtitle', 'Basar, öppet hus & familjeaktiviteter', 'text', 'Undertitel', 'Visas under huvudrubriken.'],
+  ['eventTitle', 'Festival', 'text', 'Eventets titel', 'Stor hero-rubrik på publika sidan.'],
+  ['eventSubtitle', '— en dag för gemenskap', 'text', 'Underrubrik (kursiv)', 'Visas i kursiv mässing-färg under titeln.'],
   ['eventDate', 'Lördag 30 maj', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],
   ['bazaarTime', '13:00–17:00', 'text', 'Basarens tid', 'Specifik tid för basaren.'],
@@ -1650,7 +1650,7 @@ const DEFAULT_SETTINGS = [
   ['expectedAdults', 200, 'number', 'Förväntade vuxna', 'Används i info-kort.'],
   ['registrationOpen', 'TRUE', 'boolean', 'Anmälan öppen', 'TRUE = formuläret visas. FALSE = utställarlistan visas.'],
   ['showExhibitors', 'TRUE', 'boolean', 'Visa utställarlista', 'TRUE = visa publicerade utställare.'],
-  ['heroButtonText', 'Anmäl intresse till bazaren', 'text', 'Text på hero-knapp', 'Primär CTA i hero.'],
+  ['heroButtonText', 'Anmäl dig till basaren', 'text', 'Text på hero-knapp', 'Primär CTA i hero.'],
   ['introText', DEFAULT_INTRO_TEXT, 'textarea', 'Introduktionstext', 'Inledande text under hero.'],
   ['whoCanApplyText', DEFAULT_WHO_CAN_APPLY_TEXT, 'textarea', 'Vem kan anmäla sig?', 'Sektion om målgrupp.'],
   ['selectionText', DEFAULT_SELECTION_TEXT, 'textarea', 'Så görs urvalet', 'Sektion om urvalsprocessen.'],
