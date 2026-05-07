@@ -392,12 +392,18 @@
       labelCb.appendChild(inputCb);
       labelCb.appendChild(document.createTextNode(' '));
       labelCb.appendChild(document.createTextNode(q.label || ''));
-      if (required) labelCb.appendChild(el('span', { class: 'field__required', 'aria-hidden': 'true', text: ' *' }));
+      if (required) {
+        labelCb.appendChild(el('span', { class: 'field__required', 'aria-hidden': 'true', text: ' *' }));
+        labelCb.appendChild(el('span', { class: 'visually-hidden', text: ' (obligatoriskt)' }));
+      }
       wrap.appendChild(labelCb);
     } else {
       // Label före kontroll.
       var labelEl = el('label', { 'for': fieldId, class: 'field__label', text: q.label || '' });
-      if (required) labelEl.appendChild(el('span', { class: 'field__required', 'aria-hidden': 'true', text: ' *' }));
+      if (required) {
+        labelEl.appendChild(el('span', { class: 'field__required', 'aria-hidden': 'true', text: ' *' }));
+        labelEl.appendChild(el('span', { class: 'visually-hidden', text: ' (obligatoriskt)' }));
+      }
       wrap.appendChild(labelEl);
 
       if (q.helperText) {
@@ -432,8 +438,14 @@
           required: required,
           'aria-describedby': (q.helperText ? helperId + ' ' : '') + errorId
         };
-        if (inputType === 'email') attrs.autocomplete = 'email';
-        if (inputType === 'tel') attrs.autocomplete = 'tel';
+        if (inputType === 'email') {
+          attrs.autocomplete = 'email';
+          attrs.inputmode = 'email';
+        }
+        if (inputType === 'tel') {
+          attrs.autocomplete = 'tel';
+          attrs.inputmode = 'tel';
+        }
         if (fieldId === 'name') attrs.autocomplete = 'name';
         control = el('input', attrs);
       }
@@ -468,7 +480,11 @@
     if (!container) return;
 
     var open = toBool(settings && settings.registrationOpen);
-    if (open) {
+    var show = settings && settings.showExhibitors !== undefined
+      ? toBool(settings.showExhibitors) : true;
+
+    // När anmälan är öppen, eller admin valt att dölja listan: göm helt.
+    if (open || !show) {
       container.hidden = true;
       while (container.firstChild) container.removeChild(container.firstChild);
       return;
@@ -477,19 +493,20 @@
     container.hidden = false;
     while (container.firstChild) container.removeChild(container.firstChild);
 
-    var closedMsg = (settings && settings.closedMessage) ||
-                    'Anmälan är stängd. Utställare publiceras här när programmet är klart.';
-    container.appendChild(el('p', { class: 'exhibitors-intro', text: closedMsg }));
-
     var list = (exhibitors || []).slice().sort(byOrder);
 
+    var closedMsg = (settings && settings.closedMessage) ||
+                    'Anmälan är stängd. Utställare publiceras här när programmet är klart.';
+    var closedWrap = el('div', { class: 'closed-message' });
+    closedWrap.appendChild(el('p', { text: closedMsg }));
+    container.appendChild(closedWrap);
+
     if (list.length === 0) {
-      container.appendChild(el('p', {
-        class: 'exhibitors-empty',
-        text: 'Utställare publiceras här när programmet är klart.'
-      }));
+      // Tom-state hanteras av closed-message ovanför; ingen ytterligare dubblett.
       return;
     }
+
+    container.appendChild(el('h3', { class: 'exhibitors-title', text: 'Årets utställare' }));
 
     var grid = el('ul', { class: 'exhibitors-grid', role: 'list' });
     list.forEach(function (ex) {
@@ -502,18 +519,18 @@
   function buildExhibitorCard(ex) {
     var card = el('li', { class: 'exhibitor-card' });
     var head = el('div', { class: 'exhibitor-card__head' });
-    head.appendChild(el('h3', { class: 'exhibitor-card__name', text: ex.name || '' }));
+    head.appendChild(el('h3', { class: 'exhibitor-card__title', text: ex.name || '' }));
     if (ex.company) {
-      head.appendChild(el('p', { class: 'exhibitor-card__company', text: ex.company }));
+      head.appendChild(el('p', { class: 'exhibitor-card__subtitle', text: ex.company }));
     }
     card.appendChild(head);
 
     if (ex.category) {
-      card.appendChild(el('span', { class: 'exhibitor-card__tag', text: ex.category }));
+      card.appendChild(el('span', { class: 'exhibitor-card__chip', text: ex.category }));
     }
 
     if (ex.description) {
-      card.appendChild(el('p', { class: 'exhibitor-card__desc', text: ex.description }));
+      card.appendChild(el('p', { class: 'exhibitor-card__description', text: ex.description }));
     }
 
     var links = [];
@@ -695,6 +712,7 @@
     var originalText = submitBtn ? submitBtn.textContent : '';
     if (submitBtn) {
       submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
       submitBtn.textContent = 'Skickar…';
     }
 
@@ -708,6 +726,7 @@
       // Bekräftat fel — visa inline, behåll fältvärden.
       if (submitBtn) {
         submitBtn.disabled = false;
+        submitBtn.removeAttribute('aria-busy');
         submitBtn.textContent = originalText || 'Skicka intresseanmälan';
       }
       if (statusEl) {

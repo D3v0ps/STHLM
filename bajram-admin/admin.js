@@ -28,7 +28,7 @@
     { key: 'eventSubtitle',      label: 'Undertitel',                             type: 'text',     help: 'Visas under titeln. Kort beskrivning av eventet.' },
     { key: 'eventDate',          label: 'Datum',                                  type: 'text',     help: 'T.ex. "Lördag 30 maj".' },
     { key: 'eventTime',          label: 'Tid (hela eventet)',                     type: 'text',     help: 'T.ex. "12:00–19:00".' },
-    { key: 'bazaarTime',         label: 'Bazarens tid',                           type: 'text',     help: 'T.ex. "13:00–17:00".' },
+    { key: 'bazaarTime',         label: 'Basarens tid',                           type: 'text',     help: 'T.ex. "13:00–17:00".' },
     { key: 'eventLocation',      label: 'Plats',                                  type: 'text',     help: 'Visas i hero-sektionen och i info-kort.' },
     { key: 'expectedChildren',   label: 'Förväntat antal barn',                   type: 'number',   help: 'Visas som info till anmälare.' },
     { key: 'expectedAdults',     label: 'Förväntat antal vuxna',                  type: 'number',   help: 'Visas som info till anmälare.' },
@@ -207,10 +207,16 @@
       renderSubmissionsTable();
     });
     const subSearch = document.getElementById('submissions-search');
-    if (subSearch) subSearch.addEventListener('input', function() {
-      state.submissionsFilter.search = subSearch.value;
-      renderSubmissionsTable();
-    });
+    if (subSearch) {
+      let searchTimer = null;
+      subSearch.addEventListener('input', function() {
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(function() {
+          state.submissionsFilter.search = subSearch.value;
+          renderSubmissionsTable();
+        }, 200);
+      });
+    }
     const exportBtn = document.getElementById('export-csv-btn');
     if (exportBtn) exportBtn.addEventListener('click', handleExportCsv);
 
@@ -223,6 +229,14 @@
       btn.addEventListener('click', function() {
         const dlg = btn.closest('dialog');
         if (dlg && dlg.open) dlg.close();
+      });
+    });
+
+    // Klick på backdrop stänger dialog (vanligaste mobil-gesten)
+    document.querySelectorAll('dialog').forEach(function(dlg) {
+      if (dlg.id === 'loading-overlay') return;
+      dlg.addEventListener('click', function(e) {
+        if (e.target === dlg) dlg.close();
       });
     });
 
@@ -421,10 +435,23 @@
   // ============================================================
 
   function bindTabs() {
-    document.querySelectorAll('[data-tab]').forEach(function(btn) {
+    const tabBtns = Array.from(document.querySelectorAll('[data-tab]'));
+    tabBtns.forEach(function(btn, idx) {
       btn.addEventListener('click', function() {
         const tab = btn.getAttribute('data-tab');
-        activateTab(tab);
+        activateTab(tab, { focus: false });
+      });
+      btn.addEventListener('keydown', function(e) {
+        let next = -1;
+        if (e.key === 'ArrowRight') next = (idx + 1) % tabBtns.length;
+        else if (e.key === 'ArrowLeft') next = (idx - 1 + tabBtns.length) % tabBtns.length;
+        else if (e.key === 'Home') next = 0;
+        else if (e.key === 'End') next = tabBtns.length - 1;
+        if (next !== -1) {
+          e.preventDefault();
+          const nextTab = tabBtns[next].getAttribute('data-tab');
+          activateTab(nextTab, { focus: true });
+        }
       });
     });
     document.querySelectorAll('[data-goto-tab]').forEach(function(btn) {
@@ -435,14 +462,20 @@
     });
   }
 
-  function activateTab(tabName) {
+  function activateTab(tabName, opts) {
     if (!tabName) tabName = 'overview';
+    opts = opts || {};
 
     // Knappar
     document.querySelectorAll('[data-tab]').forEach(function(btn) {
       const isActive = btn.getAttribute('data-tab') === tabName;
       btn.classList.toggle('is-active', isActive);
       btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
+      if (isActive && opts.focus) btn.focus();
+      if (isActive) {
+        try { btn.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' }); } catch (_) {}
+      }
     });
 
     // Paneler
@@ -478,13 +511,25 @@
 
     setText('overview-registration-status', isOpen ? 'Öppen' : 'Stängd');
     const statusEl = document.getElementById('overview-registration-status');
-    if (statusEl) {
-      statusEl.classList.toggle('is-open', isOpen);
-      statusEl.classList.toggle('is-closed', !isOpen);
+    const regCard = statusEl ? statusEl.closest('.status-card--registration') : null;
+    if (regCard) {
+      regCard.classList.toggle('is-open', isOpen);
+      regCard.classList.toggle('is-closed', !isOpen);
     }
     setText('overview-new-count', String(newCount));
     setText('overview-total-count', String(totalCount));
     setText('overview-published-count', String(publishedCount));
+
+    // Tab-badge för Anmälningar
+    const badge = document.getElementById('tab-badge-submissions');
+    if (badge) {
+      if (newCount > 0) {
+        badge.textContent = String(newCount);
+        badge.hidden = false;
+      } else {
+        badge.hidden = true;
+      }
+    }
 
     const toggleBtn = document.getElementById('toggle-registration-btn');
     if (toggleBtn) {
@@ -557,8 +602,11 @@
         inputEl.dataset.settingType = 'boolean';
         inputEl.checked = !!value;
 
-        const slider = document.createElement('span');
-        slider.className = 'toggle__slider';
+        const track = document.createElement('span');
+        track.className = 'toggle__track';
+        const thumb = document.createElement('span');
+        thumb.className = 'toggle__thumb';
+        track.appendChild(thumb);
         const onLabel = document.createElement('span');
         onLabel.className = 'toggle__label';
         onLabel.textContent = inputEl.checked ? 'På' : 'Av';
@@ -569,7 +617,7 @@
         });
 
         toggleWrap.appendChild(inputEl);
-        toggleWrap.appendChild(slider);
+        toggleWrap.appendChild(track);
         toggleWrap.appendChild(onLabel);
 
         wrap.appendChild(labelEl);
@@ -650,7 +698,7 @@
       state.unsavedChanges.event = false;
       showSavedMsg('event-saved-msg');
       renderOverview();
-      toast('Inställningarna är sparade. Live om ~5 min.', 'success');
+      toast('Inställningarna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
       toast('Kunde inte spara. Försök igen.', 'error');
@@ -883,14 +931,17 @@
     const input = document.createElement('input');
     input.type = 'checkbox';
     input.checked = !!initial;
-    const slider = document.createElement('span');
-    slider.className = 'toggle__slider';
+    const track = document.createElement('span');
+    track.className = 'toggle__track';
+    const thumb = document.createElement('span');
+    thumb.className = 'toggle__thumb';
+    track.appendChild(thumb);
     const labelEl = document.createElement('span');
     labelEl.className = 'toggle__label';
     labelEl.textContent = labelText;
     input.addEventListener('change', function() { onChange(input.checked); });
     wrap.appendChild(input);
-    wrap.appendChild(slider);
+    wrap.appendChild(track);
     wrap.appendChild(labelEl);
     return wrap;
   }
@@ -1064,7 +1115,7 @@
       await runServer('saveFormQuestions', state.token, state.data.questions);
       state.unsavedChanges.questions = false;
       showSavedMsg('questions-saved-msg');
-      toast('Frågorna är sparade. Live om ~5 min.', 'success');
+      toast('Frågorna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
       toast('Kunde inte spara frågorna. Försök igen.', 'error');
@@ -1119,34 +1170,41 @@
       const tr = document.createElement('tr');
 
       const dateTd = document.createElement('td');
+      dateTd.dataset.label = 'Datum';
       dateTd.textContent = formatDateTime(s.timestamp);
       tr.appendChild(dateTd);
 
       const nameTd = document.createElement('td');
+      nameTd.dataset.label = 'Namn';
       nameTd.textContent = s.name || '–';
       tr.appendChild(nameTd);
 
       const compTd = document.createElement('td');
+      compTd.dataset.label = 'Företag';
       compTd.textContent = s.company || '–';
       tr.appendChild(compTd);
 
       const emailTd = document.createElement('td');
+      emailTd.dataset.label = 'E-post';
       emailTd.textContent = s.email || '–';
       tr.appendChild(emailTd);
 
       const phoneTd = document.createElement('td');
+      phoneTd.dataset.label = 'Telefon';
       phoneTd.textContent = s.phone || '–';
       tr.appendChild(phoneTd);
 
       const statusTd = document.createElement('td');
+      statusTd.dataset.label = 'Status';
       statusTd.appendChild(buildStatusChip(s.status || 'new'));
       tr.appendChild(statusTd);
 
       const actTd = document.createElement('td');
+      actTd.dataset.label = '';
       const viewBtn = document.createElement('button');
       viewBtn.type = 'button';
       viewBtn.className = 'btn btn--small';
-      viewBtn.textContent = 'Visa';
+      viewBtn.textContent = 'Öppna anmälan';
       viewBtn.addEventListener('click', function() { openSubmissionDetail(s.id); });
       actTd.appendChild(viewBtn);
       tr.appendChild(actTd);
@@ -1158,7 +1216,7 @@
   function buildStatusChip(status) {
     const chip = document.createElement('span');
     const s = (status || 'new').toLowerCase();
-    chip.className = 'status-chip status-chip--' + s;
+    chip.className = 'status-badge status-badge--' + s;
     chip.textContent = STATUS_LABELS[s] || s;
     return chip;
   }
@@ -1641,7 +1699,7 @@
       showSavedMsg('exhibitors-saved-msg');
       try { state.overview = await runServer('getOverview', state.token); } catch (_) {}
       renderOverview();
-      toast('Utställarna är sparade. Live om ~5 min.', 'success');
+      toast('Utställarna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
       toast('Kunde inte spara. Försök igen.', 'error');
@@ -1797,7 +1855,7 @@
       await runServer('saveSocialLinks', state.token, state.data.socialLinks);
       state.unsavedChanges.social = false;
       showSavedMsg('social-saved-msg');
-      toast('Länkarna är sparade. Live om ~5 min.', 'success');
+      toast('Länkarna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
       toast('Kunde inte spara. Försök igen.', 'error');
@@ -1901,7 +1959,7 @@
       await runServer('saveSportsPages', state.token, state.data.sportsPages);
       state.unsavedChanges.sports = false;
       showSavedMsg('sports-saved-msg');
-      toast('Sport-sidorna är sparade. Live om ~5 min.', 'success');
+      toast('Sport-sidorna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
       toast('Kunde inte spara. Försök igen.', 'error');
@@ -1953,7 +2011,7 @@
   function dismissToast(t) {
     if (!t || !t.parentNode) return;
     t.classList.remove('is-visible');
-    t.classList.add('is-hiding');
+    t.classList.add('is-leaving');
     setTimeout(function() {
       if (t.parentNode) t.parentNode.removeChild(t);
     }, 250);

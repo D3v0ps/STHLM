@@ -2,17 +2,21 @@
 <html lang="sv">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#0f1e4a">
   <title>Admin – Stockholms Moské Festival</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300..700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Inter:wght@300..700&display=swap">
 
   <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+
+  <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
 
   <!-- ========================================================== -->
   <!-- LOGIN-VY                                                    -->
@@ -25,7 +29,7 @@
         <label for="login-password">Lösenord</label>
         <input type="password" id="login-password" required autocomplete="current-password" autofocus>
         <button type="submit">Logga in</button>
-        <p id="login-error" class="error" hidden></p>
+        <p id="login-error" class="error" role="alert" aria-live="assertive" hidden></p>
       </form>
     </div>
   </section>
@@ -47,21 +51,21 @@
     <div class="dashboard-layout">
 
       <!-- Tab-navigation -->
-      <nav class="tab-nav" aria-label="Adminnavigering">
-        <button class="tab-nav__btn is-active" data-tab="overview" type="button">Översikt</button>
-        <button class="tab-nav__btn" data-tab="event" type="button">Eventinformation</button>
-        <button class="tab-nav__btn" data-tab="questions" type="button">Formulärfrågor</button>
-        <button class="tab-nav__btn" data-tab="submissions" type="button">Anmälningar</button>
-        <button class="tab-nav__btn" data-tab="exhibitors" type="button">Utställare</button>
-        <button class="tab-nav__btn" data-tab="social" type="button">Sociala medier</button>
-        <button class="tab-nav__btn" data-tab="sports" type="button">Fotboll &amp; basket</button>
+      <nav class="tab-nav" aria-label="Adminnavigering" role="tablist">
+        <button class="tab-nav__btn is-active" data-tab="overview" type="button" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true" tabindex="0">Översikt</button>
+        <button class="tab-nav__btn" data-tab="event" type="button" role="tab" id="tab-event" aria-controls="panel-event" aria-selected="false" tabindex="-1">Eventinformation</button>
+        <button class="tab-nav__btn" data-tab="questions" type="button" role="tab" id="tab-questions" aria-controls="panel-questions" aria-selected="false" tabindex="-1">Formulärfrågor</button>
+        <button class="tab-nav__btn" data-tab="submissions" type="button" role="tab" id="tab-submissions" aria-controls="panel-submissions" aria-selected="false" tabindex="-1">Anmälningar<span id="tab-badge-submissions" class="tab-nav__badge" hidden></span></button>
+        <button class="tab-nav__btn" data-tab="exhibitors" type="button" role="tab" id="tab-exhibitors" aria-controls="panel-exhibitors" aria-selected="false" tabindex="-1">Utställare</button>
+        <button class="tab-nav__btn" data-tab="social" type="button" role="tab" id="tab-social" aria-controls="panel-social" aria-selected="false" tabindex="-1">Sociala medier</button>
+        <button class="tab-nav__btn" data-tab="sports" type="button" role="tab" id="tab-sports" aria-controls="panel-sports" aria-selected="false" tabindex="-1">Fotboll &amp; basket</button>
       </nav>
 
       <!-- Innehållsområde -->
-      <main class="tab-content">
+      <main class="tab-content" id="main-content">
 
         <!-- ---------- ÖVERSIKT ---------- -->
-        <section data-tab-panel="overview">
+        <section data-tab-panel="overview" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" tabindex="0">
           <h2>Översikt</h2>
           <div class="status-cards">
             <div class="status-card status-card--registration">
@@ -83,41 +87,43 @@
             </div>
           </div>
           <div class="quick-links">
-            <button data-goto-tab="submissions" class="btn">Visa anmälningar</button>
-            <button data-goto-tab="exhibitors" class="btn">Hantera utställare</button>
-            <button data-goto-tab="event" class="btn">Ändra eventinfo</button>
+            <button data-goto-tab="submissions" class="btn">Visa anmälningar →</button>
+            <button data-goto-tab="exhibitors" class="btn">Hantera utställare →</button>
+            <button data-goto-tab="event" class="btn">Ändra eventinfo →</button>
           </div>
         </section>
 
         <!-- ---------- EVENTINFORMATION ---------- -->
-        <section data-tab-panel="event" hidden>
+        <section data-tab-panel="event" id="panel-event" role="tabpanel" aria-labelledby="tab-event" tabindex="0" hidden>
           <h2>Eventinformation</h2>
           <p class="help">Ändringarna syns på publika sidan inom ~5 minuter (eller direkt om besökaren öppnar sidan i ny flik).</p>
           <form id="event-form">
             <div id="event-fields"></div>
-            <button type="submit" class="btn btn--primary">Spara ändringar</button>
-            <span id="event-saved-msg" class="saved-msg" hidden>✓ Sparat</span>
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary">Spara eventinfo</button>
+              <span id="event-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
+            </div>
           </form>
         </section>
 
         <!-- ---------- FORMULÄRFRÅGOR ---------- -->
-        <section data-tab-panel="questions" hidden>
+        <section data-tab-panel="questions" id="panel-questions" role="tabpanel" aria-labelledby="tab-questions" tabindex="0" hidden>
           <h2>Formulärfrågor</h2>
           <p class="help">Drag och släpp för att ändra ordning. Klicka på <strong>Ny fråga</strong> längst ned för att lägga till.</p>
           <ul id="questions-list" class="questions-list"></ul>
           <button id="add-question-btn" class="btn">+ Ny fråga</button>
           <div class="form-actions">
-            <button id="save-questions-btn" class="btn btn--primary">Spara ändringar</button>
-            <span id="questions-saved-msg" class="saved-msg" hidden>✓ Sparat</span>
+            <button id="save-questions-btn" class="btn btn--primary">Spara frågor</button>
+            <span id="questions-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
         </section>
 
         <!-- ---------- ANMÄLNINGAR ---------- -->
-        <section data-tab-panel="submissions" hidden>
+        <section data-tab-panel="submissions" id="panel-submissions" role="tabpanel" aria-labelledby="tab-submissions" tabindex="0" hidden>
           <h2>Anmälningar</h2>
           <div class="toolbar">
-            <input type="search" id="submissions-search" placeholder="Sök på namn, företag, email…" aria-label="Sök">
-            <select id="submissions-filter">
+            <input type="search" id="submissions-search" placeholder="Sök anmälningar…" aria-label="Sök anmälningar">
+            <select id="submissions-filter" aria-label="Filtrera på status">
               <option value="all">Alla statusar</option>
               <option value="new">Nya</option>
               <option value="reviewed">Granskade</option>
@@ -129,49 +135,49 @@
           </div>
           <table id="submissions-table" class="data-table">
             <thead>
-              <tr><th>Datum</th><th>Namn</th><th>Företag</th><th>Email</th><th>Telefon</th><th>Status</th><th></th></tr>
+              <tr><th>Datum</th><th>Namn</th><th>Företag</th><th>E-post</th><th>Telefon</th><th>Status</th><th><span class="visually-hidden">Åtgärder</span></th></tr>
             </thead>
             <tbody id="submissions-tbody"></tbody>
           </table>
 
           <!-- Detalj-modal -->
-          <dialog id="submission-detail">
+          <dialog id="submission-detail" aria-labelledby="submission-detail-title">
             <button class="dialog__close" aria-label="Stäng">×</button>
             <div id="submission-detail-content"></div>
           </dialog>
         </section>
 
         <!-- ---------- UTSTÄLLARE ---------- -->
-        <section data-tab-panel="exhibitors" hidden>
+        <section data-tab-panel="exhibitors" id="panel-exhibitors" role="tabpanel" aria-labelledby="tab-exhibitors" tabindex="0" hidden>
           <h2>Utställare</h2>
           <p class="help">Bara utställare med <strong>Publicerad</strong> = på syns på publika sidan.</p>
           <ul id="exhibitors-list"></ul>
           <button id="add-exhibitor-btn" class="btn">+ Lägg till utställare</button>
           <div class="form-actions">
-            <button id="save-exhibitors-btn" class="btn btn--primary">Spara ändringar</button>
-            <span id="exhibitors-saved-msg" class="saved-msg" hidden>✓ Sparat</span>
+            <button id="save-exhibitors-btn" class="btn btn--primary">Spara utställare</button>
+            <span id="exhibitors-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
         </section>
 
         <!-- ---------- SOCIALA MEDIER ---------- -->
-        <section data-tab-panel="social" hidden>
+        <section data-tab-panel="social" id="panel-social" role="tabpanel" aria-labelledby="tab-social" tabindex="0" hidden>
           <h2>Sociala medier</h2>
           <ul id="social-list"></ul>
           <button id="add-social-btn" class="btn">+ Lägg till länk</button>
           <div class="form-actions">
-            <button id="save-social-btn" class="btn btn--primary">Spara ändringar</button>
-            <span id="social-saved-msg" class="saved-msg" hidden>✓ Sparat</span>
+            <button id="save-social-btn" class="btn btn--primary">Spara länkar</button>
+            <span id="social-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
         </section>
 
         <!-- ---------- FOTBOLL & BASKET ---------- -->
-        <section data-tab-panel="sports" hidden>
+        <section data-tab-panel="sports" id="panel-sports" role="tabpanel" aria-labelledby="tab-sports" tabindex="0" hidden>
           <h2>Fotboll &amp; basket</h2>
           <p class="help">Hantera kommande sport-anmälningar.</p>
           <div id="sports-list"></div>
           <div class="form-actions">
-            <button id="save-sports-btn" class="btn btn--primary">Spara ändringar</button>
-            <span id="sports-saved-msg" class="saved-msg" hidden>✓ Sparat</span>
+            <button id="save-sports-btn" class="btn btn--primary">Spara sport-sidor</button>
+            <span id="sports-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
         </section>
 
@@ -182,12 +188,12 @@
   <!-- ========================================================== -->
   <!-- TOAST CONTAINER                                             -->
   <!-- ========================================================== -->
-  <div id="toast-container" aria-live="polite"></div>
+  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
 
   <!-- ========================================================== -->
   <!-- BEKRÄFTELSE-MODAL                                           -->
   <!-- ========================================================== -->
-  <dialog id="confirm-dialog">
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
     <h3 id="confirm-title">Bekräfta</h3>
     <p id="confirm-message"></p>
     <div class="dialog__actions">
@@ -196,7 +202,7 @@
     </div>
   </dialog>
 
-  <script src="config.js"></script>
-  <script src="admin.js"></script>
+  <script src="config.js" defer></script>
+  <script src="admin.js" defer></script>
 </body>
 </html>

@@ -1628,7 +1628,7 @@ function setupAdminPassword(password) {
 // SECTION 9 — DEFAULT-DATA
 // =============================================================================
 
-const DEFAULT_INTRO_TEXT = 'Föreningen arrangerar en festival med bazaar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns trädgård vid Medborgarplatsen. Vi bjuder in företagare, kreativa personer och föreningar som vill sälja eller presentera produkter och tjänster vid ett stånd att anmäla sig.';
+const DEFAULT_INTRO_TEXT = 'Föreningen arrangerar en festival med basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns trädgård vid Medborgarplatsen. Vi bjuder in företagare, kreativa personer och föreningar som vill sälja eller presentera produkter och tjänster vid ett stånd att anmäla sig.';
 
 const DEFAULT_WHO_CAN_APPLY_TEXT = 'Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.';
 
@@ -1641,10 +1641,10 @@ const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är
  */
 const DEFAULT_SETTINGS = [
   ['eventTitle', 'Stockholms Moské Festival', 'text', 'Eventets titel', 'Hero-rubrik på publika sidan.'],
-  ['eventSubtitle', 'Bazaar, öppet hus & familjeaktiviteter', 'text', 'Undertitel', 'Visas under huvudrubriken.'],
+  ['eventSubtitle', 'Basar, öppet hus & familjeaktiviteter', 'text', 'Undertitel', 'Visas under huvudrubriken.'],
   ['eventDate', 'Lördag 30 maj', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],
-  ['bazaarTime', '13:00–17:00', 'text', 'Bazarens tid', 'Specifik tid för bazaren.'],
+  ['bazaarTime', '13:00–17:00', 'text', 'Basarens tid', 'Specifik tid för basaren.'],
   ['eventLocation', 'Stockholms Moské & Björns trädgård, Medborgarplatsen', 'text', 'Plats', 'Visas i hero och info-kort.'],
   ['expectedChildren', 130, 'number', 'Förväntade barn', 'Används i info-kort.'],
   ['expectedAdults', 200, 'number', 'Förväntade vuxna', 'Används i info-kort.'],
