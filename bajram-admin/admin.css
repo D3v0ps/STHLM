@@ -1226,11 +1226,31 @@ dialog p { margin-bottom: 16px; }
   border-bottom: 1px solid var(--line);
   box-shadow: none;
 }
+.topbar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar__logo {
+  width: 32px;
+  height: 36px;
+  object-fit: contain;
+}
 .topbar__title {
-  font-family: var(--sm-font-display);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
   font-weight: 400;
   color: var(--ink);
+}
+.topbar__name {
+  font-family: var(--sm-font-display);
+  font-size: 15px;
   letter-spacing: -0.005em;
+}
+.topbar__sub {
+  font-size: 11px;
+  color: var(--ink-muted);
 }
 .topbar .btn--ghost-light {
   color: var(--ink);
