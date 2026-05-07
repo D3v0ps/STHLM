@@ -11,7 +11,7 @@
   // ---------------------------------------------------------------------------
 
   var CACHE_KEY = 'smf_publicData';
-  var CACHE_TTL_MS = 5 * 60 * 1000; // 5 min
+  var CACHE_TTL_MS = 60 * 1000; // 1 min — cache är bara för instant paint, nätverk körs ändå
   var FETCH_TIMEOUT_MS = 8000;
   var SUBMIT_COOLDOWN_MS = 60 * 1000;
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -126,15 +126,17 @@
     // Bind popup direkt — fungerar oavsett data.
     bindPopup();
 
+    // Stale-while-revalidate: rendera cache direkt om den finns för snabb
+    // first paint, men kör alltid en färsk fetch i bakgrunden så att
+    // ändringar från admin slår igenom direkt vid en omladdning.
     var cached = readCache();
-    if (cached) {
-      applyData(cached);
-      return;
-    }
+    if (cached) applyData(cached);
 
     fetchPublicData(function (err, data) {
       if (err || !data) {
-        applyData((getConfig().fallbackData) || emptyData());
+        // Nätverket failade — om vi redan renderat cache: behåll den.
+        // Annars fall tillbaka på config.fallbackData.
+        if (!cached) applyData((getConfig().fallbackData) || emptyData());
         return;
       }
       writeCache(data);
