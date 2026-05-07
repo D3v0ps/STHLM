@@ -58,6 +58,7 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   scroll-behavior: smooth;
 }
 
@@ -78,6 +79,7 @@ ol[role="list"] {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
   font-family: var(--sm-font-body);
   font-size: 1rem;
   line-height: 1.6;
@@ -307,7 +309,9 @@ button {
 
 .hero__title {
   font-family: var(--sm-font-display);
-  font-size: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+  font-size: clamp(2rem, 6vw + 0.75rem, 5.5rem);
+  overflow-wrap: balance;
+  hyphens: auto;
   font-weight: 500;
   line-height: 1.05;
   letter-spacing: -0.015em;
@@ -914,6 +918,10 @@ button {
   gap: 12px;
 }
 
+.field--checkbox label {
+  min-height: 44px;
+  padding: 10px 0;
+}
 .field--checkbox input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -1090,6 +1098,12 @@ button {
   box-shadow: var(--sm-shadow-sm);
 }
 
+.exhibitor-card__head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .exhibitor-card__title {
   font-family: var(--sm-font-display);
   font-size: 1.25rem;
@@ -1097,6 +1111,22 @@ button {
   color: var(--sm-blue-900);
   margin: 0;
   line-height: 1.25;
+}
+
+.exhibitor-card__subtitle {
+  font-family: var(--sm-font-body);
+  font-size: 0.875rem;
+  color: var(--sm-text-muted);
+  margin: 0;
+}
+
+.exhibitors-title {
+  font-family: var(--sm-font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--sm-blue-900);
+  margin: 32px 0 20px;
+  letter-spacing: -0.01em;
 }
 
 .exhibitor-card__chip {
@@ -1249,11 +1279,14 @@ button {
 /* --------------------------------------------------------------------------
    15. Floating "Följ oss"-knapp
    -------------------------------------------------------------------------- */
+/* Tom-state padding så FAB inte överlappar submit-knappen */
+.section--form { padding-bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 88px)); }
+
 .social-fab,
 #social-fab {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom, 20px));
+  right: max(20px, env(safe-area-inset-right, 20px));
   z-index: 50;
   display: inline-flex;
   align-items: center;
@@ -1386,8 +1419,8 @@ dialog#social-dialog::backdrop,
 
 .dialog__close {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   display: inline-grid;
   place-items: center;
   background: transparent;
