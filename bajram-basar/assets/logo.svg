@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 110" role="img" aria-label="Islamiska Förbundet · Stockholms Moské">
+  <title>Islamiska Förbundet · Stockholms Moské</title>
+  <!--
+    Placeholder-mark i designsystemets brass-färg (#b8956a).
+    Mosaic-arch med IF-monogram. Ersätt gärna denna fil med
+    föreningens riktiga logotyp (PNG eller SVG behåll filnamnet).
+  -->
+  <g fill="#b8956a">
+    <!-- Yttre arch-ram (mosque-form) -->
+    <path d="M 8 105 L 8 42 Q 8 4 50 4 Q 92 4 92 42 L 92 105 L 78 105 L 78 50 Q 78 22 50 22 Q 22 22 22 50 L 22 105 Z"/>
+    <!-- I bokstav -->
+    <rect x="29" y="38" width="9" height="58" rx="1.5"/>
+    <!-- F bokstav -->
+    <rect x="48" y="38" width="9" height="58" rx="1.5"/>
+    <rect x="48" y="38" width="24" height="9" rx="1.5"/>
+    <rect x="48" y="58" width="18" height="9" rx="1.5"/>
+  </g>
+</svg>

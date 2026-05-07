@@ -8,18 +8,18 @@ window.APP_CONFIG = {
   // så sidan ser bra ut även när backend är nere.
   fallbackData: {
     settings: {
-      eventTitle: "Stockholms Moské Festival",
-      eventSubtitle: "Basar, öppet hus & familjeaktiviteter",
+      eventTitle: "Festival",
+      eventSubtitle: "— en dag för gemenskap",
       eventDate: "Lördag 30 maj",
       eventTime: "12:00–19:00",
       bazaarTime: "13:00–17:00",
-      eventLocation: "Stockholms Moské & Björns trädgård, Medborgarplatsen",
+      eventLocation: "Stockholms Moské",
       expectedChildren: 130,
       expectedAdults: 200,
       registrationOpen: true,
       showExhibitors: true,
-      heroButtonText: "Anmäl intresse till bazaren",
-      introText: "Föreningen arrangerar en festival med basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns trädgård vid Medborgarplatsen. Vi bjuder in företagare, kreativa personer och föreningar som vill sälja eller presentera produkter och tjänster vid ett stånd att anmäla sig.",
+      heroButtonText: "Anmäl dig till basaren",
+      introText: "Basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.",
       whoCanApplyText: "Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.",
       selectionText: "Urvalet kommer att göras baserat på hur relevant ditt erbjudande är för besökarna samt hur genomförbart det är. Ju mer information du lämnar om vad du planerar att sälja eller presentera, desto enklare blir bedömningen. Vi hör av oss efter att urvalsprocessen är klar.",
       importantInfoText: "• Att delta är gratis.\n• Anmälan är bindande – vid sen avanmälan kan en avgift debiteras.\n• Varje deltagare ansvarar för sin egen plats.\n• Varje deltagare ansvarar för städning efter avslutat evenemang.\n• Bazaren är öppen mellan kl. 13:00–17:00; festivalen pågår 12:00–19:00.",

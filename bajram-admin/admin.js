@@ -1980,41 +1980,44 @@
    * @param {string} message  Meddelandetext (svenska).
    * @param {string} [type]   'info' | 'success' | 'error'
    */
+  // Banner-system: en inline-banner ovanför dashboarden istället för flytande toasts.
+  // Lugnt, läsbart, syns tills användaren stänger eller en ny händelse skriver över.
+  let bannerHideTimer = null;
   function toast(message, type) {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
-    const t = document.createElement('div');
-    t.className = 'toast toast--' + (type || 'info');
-    t.setAttribute('role', type === 'error' ? 'alert' : 'status');
+    const banner = document.getElementById('banner');
+    if (!banner) return;
+    const variant = type || 'info';
+    banner.className = 'banner banner--' + variant;
+    banner.setAttribute('role', variant === 'error' ? 'alert' : 'status');
+    banner.hidden = false;
 
+    while (banner.firstChild) banner.removeChild(banner.firstChild);
     const txt = document.createElement('span');
-    txt.className = 'toast__text';
+    txt.className = 'banner__text';
     txt.textContent = message;
-    t.appendChild(txt);
+    banner.appendChild(txt);
 
     const close = document.createElement('button');
     close.type = 'button';
-    close.className = 'toast__close';
+    close.className = 'banner__close';
     close.setAttribute('aria-label', 'Stäng meddelande');
     close.textContent = '×';
-    close.addEventListener('click', function() { dismissToast(t); });
-    t.appendChild(close);
+    close.addEventListener('click', function() { hideBanner(); });
+    banner.appendChild(close);
 
-    container.appendChild(t);
-
-    // Animation in
-    requestAnimationFrame(function() { t.classList.add('is-visible'); });
-
-    setTimeout(function() { dismissToast(t); }, 4000);
+    if (bannerHideTimer) { clearTimeout(bannerHideTimer); bannerHideTimer = null; }
+    // Auto-dölj success/info efter 5s. Errors stannar kvar tills användaren stänger.
+    if (variant !== 'error') {
+      bannerHideTimer = setTimeout(hideBanner, 5000);
+    }
   }
 
-  function dismissToast(t) {
-    if (!t || !t.parentNode) return;
-    t.classList.remove('is-visible');
-    t.classList.add('is-leaving');
-    setTimeout(function() {
-      if (t.parentNode) t.parentNode.removeChild(t);
-    }, 250);
+  function hideBanner() {
+    const banner = document.getElementById('banner');
+    if (!banner) return;
+    banner.hidden = true;
+    while (banner.firstChild) banner.removeChild(banner.firstChild);
+    if (bannerHideTimer) { clearTimeout(bannerHideTimer); bannerHideTimer = null; }
   }
 
   /**

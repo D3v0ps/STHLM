@@ -41,7 +41,13 @@
 
     <!-- Toppbar -->
     <header class="topbar">
-      <div class="topbar__title">Admin · Stockholms Moské Festival</div>
+      <div class="topbar__brand">
+        <img src="assets/logo.svg" alt="" class="topbar__logo" width="32" height="36">
+        <div class="topbar__title">
+          <span class="topbar__name">Stockholms Moské</span>
+          <span class="topbar__sub">Admin · Festival 2026</span>
+        </div>
+      </div>
       <div class="topbar__actions">
         <a id="preview-public-link" href="../bajram-basar/" target="_blank" rel="noopener" class="btn btn--ghost-light">Förhandsgranska publik sida</a>
         <button id="logout-btn" class="btn btn--ghost-light">Logga ut</button>
@@ -185,10 +191,8 @@
     </div>
   </div>
 
-  <!-- ========================================================== -->
-  <!-- TOAST CONTAINER                                             -->
-  <!-- ========================================================== -->
-  <div id="toast-container" aria-live="polite" aria-atomic="false"></div>
+  <!-- Banner ersätter toasts: live-meddelande direkt i layouten -->
+  <div id="banner" class="banner" role="status" aria-live="polite" hidden></div>
 
   <!-- ========================================================== -->
   <!-- BEKRÄFTELSE-MODAL                                           -->

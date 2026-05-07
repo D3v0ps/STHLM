@@ -326,6 +326,16 @@
     if (!container) return;
 
     var open = toBool(settings && settings.registrationOpen);
+
+    // Uppdatera chip i form-card head ("Anmälan öppen" / "Anmälan stängd")
+    var chip = document.getElementById('form-status-chip');
+    if (chip) {
+      chip.className = open ? 'chip ok' : 'chip muted';
+      chip.innerHTML = '';
+      chip.appendChild(el('span', { class: open ? 'dot ok' : 'dot' }));
+      chip.appendChild(document.createTextNode(open ? 'Anmälan öppen' : 'Anmälan stängd'));
+    }
+
     if (!open) {
       container.hidden = true;
       while (container.firstChild) container.removeChild(container.firstChild);
@@ -361,9 +371,10 @@
     var status = el('div', { id: 'form-status', class: 'form-status', 'aria-live': 'polite', role: 'status' });
     form.appendChild(status);
 
-    // Submit-knapp.
+    // Submit-rad: notering + knapp.
     var actions = el('div', { class: 'form-actions' }, [
-      el('button', { type: 'submit', class: 'btn btn--primary', text: 'Skicka intresseanmälan' })
+      el('span', { class: 'form-card__foot-note', text: 'Vi återkommer inom 1–2 veckor med besked.' }),
+      el('button', { type: 'submit', class: 'btn btn-primary', text: 'Skicka anmälan' })
     ]);
     form.appendChild(actions);
 
@@ -806,10 +817,10 @@
   function showSuccess(form) {
     var settings = (currentData && currentData.settings) || {};
     var msg = settings.successMessage ||
-      'Tack! Din intresseanmälan har skickats. Vi återkommer efter att urvalet har gåtts igenom.';
+      'Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.';
     var parent = form.parentNode;
     if (!parent) return;
-    var success = el('div', { class: 'form-success', role: 'status', 'aria-live': 'polite' }, [
+    var success = el('div', { class: 'success-state', role: 'status', 'aria-live': 'polite' }, [
       el('h3', { text: 'Tack för din anmälan!' }),
       el('p', { text: msg })
     ]);
@@ -869,6 +880,7 @@
   /** Bind FAB-knapp, dialog-stängning, ESC och klick utanför. */
   function bindPopup() {
     var fab = document.getElementById('social-fab');
+    var navTrigger = document.getElementById('social-fab-trigger');
     var dialog = document.getElementById('social-dialog');
     if (!fab || !dialog) return;
 
@@ -902,6 +914,13 @@
       if (dialog.open) close(true);
       else open();
     });
+
+    if (navTrigger) {
+      navTrigger.addEventListener('click', function () {
+        if (dialog.open) close(true);
+        else open();
+      });
+    }
 
     if (closeBtn) {
       closeBtn.addEventListener('click', function () { close(true); });
