@@ -1,7 +1,7 @@
-# festival-bazaar/ – Publik landningssida
+# festival/ – Publik landningssida
 
 Statiska filer som laddas upp till One.com via SFTP. Sidan körs på:
-https://karimkhalil.se/festival-bazaar/
+https://stockholmsmoske.se/festival/
 
 ## Filer i denna mapp
 
@@ -22,11 +22,11 @@ Använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit) eller kommandorad.
 
 **SFTP-uppgifter:** Förvara dem i en lösenordshanterare eller GitHub Actions Secrets — ALDRIG i denna kod.
 
-Hosta hela mappens innehåll på One.com under sökvägen `/festival-bazaar/` i webroot (eller motsvarande sökväg som ger URL:en `karimkhalil.se/festival-bazaar/`).
+Hosta hela mappens innehåll på One.com under sökvägen `/festival/` i webroot (eller motsvarande sökväg som ger URL:en `stockholmsmoske.se/festival/`).
 
 **Exempel med rsync över SSH:**
 
-    rsync -avz --delete festival-bazaar/ <user>@<host>:/<webroot>/festival-bazaar/
+    rsync -avz --delete festival/ <user>@<host>:/<webroot>/festival/
 
 (Värdena hämtas från lösenordshanteraren/Secrets, inte från koden.)
 

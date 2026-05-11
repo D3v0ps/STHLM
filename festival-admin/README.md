@@ -3,7 +3,7 @@
 En fullständig adminpanel som körs som static SPA på One.com och pratar med
 Apps Script Web App via fetch POST. Inga build-steg, inga frameworks.
 
-URL: https://karimkhalil.se/festival-admin/
+URL: https://stockholmsmoske.se/festival-admin/
 
 ## Filer
 
