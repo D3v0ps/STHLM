@@ -1630,11 +1630,11 @@ function setupAdminPassword(password) {
 
 const DEFAULT_INTRO_TEXT = 'Bazaar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.';
 
-const DEFAULT_WHO_CAN_APPLY_TEXT = 'Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.';
+const DEFAULT_WHO_CAN_APPLY_TEXT = 'Bazaren är öppen för företagare, kreatörer, föreningar och privatpersoner som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis. I formuläret vill vi att du beskriver vad du planerar att erbjuda och vilket stånd du behöver.';
 
 const DEFAULT_SELECTION_TEXT = 'Urvalet kommer att göras baserat på hur relevant ditt erbjudande är för besökarna samt hur genomförbart det är. Ju mer information du lämnar om vad du planerar att sälja eller presentera, desto enklare blir bedömningen. Vi hör av oss efter att urvalsprocessen är klar.';
 
-const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är bindande – vid sen avanmälan kan en avgift debiteras.\n• Varje deltagare ansvarar för sin egen plats.\n• Varje deltagare ansvarar för städning efter avslutat evenemang.\n• Bazaren är öppen mellan kl. 13:00–17:00; festivalen pågår 12:00–19:00.';
+const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är bindande – vid sen avanmälan kan en avgift tillkomma.\n• Varje deltagare ansvarar för sin egen plats.\n• Varje deltagare ansvarar för städning efter avslutat evenemang.\n• Bazaren är öppen mellan kl. 13:00–17:00; festivalen pågår 12:00–19:00.';
 
 /**
  * Settings-rader: [Key, Value, Type, Label, Description].
@@ -1657,7 +1657,7 @@ const DEFAULT_SETTINGS = [
   ['importantInfoText', DEFAULT_IMPORTANT_INFO_TEXT, 'textarea', 'Viktigt att känna till', 'Punktlista med villkor.'],
   ['successMessage', 'Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.', 'text', 'Tack-meddelande', 'Visas efter lyckad inlämning.'],
   ['closedMessage', 'Anmälan är stängd. Utställare publiceras här när programmet är klart.', 'text', 'Stängd-meddelande', 'Visas när registrationOpen=FALSE.'],
-  ['purposeText', 'Stockholms Moské Festival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
+  ['purposeText', 'Stockholms Moské Festival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – i en öppen, familjevänlig och inkluderande miljö där människor möts.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
   ['linktreeUrl', 'https://linktr.ee/stockholmsmoske', 'text', 'Linktree-URL', 'Om satt visas en länk till Linktree i marknadsförings-sektionen.'],
   ['activityBazaarText', 'Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.', 'textarea', 'Bazaar — beskrivning', 'Visas på bazaar-kortet.'],
   ['activitySportText', 'Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.', 'textarea', 'Sport — beskrivning', 'Visas på sport-kortet.'],
