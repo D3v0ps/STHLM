@@ -95,6 +95,11 @@
           <span class="tab-nav__icon" aria-hidden="true">◇</span>
           <span class="tab-nav__label">Fotboll &amp; basket</span>
         </button>
+        <button class="tab-nav__btn" data-tab="volunteers" type="button" id="tab-volunteers" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">✦</span>
+          <span class="tab-nav__label">Volontärer</span>
+          <span id="tab-badge-volunteers" class="tab-nav__badge" hidden></span>
+        </button>
 
         <p class="tab-nav__group-label">Inställningar</p>
         <button class="tab-nav__btn" data-tab="social" type="button" id="tab-social" aria-selected="false">
@@ -284,6 +289,44 @@
             <button id="save-sports-btn" class="btn btn--primary">Spara sport-sidor</button>
             <span id="sports-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
+        </section>
+
+        <!-- ---------- VOLONTÄRER ---------- -->
+        <section data-tab-panel="volunteers" id="panel-volunteers" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Volontärer</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Volontärer</h1>
+                <p class="page-header__sub" id="volunteers-subtitle">Anmälningar från volontärformuläret.</p>
+              </div>
+              <button id="export-volunteers-csv-btn" class="btn btn-ghost">Exportera CSV ↓</button>
+            </div>
+          </div>
+
+          <div class="filter-tabs" role="tablist" aria-label="Filtrera volontärer på status">
+            <button class="filter-tab is-active" data-vol-filter="all" type="button" role="tab" aria-selected="true">Alla <span class="filter-tab__count" data-vol-count="all">0</span></button>
+            <button class="filter-tab" data-vol-filter="new" type="button" role="tab" aria-selected="false">Nya <span class="filter-tab__count" data-vol-count="new">0</span></button>
+            <button class="filter-tab" data-vol-filter="reviewed" type="button" role="tab" aria-selected="false">Granskar <span class="filter-tab__count" data-vol-count="reviewed">0</span></button>
+            <button class="filter-tab" data-vol-filter="approved" type="button" role="tab" aria-selected="false">Godkända <span class="filter-tab__count" data-vol-count="approved">0</span></button>
+            <button class="filter-tab" data-vol-filter="contacted" type="button" role="tab" aria-selected="false">Kontaktade <span class="filter-tab__count" data-vol-count="contacted">0</span></button>
+            <button class="filter-tab" data-vol-filter="rejected" type="button" role="tab" aria-selected="false">Nekade <span class="filter-tab__count" data-vol-count="rejected">0</span></button>
+          </div>
+
+          <div class="toolbar">
+            <input type="search" id="volunteers-search" placeholder="Sök volontärer…" aria-label="Sök volontärer">
+          </div>
+          <table id="volunteers-table" class="data-table">
+            <thead>
+              <tr><th>Datum</th><th>Namn</th><th>Telefon</th><th>Pass</th><th>Områden</th><th>Status</th><th><span class="visually-hidden">Åtgärder</span></th></tr>
+            </thead>
+            <tbody id="volunteers-tbody"></tbody>
+          </table>
+
+          <dialog id="volunteer-detail" aria-labelledby="volunteer-detail-title">
+            <button class="dialog__close" aria-label="Stäng">×</button>
+            <div id="volunteer-detail-content"></div>
+          </dialog>
         </section>
 
       </main>

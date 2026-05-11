@@ -123,6 +123,7 @@
       sports: false
     },
     submissionsFilter: { status: 'all', search: '' },
+    volunteersFilter: { status: 'all', search: '' },
     currentSubmissionId: null
   };
 
@@ -279,6 +280,34 @@
     }
     const exportBtn = document.getElementById('export-csv-btn');
     if (exportBtn) exportBtn.addEventListener('click', handleExportCsv);
+
+    // Volontär-filter-pills
+    document.querySelectorAll('[data-vol-filter]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const value = btn.getAttribute('data-vol-filter') || 'all';
+        document.querySelectorAll('[data-vol-filter]').forEach(function(other) {
+          const isActive = other === btn;
+          other.classList.toggle('is-active', isActive);
+          other.setAttribute('aria-selected', isActive ? 'true' : 'false');
+        });
+        state.volunteersFilter.status = value;
+        renderVolunteersTable();
+      });
+    });
+
+    const volSearch = document.getElementById('volunteers-search');
+    if (volSearch) {
+      let volTimer = null;
+      volSearch.addEventListener('input', function() {
+        if (volTimer) clearTimeout(volTimer);
+        volTimer = setTimeout(function() {
+          state.volunteersFilter.search = volSearch.value;
+          renderVolunteersTable();
+        }, 200);
+      });
+    }
+    const exportVolBtn = document.getElementById('export-volunteers-csv-btn');
+    if (exportVolBtn) exportVolBtn.addEventListener('click', handleExportVolunteersCsv);
 
     // Toggle registration
     const toggleRegBtn = document.getElementById('toggle-registration-btn');
@@ -532,6 +561,7 @@
     renderExhibitorsList();
     renderSocialList();
     renderSportsList();
+    renderVolunteersTable();
   }
 
   // ============================================================
@@ -1754,6 +1784,297 @@
       const a = document.createElement('a');
       a.href = url;
       a.download = 'anmalningar-' + dateStampForFile() + '.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { try { URL.revokeObjectURL(url); } catch (_) {} }, 1000);
+      toast('Exporten är klar.', 'success');
+    } catch (err) {
+      if (isAuthError(err)) { await handleAuthError(); return; }
+      toast('Kunde inte exportera. Försök igen.', 'error');
+    } finally {
+      hideLoadingOverlay();
+    }
+  }
+
+  // ============================================================
+  // VOLONTÄRER
+  // ============================================================
+
+  function renderVolunteersTable() {
+    const tbody = document.getElementById('volunteers-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const vols = ((state.data && state.data.volunteers) || []).slice();
+    vols.sort(function(a, b) {
+      const ta = parseTimestamp(a.timestamp);
+      const tb = parseTimestamp(b.timestamp);
+      return tb - ta;
+    });
+
+    // Filter-räknare
+    const counts = { all: vols.length, new: 0, reviewed: 0, approved: 0, rejected: 0, contacted: 0 };
+    vols.forEach(function(v) {
+      const status = (v.status || 'new').toLowerCase();
+      if (counts.hasOwnProperty(status)) counts[status]++;
+    });
+    Object.keys(counts).forEach(function(key) {
+      const el = document.querySelector('.filter-tab__count[data-vol-count="' + key + '"]');
+      if (el) el.textContent = String(counts[key]);
+    });
+
+    // Tab-badge (nya)
+    const badge = document.getElementById('tab-badge-volunteers');
+    if (badge) {
+      if (counts.new > 0) { badge.textContent = String(counts.new); badge.hidden = false; }
+      else { badge.hidden = true; }
+    }
+
+    // Subtitle
+    const sub = document.getElementById('volunteers-subtitle');
+    if (sub) {
+      sub.textContent = vols.length + (vols.length === 1 ? ' volontär' : ' volontärer') +
+        ' totalt. Klicka på en rad för att se hela formuläret och uppdatera status.';
+    }
+
+    // Filtrera
+    const filtered = vols.filter(function(v) {
+      const status = (v.status || '').toLowerCase();
+      if (state.volunteersFilter.status !== 'all' && status !== state.volunteersFilter.status) return false;
+      const q = (state.volunteersFilter.search || '').trim().toLowerCase();
+      if (!q) return true;
+      const hay = ((v.name || '') + ' ' + (v.phone || '') + ' ' + (v.areas || '') + ' ' + (v.shifts || '')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+
+    if (filtered.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 7;
+      td.className = 'empty-state';
+      td.textContent = vols.length === 0 ? 'Inga volontäranmälningar än.' : 'Inga volontärer matchar dina filter.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    filtered.forEach(function(v) {
+      const tr = document.createElement('tr');
+      const dateTd = document.createElement('td');
+      dateTd.dataset.label = 'Datum';
+      dateTd.textContent = formatDateTime(v.timestamp);
+      tr.appendChild(dateTd);
+
+      const nameTd = document.createElement('td');
+      nameTd.dataset.label = 'Namn';
+      nameTd.textContent = v.name || '–';
+      tr.appendChild(nameTd);
+
+      const phoneTd = document.createElement('td');
+      phoneTd.dataset.label = 'Telefon';
+      phoneTd.textContent = v.phone || '–';
+      tr.appendChild(phoneTd);
+
+      const shiftsTd = document.createElement('td');
+      shiftsTd.dataset.label = 'Pass';
+      shiftsTd.textContent = shiftsToLabels(v.shifts);
+      tr.appendChild(shiftsTd);
+
+      const areasTd = document.createElement('td');
+      areasTd.dataset.label = 'Områden';
+      areasTd.textContent = areasToLabels(v.areas);
+      tr.appendChild(areasTd);
+
+      const statusTd = document.createElement('td');
+      statusTd.dataset.label = 'Status';
+      statusTd.appendChild(buildStatusChip(v.status || 'new'));
+      tr.appendChild(statusTd);
+
+      const actTd = document.createElement('td');
+      actTd.dataset.label = '';
+      const viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = 'btn btn--small';
+      viewBtn.textContent = 'Öppna anmälan';
+      viewBtn.addEventListener('click', function() { openVolunteerDetail(v.id); });
+      actTd.appendChild(viewBtn);
+      tr.appendChild(actTd);
+      tbody.appendChild(tr);
+    });
+  }
+
+  const AREA_LABELS = {
+    reception: 'Reception',
+    mat: 'Mat & fika',
+    barn: 'Barn',
+    sakerhet: 'Säkerhet',
+    bazaar: 'Bazaar',
+    stadning: 'Städning'
+  };
+  const SHIFT_LABELS = {
+    forenoon: 'Förmiddag (10:00–15:00)',
+    afternoon: 'Eftermiddag (15:00–20:00)'
+  };
+
+  function shiftsToLabels(raw) {
+    if (!raw) return '';
+    return String(raw).split(',').map(function(s) {
+      const k = s.trim();
+      return SHIFT_LABELS[k] || k;
+    }).join(', ');
+  }
+  function areasToLabels(raw) {
+    if (!raw) return '';
+    return String(raw).split(',').map(function(s) {
+      const k = s.trim();
+      return AREA_LABELS[k] || k;
+    }).join(', ');
+  }
+
+  function findVolunteer(id) {
+    return ((state.data && state.data.volunteers) || []).filter(function(v) { return v.id === id; })[0];
+  }
+
+  function openVolunteerDetail(id) {
+    const v = findVolunteer(id);
+    if (!v) return;
+    const dlg = document.getElementById('volunteer-detail');
+    const content = document.getElementById('volunteer-detail-content');
+    if (!dlg || !content) return;
+    content.innerHTML = '';
+
+    const head = document.createElement('div');
+    head.style.padding = '24px 28px 16px';
+    head.innerHTML = '<p class="eyebrow" style="margin: 0 0 8px;">Volontäranmälan</p>' +
+      '<h3 id="volunteer-detail-title" style="font-family: var(--sm-font-display); font-size: 24px; margin: 0 0 4px;">' + escape(v.name || '–') + '</h3>' +
+      '<p style="margin: 0; font-size: 12px; color: var(--ink-muted);">Inkommen: ' + escape(formatDateTime(v.timestamp)) + '</p>';
+    content.appendChild(head);
+
+    const detailBody = document.createElement('div');
+    detailBody.style.padding = '8px 28px 24px';
+    detailBody.appendChild(detailRow('Namn', v.name));
+    detailBody.appendChild(detailRow('Telefon', v.phone, 'tel:' + (v.phone || '')));
+    detailBody.appendChild(detailRow('Födelsedatum', v.birthDate ? formatBirth(v.birthDate) : '–'));
+    detailBody.appendChild(detailRow('Tidigare erfarenhet', v.hasExperience === 'ja' ? 'Ja' : 'Nej'));
+    detailBody.appendChild(detailRow('Pass', shiftsToLabels(v.shifts) || '–'));
+    detailBody.appendChild(detailRow('Områden', areasToLabels(v.areas) || '–'));
+    detailBody.appendChild(detailRow('Om sig själv', v.about || '–', null, true));
+    content.appendChild(detailBody);
+
+    // Status + notes
+    const footer = document.createElement('div');
+    footer.style.cssText = 'padding: 20px 28px; border-top: 1px solid var(--line); background: var(--cream); display: grid; grid-template-columns: 1fr 1fr; gap: 16px;';
+
+    const statusWrap = document.createElement('div');
+    statusWrap.innerHTML = '<label class="field-label" for="vol-status">Status</label>';
+    const statusSel = document.createElement('select');
+    statusSel.id = 'vol-status';
+    statusSel.className = 'select';
+    ['new', 'reviewed', 'approved', 'rejected', 'contacted'].forEach(function(s) {
+      const o = document.createElement('option');
+      o.value = s;
+      o.textContent = ({ new: 'Ny', reviewed: 'Granskar', approved: 'Godkänd', rejected: 'Nekad', contacted: 'Kontaktad' })[s];
+      if ((v.status || 'new') === s) o.selected = true;
+      statusSel.appendChild(o);
+    });
+    statusWrap.appendChild(statusSel);
+    footer.appendChild(statusWrap);
+
+    const notesWrap = document.createElement('div');
+    notesWrap.innerHTML = '<label class="field-label" for="vol-notes">Interna anteckningar</label>';
+    const notesArea = document.createElement('textarea');
+    notesArea.id = 'vol-notes';
+    notesArea.className = 'textarea';
+    notesArea.rows = 2;
+    notesArea.value = v.internalNotes || '';
+    notesWrap.appendChild(notesArea);
+    footer.appendChild(notesWrap);
+
+    content.appendChild(footer);
+
+    // Action buttons
+    const actions = document.createElement('div');
+    actions.style.cssText = 'padding: 16px 28px 24px; background: var(--cream); display: flex; justify-content: flex-end; gap: 10px; border-bottom-left-radius: var(--sm-radius-lg); border-bottom-right-radius: var(--sm-radius-lg);';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn btn-ghost';
+    cancelBtn.textContent = 'Stäng';
+    cancelBtn.addEventListener('click', function() { dlg.close(); });
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'btn btn--primary';
+    saveBtn.textContent = 'Spara ändringar';
+    saveBtn.addEventListener('click', async function() {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Sparar…';
+      try {
+        await runServer('updateVolunteerStatus', state.token, v.id, statusSel.value, notesArea.value);
+        v.status = statusSel.value;
+        v.internalNotes = notesArea.value;
+        try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
+        dlg.close();
+        renderVolunteersTable();
+        toast('Volontäranmälan uppdaterad.', 'success');
+      } catch (err) {
+        if (isAuthError(err)) { await handleAuthError(); return; }
+        toast('Kunde inte spara. Försök igen.', 'error');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Spara ändringar';
+      }
+    });
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+    content.appendChild(actions);
+
+    try { dlg.showModal(); } catch (_) { dlg.setAttribute('open', ''); }
+  }
+
+  function detailRow(label, value, link, multiline) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display: grid; grid-template-columns: 160px 1fr; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line-soft); align-items: flex-start;';
+    const labelEl = document.createElement('div');
+    labelEl.style.cssText = 'font-size: 11px; color: var(--ink-muted); letter-spacing: 0.04em; text-transform: uppercase; font-weight: 500; padding-top: 2px;';
+    labelEl.textContent = label;
+    row.appendChild(labelEl);
+    const valueEl = document.createElement('div');
+    valueEl.style.cssText = 'font-size: 14px; color: var(--ink); line-height: ' + (multiline ? '1.6' : '1.4') + '; white-space: pre-wrap;';
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link;
+      a.style.color = 'var(--blue, #1e3a5f)';
+      a.style.textDecoration = 'none';
+      a.textContent = value || '–';
+      valueEl.appendChild(a);
+    } else {
+      valueEl.textContent = value || '–';
+    }
+    row.appendChild(valueEl);
+    return row;
+  }
+
+  function formatBirth(raw) {
+    if (!raw || !/^\d{6}$/.test(raw)) return raw || '';
+    // YYMMDD → ÅÅ-MM-DD
+    return raw.substring(0, 2) + '-' + raw.substring(2, 4) + '-' + raw.substring(4, 6);
+  }
+
+  function escape(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  async function handleExportVolunteersCsv() {
+    showLoadingOverlay();
+    try {
+      const csv = await runServer('exportVolunteersCsv', state.token);
+      if (!csv) { toast('Inget att exportera.', 'info'); return; }
+      const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'volontarer-' + dateStampForFile() + '.csv';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

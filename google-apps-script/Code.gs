@@ -22,6 +22,7 @@ const SHEET_NAMES = {
   EXHIBITORS: 'Exhibitors',
   SOCIAL_LINKS: 'SocialLinks',
   SPORTS_PAGES: 'SportsPages',
+  VOLUNTEERS: 'VolunteerSubmissions',
   ADMIN_LOGS: 'AdminLogs'
 };
 
@@ -40,6 +41,7 @@ const SHEET_HEADERS = {
   Exhibitors: ['ID', 'Order', 'Name', 'Company', 'Description', 'Category', 'Instagram', 'Website', 'Published'],
   SocialLinks: ['Order', 'Platform', 'Label', 'URL', 'Active'],
   SportsPages: ['Slug', 'Title', 'Description', 'Active', 'Registration Open'],
+  VolunteerSubmissions: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About', 'Internal Notes'],
   AdminLogs: ['Timestamp', 'Action', 'Details', 'Session ID']
 };
 
@@ -387,6 +389,10 @@ function doPost(e) {
       return jsonResponse_(handleSubmit_(body));
     }
 
+    if (action === 'submitVolunteer') {
+      return jsonResponse_(handleVolunteerSubmit_(body));
+    }
+
     if (adminAction) {
       return jsonResponse_(adminDispatch_(adminAction, body));
     }
@@ -440,6 +446,12 @@ function adminDispatch_(action, body) {
       return deleteExhibitor(args[0], args[1]);
     case 'exportSubmissionsCsv':
       return exportSubmissionsCsv(args[0]);
+    case 'getVolunteers':
+      return getVolunteers(args[0]);
+    case 'updateVolunteerStatus':
+      return updateVolunteerStatus(args[0], args[1], args[2], args[3]);
+    case 'exportVolunteersCsv':
+      return exportVolunteersCsv(args[0]);
     default:
       return { ok: false, error: 'unknown_admin_action' };
   }
@@ -528,6 +540,68 @@ function handleSubmit_(body) {
     ''
   ]);
 
+  return { ok: true, data: { id: id } };
+}
+
+/**
+ * Hanterar volontäranmälan från publika sidan. Skriver till
+ * VolunteerSubmissions-fliken. Skild från bazaar-submit eftersom
+ * datamodellen är annorlunda (egna kolumner, ingen FormQuestions-koppling).
+ *
+ * @param {Object} body  Förväntar { action: 'submitVolunteer', data: { ... } }
+ * @return {Object}
+ */
+function handleVolunteerSubmit_(body) {
+  const data = (body && body.data) || {};
+
+  // Honeypot
+  const honeypot = data.kontakttid;
+  if (honeypot && String(honeypot).trim() !== '') {
+    logAdminAction_('spam_blocked', { formType: 'volunteer', reason: 'honeypot_filled' }, null);
+    return { ok: true };
+  }
+
+  // Validering (server-side fallback; klienten gör mest jobbet)
+  const name = String(data.name || '').trim();
+  const phone = String(data.phone || '').trim();
+  const birthDate = String(data.birthDate || '').trim();
+  const hasExperience = data.hasExperience === true || data.hasExperience === 'ja' || data.hasExperience === 'true';
+  const areasRaw = data.areas;
+  const areas = Array.isArray(areasRaw) ? areasRaw : (areasRaw ? [String(areasRaw)] : []);
+  const shiftsRaw = data.shifts;
+  const shifts = Array.isArray(shiftsRaw) ? shiftsRaw : (shiftsRaw ? [String(shiftsRaw)] : []);
+  const about = String(data.about || '').trim();
+
+  const errors = {};
+  if (!name) errors.name = 'required';
+  if (!phone) errors.phone = 'required';
+  if (!birthDate || !/^\d{6}$/.test(birthDate)) errors.birthDate = 'invalid_format';
+  if (areas.length === 0) errors.areas = 'pick_at_least_one';
+  if (shifts.length === 0) errors.shifts = 'pick_at_least_one';
+  if (!about || about.length < 10) errors.about = 'too_short';
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, error: 'validation_failed', details: errors };
+  }
+
+  const id = Utilities.getUuid();
+  const timestamp = new Date().toISOString();
+  const sheet = getSheet_(SHEET_NAMES.VOLUNTEERS);
+  sheet.appendRow([
+    id,
+    timestamp,
+    'new',
+    name,
+    phone,
+    birthDate,
+    hasExperience ? 'ja' : 'nej',
+    areas.join(', '),
+    shifts.join(', '),
+    about,
+    ''
+  ]);
+
+  logAdminAction_('volunteer_submitted', { id: id, name: name }, null);
   return { ok: true, data: { id: id } };
 }
 
@@ -921,7 +995,8 @@ function getAdminData(token) {
         submissions: readAllSubmissions_(),
         exhibitors: readAllExhibitors_(),
         socialLinks: readAllSocialLinks_(),
-        sportsPages: readSportsPages_()
+        sportsPages: readSportsPages_(),
+        volunteers: readAllVolunteers_()
       }
     };
   });
@@ -1355,6 +1430,104 @@ function readAllSubmissions_() {
 }
 
 /**
+ * Läser alla volontäranmälningar.
+ *
+ * @return {Array<Object>}
+ */
+function readAllVolunteers_() {
+  const rows = readSheetAsObjects_(SHEET_NAMES.VOLUNTEERS);
+  return rows.map(function (r) {
+    return {
+      id: r.id || '',
+      timestamp: r.timestamp || '',
+      status: r.status || 'new',
+      name: r.name || '',
+      phone: r.phone || '',
+      birthDate: r.birthDate || '',
+      hasExperience: r.hasExperience || '',
+      areas: r.areas || '',
+      shifts: r.shifts || '',
+      about: r.about || '',
+      internalNotes: r.internalNotes || ''
+    };
+  });
+}
+
+/**
+ * Admin: hämta alla volontäranmälningar.
+ *
+ * @param {string} token
+ * @return {Object}
+ */
+function getVolunteers(token) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    return { ok: true, data: readAllVolunteers_() };
+  });
+}
+
+/**
+ * Admin: uppdatera status + interna anteckningar för en volontäranmälan.
+ *
+ * @param {string} token
+ * @param {string} volunteerId
+ * @param {string} status
+ * @param {string} notes
+ * @return {Object}
+ */
+function updateVolunteerStatus(token, volunteerId, status, notes) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    const allowedStatuses = ['new', 'reviewed', 'approved', 'rejected', 'contacted'];
+    if (allowedStatuses.indexOf(status) === -1) {
+      return { ok: false, error: 'invalid_status' };
+    }
+    const updates = { 'Status': status };
+    if (notes !== undefined && notes !== null) {
+      updates['Internal Notes'] = String(notes);
+    }
+    const ok = updateRowByMatch_(SHEET_NAMES.VOLUNTEERS, 'ID', volunteerId, updates);
+    if (!ok) return { ok: false, error: 'not_found' };
+    logAdminAction_('update_volunteer_status', { id: volunteerId, status: status }, token);
+    return { ok: true };
+  });
+}
+
+/**
+ * Admin: CSV-export av alla volontäranmälningar.
+ *
+ * @param {string} token
+ * @return {Object}
+ */
+function exportVolunteersCsv(token) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    const volunteers = readAllVolunteers_();
+    const headers = ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About', 'Internal Notes'];
+    const lines = [headers.map(csvEscape_).join(',')];
+    for (let i = 0; i < volunteers.length; i++) {
+      const v = volunteers[i];
+      lines.push([
+        v.id || '',
+        v.timestamp || '',
+        v.status || '',
+        v.name || '',
+        v.phone || '',
+        v.birthDate || '',
+        v.hasExperience || '',
+        v.areas || '',
+        v.shifts || '',
+        v.about || '',
+        v.internalNotes || ''
+      ].map(csvEscape_).join(','));
+    }
+    const csv = lines.join('\r\n');
+    logAdminAction_('export_volunteers_csv', { count: volunteers.length }, token);
+    return { ok: true, data: csv };
+  });
+}
+
+/**
  * Läser alla utställare (även opublicerade) sorterat efter order.
  *
  * @return {Array<Object>}
@@ -1515,7 +1688,12 @@ function setupSpreadsheet() {
       addBooleanValidation_(sheet, ['Active', 'Registration Open']);
     });
 
-    // 7. AdminLogs
+    // 7. VolunteerSubmissions (tom + headers)
+    ensureSheet_(ss, SHEET_NAMES.VOLUNTEERS, SHEET_HEADERS.VolunteerSubmissions, created, updated, function (sheet) {
+      addDropdownValidation_(sheet, 'Status', ['new', 'reviewed', 'approved', 'rejected', 'contacted']);
+    });
+
+    // 8. AdminLogs
     ensureSheet_(ss, SHEET_NAMES.ADMIN_LOGS, SHEET_HEADERS.AdminLogs, created, updated);
 
     logAdminAction_('setup_spreadsheet', { created: created, updated: updated }, null);
