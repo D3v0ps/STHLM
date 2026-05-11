@@ -1628,7 +1628,7 @@ function setupAdminPassword(password) {
 // SECTION 9 — DEFAULT-DATA
 // =============================================================================
 
-const DEFAULT_INTRO_TEXT = 'Basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.';
+const DEFAULT_INTRO_TEXT = 'Bazaar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.';
 
 const DEFAULT_WHO_CAN_APPLY_TEXT = 'Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.';
 
@@ -1644,22 +1644,22 @@ const DEFAULT_SETTINGS = [
   ['eventSubtitle', '— en dag för gemenskap', 'text', 'Underrubrik (kursiv)', 'Visas i kursiv mässing-färg under titeln.'],
   ['eventDate', 'Lördag 13 juni', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],
-  ['bazaarTime', '13:00–17:00', 'text', 'Basarens tid', 'Specifik tid för basaren.'],
+  ['bazaarTime', '13:00–17:00', 'text', 'Bazaarens tid', 'Specifik tid för bazaaren.'],
   ['eventLocation', 'Stockholms Moské & Björns trädgård, Medborgarplatsen', 'text', 'Plats', 'Visas i hero och info-kort.'],
   ['expectedChildren', 130, 'number', 'Förväntade barn', 'Används i info-kort.'],
   ['expectedAdults', 200, 'number', 'Förväntade vuxna', 'Används i info-kort.'],
   ['registrationOpen', 'TRUE', 'boolean', 'Anmälan öppen', 'TRUE = formuläret visas. FALSE = utställarlistan visas.'],
   ['showExhibitors', 'TRUE', 'boolean', 'Visa utställarlista', 'TRUE = visa publicerade utställare.'],
-  ['heroButtonText', 'Anmäl dig till basaren', 'text', 'Text på hero-knapp', 'Primär CTA i hero.'],
+  ['heroButtonText', 'Anmäl dig till bazaaren', 'text', 'Text på hero-knapp', 'Primär CTA i hero.'],
   ['introText', DEFAULT_INTRO_TEXT, 'textarea', 'Introduktionstext', 'Inledande text under hero.'],
   ['whoCanApplyText', DEFAULT_WHO_CAN_APPLY_TEXT, 'textarea', 'Vem kan anmäla sig?', 'Sektion om målgrupp.'],
   ['selectionText', DEFAULT_SELECTION_TEXT, 'textarea', 'Så görs urvalet', 'Sektion om urvalsprocessen.'],
   ['importantInfoText', DEFAULT_IMPORTANT_INFO_TEXT, 'textarea', 'Viktigt att känna till', 'Punktlista med villkor.'],
   ['successMessage', 'Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.', 'text', 'Tack-meddelande', 'Visas efter lyckad inlämning.'],
   ['closedMessage', 'Anmälan är stängd. Utställare publiceras här när programmet är klart.', 'text', 'Stängd-meddelande', 'Visas när registrationOpen=FALSE.'],
-  ['purposeText', 'Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom basar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
+  ['purposeText', 'Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
   ['linktreeUrl', '', 'text', 'Linktree-URL', 'Om satt visas en länk till Linktree i marknadsförings-sektionen.'],
-  ['activityBazaarText', 'Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.', 'textarea', 'Basar — beskrivning', 'Visas på basar-kortet.'],
+  ['activityBazaarText', 'Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.', 'textarea', 'Bazaar — beskrivning', 'Visas på bazaar-kortet.'],
   ['activitySportText', 'Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.', 'textarea', 'Sport — beskrivning', 'Visas på sport-kortet.'],
   ['activityMatText', 'Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.', 'textarea', 'Mat — beskrivning', 'Visas på mat-kortet.'],
   ['activityKidsText', 'Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.', 'textarea', 'Barnaktiviteter — beskrivning', 'Visas på barn-kortet.'],
@@ -1695,6 +1695,6 @@ const DEFAULT_SOCIAL_LINKS = [
  * SportsPages-rader: [Slug, Title, Description, Active, Registration Open].
  */
 const DEFAULT_SPORTS_PAGES = [
-  ['bajram-fotboll', 'Anmälan till fotboll', 'Mer information kommer snart.', 'FALSE', 'FALSE'],
-  ['bajram-basket-3vs3', 'Anmälan till basket 3 mot 3', 'Mer information kommer snart.', 'FALSE', 'FALSE']
+  ['festival-fotboll', 'Anmälan till fotboll', 'Mer information kommer snart.', 'FALSE', 'FALSE'],
+  ['festival-basket-3vs3', 'Anmälan till basket 3 mot 3', 'Mer information kommer snart.', 'FALSE', 'FALSE']
 ];

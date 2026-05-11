@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'bajram-basar/**'
-      - 'bajram-admin/**'
+      - 'festival-bazaar/**'
+      - 'festival-admin/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
 
-      - name: Mirror bajram-basar/
+      - name: Mirror festival-bazaar/
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USER: ${{ secrets.SFTP_USER }}
@@ -56,11 +56,11 @@ jobs:
           set net:timeout 30
           set net:reconnect-interval-base 10
           set mirror:set-permissions no
-          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store bajram-basar/ "$SFTP_WEBROOT/bajram-basar/"
+          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store festival-bazaar/ "$SFTP_WEBROOT/festival-bazaar/"
           bye
           LFTP_EOF
 
-      - name: Mirror bajram-admin/
+      - name: Mirror festival-admin/
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USER: ${{ secrets.SFTP_USER }}
@@ -73,13 +73,13 @@ jobs:
           set net:timeout 30
           set net:reconnect-interval-base 10
           set mirror:set-permissions no
-          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store bajram-admin/ "$SFTP_WEBROOT/bajram-admin/"
+          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store festival-admin/ "$SFTP_WEBROOT/festival-admin/"
           bye
           LFTP_EOF
 
       - name: Summary
         run: |
           echo "### Deployed to One.com :rocket:" >> $GITHUB_STEP_SUMMARY
-          echo "- bajram-basar/ -> \`\${SFTP_WEBROOT}/bajram-basar/\`" >> $GITHUB_STEP_SUMMARY
-          echo "- bajram-admin/ -> \`\${SFTP_WEBROOT}/bajram-admin/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- festival-bazaar/ -> \`\${SFTP_WEBROOT}/festival-bazaar/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- festival-admin/ -> \`\${SFTP_WEBROOT}/festival-admin/\`" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

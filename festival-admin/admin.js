@@ -30,7 +30,7 @@
     { id: 'visitors', title: 'Förväntade besökare', subtitle: 'Siffrorna visas som info till anmälare så de förstår skalan på eventet.' },
     { id: 'visibility', title: 'Anmälan & synlighet', subtitle: 'Slå av/på funktioner på publika sidan utan att behöva röra något annat.' },
     { id: 'activities', title: 'Aktiviteter', subtitle: 'En textruta per aktivitetskort. Varje kommitté uppdaterar sin egen ruta inför festivalen.' },
-    { id: 'descriptions', title: 'Basarens beskrivningar', subtitle: 'Texter som visas tillsammans med anmälningsformuläret.' },
+    { id: 'descriptions', title: 'Bazaarens beskrivningar', subtitle: 'Texter som visas tillsammans med anmälningsformuläret.' },
     { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' },
     { id: 'marketing', title: 'Marknadsföring', subtitle: 'Länkar och kanaler där festivalen syns utåt.' }
   ];
@@ -50,7 +50,7 @@
       help: 'T.ex. "Lördag 13 juni". Skriv som du vill att besökaren ska läsa det.' },
     { key: 'eventTime',        label: 'Tid (hela eventet)',               type: 'text',     section: 'dateplace',   span: 4,
       help: 'T.ex. "12:00–19:00".' },
-    { key: 'bazaarTime',       label: 'Basarens tid',                     type: 'text',     section: 'dateplace',   span: 4,
+    { key: 'bazaarTime',       label: 'Bazaarens tid',                     type: 'text',     section: 'dateplace',   span: 4,
       help: 'T.ex. "13:00–17:00".' },
     { key: 'eventLocation',    label: 'Plats',                            type: 'text',     section: 'dateplace',   span: 12,
       help: 'Visas i hero-sektionen och i info-blocket.' },
@@ -67,8 +67,8 @@
     { key: 'heroButtonText',   label: 'Knapptext (primär CTA)',           type: 'text',     section: 'visibility',  span: 12,
       help: 'Texten på den stora knappen i hero-sektionen.' },
 
-    { key: 'activityBazaarText',    label: 'Basar — beskrivning',                  type: 'textarea', section: 'activities', span: 12,
-      help: 'Visas på basar-kortet på publika sidan.', rows: 3 },
+    { key: 'activityBazaarText',    label: 'Bazaar — beskrivning',                  type: 'textarea', section: 'activities', span: 12,
+      help: 'Visas på bazaar-kortet på publika sidan.', rows: 3 },
     { key: 'activitySportText',     label: 'Sport — beskrivning',                  type: 'textarea', section: 'activities', span: 12,
       help: 'Visas på sport-kortet (fotboll och basket).', rows: 3 },
     { key: 'activityMatText',       label: 'Mat — beskrivning',                    type: 'textarea', section: 'activities', span: 12,
@@ -2155,8 +2155,8 @@
 
     const slugLabel = document.createElement('p');
     slugLabel.className = 'sports-card__slug';
-    const slugTxt = (p.slug === 'bajram-fotboll') ? 'Fotboll'
-      : (p.slug === 'bajram-basket-3vs3') ? 'Basket 3 mot 3'
+    const slugTxt = (p.slug === 'festival-fotboll') ? 'Fotboll'
+      : (p.slug === 'festival-basket-3vs3') ? 'Basket 3 mot 3'
       : (p.slug || 'Sport');
     slugLabel.textContent = slugTxt;
     card.appendChild(slugLabel);

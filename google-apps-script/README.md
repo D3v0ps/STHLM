@@ -95,8 +95,8 @@ I Apps Script-editorn:
    - Publika endpoints (publicData, submit) är medvetet öppna.
 6. Klicka `Distribuera`.
 7. Kopiera Web App-URL:en. Det är värdet du ska klistra in i:
-   - `bajram-basar/config.js` → `appsScriptUrl`
-   - `bajram-admin/config.js` → `adminWebAppUrl` (samma URL, ev. med `?view=admin` som suffix om du vill att admin-launchern ska redirecta direkt)
+   - `festival-bazaar/config.js` → `appsScriptUrl`
+   - `festival-admin/config.js` → `adminWebAppUrl` (samma URL, ev. med `?view=admin` som suffix om du vill att admin-launchern ska redirecta direkt)
 
 ### 6. Testa
 

@@ -2,7 +2,7 @@
 // Exempel: https://script.google.com/macros/s/AKfyc.../exec
 window.APP_CONFIG = {
   appsScriptUrl: "https://script.google.com/macros/s/AKfycbwYXgZ6PirSdCa8aKTpyT0RLnw8TkCpk4zwdSZWSvTD2ENy1Vqh26nxS6u0m7xVF_nP7g/exec",
-  adminUrl: "../bajram-admin/",
+  adminUrl: "../festival-admin/",
   // Fallback-data används om Apps Script inte svarar inom 8 sekunder.
   // Innehållet ska matcha det som senare lagras i Google Sheets-fliken Settings,
   // så sidan ser bra ut även när backend är nere.
@@ -18,14 +18,14 @@ window.APP_CONFIG = {
       expectedAdults: 200,
       registrationOpen: true,
       showExhibitors: true,
-      heroButtonText: "Anmäl dig till basaren",
-      introText: "Basar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.",
+      heroButtonText: "Anmäl dig till bazaaren",
+      introText: "Bazaar, öppet hus och familjeaktiviteter på Stockholms Moské och Björns Trädgård vid Medborgarplatsen. Fri entré.",
       whoCanApplyText: "Bazaren är öppen för företagare, kreatörer, föreningar och personer som vill sälja eller presentera produkter och tjänster som passar familjer och besökare. Anmälan är gratis – vi vill bara veta vad du planerar att erbjuda och vilket stånd du behöver.",
       selectionText: "Urvalet kommer att göras baserat på hur relevant ditt erbjudande är för besökarna samt hur genomförbart det är. Ju mer information du lämnar om vad du planerar att sälja eller presentera, desto enklare blir bedömningen. Vi hör av oss efter att urvalsprocessen är klar.",
       importantInfoText: "• Att delta är gratis.\n• Anmälan är bindande – vid sen avanmälan kan en avgift debiteras.\n• Varje deltagare ansvarar för sin egen plats.\n• Varje deltagare ansvarar för städning efter avslutat evenemang.\n• Bazaren är öppen mellan kl. 13:00–17:00; festivalen pågår 12:00–19:00.",
       successMessage: "Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.",
       closedMessage: "Anmälan är stängd. Utställare publiceras här när programmet är klart.",
-      purposeText: "Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom basar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.",
+      purposeText: "Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.",
       linktreeUrl: "",
       activityBazaarText: "Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.",
       activitySportText: "Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.",
@@ -132,8 +132,8 @@ window.APP_CONFIG = {
       { order: 5, platform: "Hemsida", label: "Hemsida", url: "https://stockholmsmoske.se", active: true }
     ],
     sportsPages: [
-      { slug: "bajram-fotboll", title: "Anmälan till fotboll", description: "Mer information kommer snart.", active: false, registrationOpen: false },
-      { slug: "bajram-basket-3vs3", title: "Anmälan till basket 3 mot 3", description: "Mer information kommer snart.", active: false, registrationOpen: false }
+      { slug: "festival-fotboll", title: "Anmälan till fotboll", description: "Mer information kommer snart.", active: false, registrationOpen: false },
+      { slug: "festival-basket-3vs3", title: "Anmälan till basket 3 mot 3", description: "Mer information kommer snart.", active: false, registrationOpen: false }
     ]
   }
 };

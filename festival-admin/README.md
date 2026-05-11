@@ -1,9 +1,9 @@
-# bajram-admin/ – Adminpanel (static SPA)
+# festival-admin/ – Adminpanel (static SPA)
 
 En fullständig adminpanel som körs som static SPA på One.com och pratar med
 Apps Script Web App via fetch POST. Inga build-steg, inga frameworks.
 
-URL: https://stockholmsmoske.karimkhalil.se/bajram-admin/
+URL: https://karimkhalil.se/festival-admin/
 
 ## Filer
 
