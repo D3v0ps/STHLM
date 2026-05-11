@@ -31,8 +31,7 @@
     { id: 'visibility', title: 'Anmälan & synlighet', subtitle: 'Slå av/på funktioner på publika sidan utan att behöva röra något annat.' },
     { id: 'activities', title: 'Aktiviteter', subtitle: 'En textruta per aktivitetskort. Varje kommitté uppdaterar sin egen ruta inför festivalen.' },
     { id: 'descriptions', title: 'Bazaarens beskrivningar', subtitle: 'Texter som visas tillsammans med anmälningsformuläret.' },
-    { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' },
-    { id: 'marketing', title: 'Marknadsföring', subtitle: 'Länkar och kanaler där festivalen syns utåt.' }
+    { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' }
   ];
 
   const SETTINGS_FIELDS = [
@@ -88,10 +87,7 @@
     { key: 'successMessage',   label: 'Tackmeddelande efter anmälan',     type: 'text',     section: 'messages',    span: 12,
       help: 'Visas när anmälan har skickats.' },
     { key: 'closedMessage',    label: 'Meddelande när anmälan är stängd', type: 'text',     section: 'messages',    span: 12,
-      help: 'Visas ovanför utställarlistan när anmälan är avstängd.' },
-
-    { key: 'linktreeUrl',      label: 'Linktree-URL',                     type: 'text',     section: 'marketing',   span: 12,
-      help: 'Lämna tomt om ingen Linktree finns. Annars visas en "Öppna alla länkar i Linktree"-knapp i sektionen Följ oss.' }
+      help: 'Visas ovanför utställarlistan när anmälan är avstängd.' }
   ];
 
   const QUESTION_TYPES = [
