@@ -1640,7 +1640,7 @@ const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är
  * Settings-rader: [Key, Value, Type, Label, Description].
  */
 const DEFAULT_SETTINGS = [
-  ['eventTitle', 'Festival', 'text', 'Eventets titel', 'Stor hero-rubrik på publika sidan.'],
+  ['eventTitle', 'Stockholms Moské Festival', 'text', 'Eventets titel', 'Stor hero-rubrik på publika sidan.'],
   ['eventSubtitle', '— en dag för gemenskap', 'text', 'Underrubrik (kursiv)', 'Visas i kursiv mässing-färg under titeln.'],
   ['eventDate', 'Lördag 13 juni', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],

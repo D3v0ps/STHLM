@@ -8,7 +8,7 @@ window.APP_CONFIG = {
   // så sidan ser bra ut även när backend är nere.
   fallbackData: {
     settings: {
-      eventTitle: "Festival",
+      eventTitle: "Stockholms Moské Festival",
       eventSubtitle: "— en dag för gemenskap",
       eventDate: "Lördag 13 juni",
       eventTime: "12:00–19:00",
