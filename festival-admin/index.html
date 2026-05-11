@@ -100,6 +100,10 @@
           <span class="tab-nav__label">Volontärer</span>
           <span id="tab-badge-volunteers" class="tab-nav__badge" hidden></span>
         </button>
+        <button class="tab-nav__btn" data-tab="volunteer-questions" type="button" id="tab-volunteer-questions" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">⊞</span>
+          <span class="tab-nav__label">Volontärfrågor</span>
+        </button>
 
         <p class="tab-nav__group-label">Inställningar</p>
         <button class="tab-nav__btn" data-tab="social" type="button" id="tab-social" aria-selected="false">
@@ -327,6 +331,25 @@
             <button class="dialog__close" aria-label="Stäng">×</button>
             <div id="volunteer-detail-content"></div>
           </dialog>
+        </section>
+
+        <!-- ---------- VOLONTÄRFRÅGOR ---------- -->
+        <section data-tab-panel="volunteer-questions" id="panel-volunteer-questions" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Volontärer → Volontärfrågor</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Volontärfrågor</h1>
+                <p class="page-header__sub">Frågor som visas på volontärformuläret. Drag och släpp för att ändra ordning. Lägg till nya frågor längst ned.</p>
+              </div>
+            </div>
+          </div>
+          <ul id="volunteer-questions-list" class="questions-list"></ul>
+          <button id="add-volunteer-question-btn" class="btn btn-add">+ Ny volontärfråga</button>
+          <div class="form-actions">
+            <button id="save-volunteer-questions-btn" class="btn btn--primary">Spara volontärfrågor</button>
+            <span id="volunteer-questions-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
+          </div>
         </section>
 
       </main>

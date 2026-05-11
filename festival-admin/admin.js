@@ -99,6 +99,11 @@
     { value: 'select',   label: 'Rullista (välj alternativ)' }
   ];
 
+  const VOLUNTEER_QUESTION_TYPES = QUESTION_TYPES.concat([
+    { value: 'radio',      label: 'Radio (välj ett, Ja/Nej-stil)' },
+    { value: 'multicheck', label: 'Flerval (kryss för flera)' }
+  ]);
+
   const STATUS_LABELS = {
     'new':       'Ny',
     'reviewed':  'Granskad',
@@ -120,7 +125,8 @@
       questions: false,
       exhibitors: false,
       social: false,
-      sports: false
+      sports: false,
+      volunteerQuestions: false
     },
     submissionsFilter: { status: 'all', search: '' },
     volunteersFilter: { status: 'all', search: '' },
@@ -232,6 +238,12 @@
 
     const saveQBtn = document.getElementById('save-questions-btn');
     if (saveQBtn) saveQBtn.addEventListener('click', handleQuestionsSave);
+
+    const addVolQBtn = document.getElementById('add-volunteer-question-btn');
+    if (addVolQBtn) addVolQBtn.addEventListener('click', handleAddVolunteerQuestion);
+
+    const saveVolQBtn = document.getElementById('save-volunteer-questions-btn');
+    if (saveVolQBtn) saveVolQBtn.addEventListener('click', handleVolunteerQuestionsSave);
 
     const addExhBtn = document.getElementById('add-exhibitor-btn');
     if (addExhBtn) addExhBtn.addEventListener('click', handleAddExhibitor);
@@ -482,7 +494,7 @@
     clearToken();
     state.data = null;
     state.overview = null;
-    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
+    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
     showLogin();
   }
 
@@ -507,7 +519,7 @@
     clearToken();
     state.data = null;
     state.overview = null;
-    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
+    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
     showLogin();
   }
 
@@ -526,7 +538,7 @@
 
     if (cached) {
       state.data = cached;
-      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
+      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
       renderAll();
     } else {
       showLoadingOverlay();
@@ -539,7 +551,7 @@
       state.data = await runServer('getAdminData', state.token);
       try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) { /* ignore */ }
 
-      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
+      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
 
       renderAll();
     } catch (err) {
@@ -562,6 +574,7 @@
     renderSocialList();
     renderSportsList();
     renderVolunteersTable();
+    renderVolunteerQuestionsList();
   }
 
   // ============================================================
@@ -1402,6 +1415,248 @@
         btn.disabled = false;
         btn.textContent = btn.dataset.originalText || 'Spara ändringar';
       }
+    }
+  }
+
+  // ============================================================
+  // VOLONTÄRFRÅGOR — admin-redigerare (mirror av Formulärfrågor)
+  // ============================================================
+
+  function renderVolunteerQuestionsList() {
+    const list = document.getElementById('volunteer-questions-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!state.data) return;
+    if (!state.data.volunteerQuestions) state.data.volunteerQuestions = [];
+    const questions = state.data.volunteerQuestions.slice().sort(function(a, b) {
+      return (a.order || 0) - (b.order || 0);
+    });
+    if (questions.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'empty-state';
+      empty.textContent = 'Inga volontärfrågor än. Klicka på "+ Ny volontärfråga" eller kör setupSpreadsheet() i Apps Script.';
+      list.appendChild(empty);
+      return;
+    }
+    questions.forEach(function(q, idx) {
+      list.appendChild(buildVolunteerQuestionItem(q, idx, questions.length));
+    });
+  }
+
+  function buildVolunteerQuestionItem(q, idx, total) {
+    const li = document.createElement('li');
+    li.className = 'question-item';
+    li.dataset.fieldId = q.fieldId || '';
+
+    const header = document.createElement('div');
+    header.className = 'question-item__header';
+    const upBtn = document.createElement('button');
+    upBtn.type = 'button';
+    upBtn.className = 'btn btn--small btn--ghost';
+    upBtn.textContent = 'Flytta upp';
+    upBtn.disabled = idx === 0;
+    upBtn.addEventListener('click', function() { moveVolunteerQuestion(idx, idx - 1); });
+    header.appendChild(upBtn);
+
+    const downBtn = document.createElement('button');
+    downBtn.type = 'button';
+    downBtn.className = 'btn btn--small btn--ghost';
+    downBtn.textContent = 'Flytta ned';
+    downBtn.disabled = idx === total - 1;
+    downBtn.addEventListener('click', function() { moveVolunteerQuestion(idx, idx + 1); });
+    header.appendChild(downBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn--small btn--danger';
+    delBtn.textContent = 'Ta bort';
+    delBtn.addEventListener('click', function() { handleDeleteVolunteerQuestion(idx); });
+    header.appendChild(delBtn);
+    li.appendChild(header);
+
+    // Field ID
+    const fieldIdRow = document.createElement('div');
+    fieldIdRow.className = 'form-row';
+    const fieldIdLabel = document.createElement('label');
+    fieldIdLabel.textContent = 'Fält-ID (teknisk identifierare)';
+    const fieldIdChip = document.createElement('input');
+    fieldIdChip.type = 'text';
+    fieldIdChip.value = q.fieldId || '';
+    fieldIdChip.addEventListener('input', function() {
+      q.fieldId = fieldIdChip.value;
+      state.unsavedChanges.volunteerQuestions = true;
+    });
+    const fieldIdHelp = document.createElement('p');
+    fieldIdHelp.className = 'help';
+    fieldIdHelp.textContent = 'name/phone/birthDate/hasExperience/about/areas/shifts har dedikerade kolumner i VolunteerSubmissions. Andra fält-ID:n hamnar som extra info i About-kolumnen.';
+    fieldIdRow.appendChild(fieldIdLabel);
+    fieldIdRow.appendChild(fieldIdChip);
+    fieldIdRow.appendChild(fieldIdHelp);
+    li.appendChild(fieldIdRow);
+
+    // Label
+    li.appendChild(buildTextInputRow('Etikett (visas för besökaren)', q.label || '', function(v) {
+      q.label = v;
+      state.unsavedChanges.volunteerQuestions = true;
+    }));
+
+    // Helper text
+    li.appendChild(buildTextInputRow('Hjälptext (visas under fältet)', q.helperText || '', function(v) {
+      q.helperText = v;
+      state.unsavedChanges.volunteerQuestions = true;
+    }));
+
+    // Placeholder
+    li.appendChild(buildTextInputRow('Platshållare (grå text inuti fältet)', q.placeholder || '', function(v) {
+      q.placeholder = v;
+      state.unsavedChanges.volunteerQuestions = true;
+    }));
+
+    // Type
+    const typeRow = document.createElement('div');
+    typeRow.className = 'form-row';
+    const typeLabel = document.createElement('label');
+    typeLabel.textContent = 'Typ av fält';
+    const typeSelect = document.createElement('select');
+    VOLUNTEER_QUESTION_TYPES.forEach(function(t) {
+      const opt = document.createElement('option');
+      opt.value = t.value;
+      opt.textContent = t.label;
+      if ((q.type || 'text') === t.value) opt.selected = true;
+      typeSelect.appendChild(opt);
+    });
+    typeRow.appendChild(typeLabel);
+    typeRow.appendChild(typeSelect);
+    li.appendChild(typeRow);
+
+    // Options (för select / radio / multicheck)
+    const optionsRow = document.createElement('div');
+    optionsRow.className = 'form-row';
+    const optionsLabel = document.createElement('label');
+    optionsLabel.textContent = 'Alternativ (radio/multicheck: "värde|etikett, värde|etikett")';
+    const optionsInput = document.createElement('input');
+    optionsInput.type = 'text';
+    optionsInput.value = (Array.isArray(q.options) ? q.options.join(', ') : (q.options || ''));
+    optionsInput.placeholder = 't.ex. ja|Ja, nej|Nej';
+    optionsInput.addEventListener('input', function() {
+      q.options = optionsInput.value.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      state.unsavedChanges.volunteerQuestions = true;
+    });
+    optionsRow.appendChild(optionsLabel);
+    optionsRow.appendChild(optionsInput);
+    function syncOptionsVisibility() {
+      const needsOptions = ['select', 'radio', 'multicheck'].indexOf(q.type || 'text') !== -1;
+      optionsRow.hidden = !needsOptions;
+    }
+    syncOptionsVisibility();
+    li.appendChild(optionsRow);
+
+    typeSelect.addEventListener('change', function() {
+      q.type = typeSelect.value;
+      syncOptionsVisibility();
+      state.unsavedChanges.volunteerQuestions = true;
+    });
+
+    // Toggles
+    const toggleRow = document.createElement('div');
+    toggleRow.className = 'form-row form-row--toggles';
+    toggleRow.appendChild(buildToggle('Obligatorisk', !!q.required, function(checked) {
+      q.required = checked;
+      state.unsavedChanges.volunteerQuestions = true;
+    }));
+    toggleRow.appendChild(buildToggle('Aktiv (visas i formuläret)', q.active !== false, function(checked) {
+      q.active = checked;
+      state.unsavedChanges.volunteerQuestions = true;
+    }));
+    li.appendChild(toggleRow);
+
+    return li;
+  }
+
+  function moveVolunteerQuestion(fromIdx, toIdx) {
+    if (!state.data || !state.data.volunteerQuestions) return;
+    const arr = state.data.volunteerQuestions;
+    if (fromIdx < 0 || toIdx < 0 || fromIdx >= arr.length || toIdx >= arr.length || fromIdx === toIdx) return;
+    const item = arr.splice(fromIdx, 1)[0];
+    arr.splice(toIdx, 0, item);
+    arr.forEach(function(q, i) { q.order = i + 1; });
+    state.unsavedChanges.volunteerQuestions = true;
+    renderVolunteerQuestionsList();
+  }
+
+  function handleAddVolunteerQuestion() {
+    if (!state.data) return;
+    if (!state.data.volunteerQuestions) state.data.volunteerQuestions = [];
+    const existing = state.data.volunteerQuestions;
+    let suffix = existing.length + 1;
+    let fid = 'fraga_' + suffix;
+    while (existing.some(function(q) { return q.fieldId === fid; })) {
+      suffix++;
+      fid = 'fraga_' + suffix;
+    }
+    const newQ = {
+      order: existing.length + 1,
+      fieldId: fid,
+      label: 'Ny fråga',
+      helperText: '',
+      placeholder: '',
+      type: 'text',
+      required: false,
+      active: true,
+      options: []
+    };
+    existing.push(newQ);
+    state.unsavedChanges.volunteerQuestions = true;
+    renderVolunteerQuestionsList();
+  }
+
+  async function handleDeleteVolunteerQuestion(idx) {
+    if (!state.data || !state.data.volunteerQuestions) return;
+    const q = state.data.volunteerQuestions[idx];
+    if (!q) return;
+    const ok = await confirmDialog(
+      'Ta bort frågan "' + (q.label || q.fieldId) + '"? Detta tas bort på publika sidan vid nästa sparning.',
+      'Ta bort',
+      true
+    );
+    if (!ok) return;
+    state.data.volunteerQuestions.splice(idx, 1);
+    state.data.volunteerQuestions.forEach(function(q, i) { q.order = i + 1; });
+    state.unsavedChanges.volunteerQuestions = true;
+    renderVolunteerQuestionsList();
+  }
+
+  async function handleVolunteerQuestionsSave() {
+    if (!state.data || !state.data.volunteerQuestions) return;
+    const ids = {};
+    let hasError = false;
+    let errorMsg = '';
+    state.data.volunteerQuestions.forEach(function(q, i) {
+      const id = (q.fieldId || '').trim();
+      const label = (q.label || '').trim();
+      if (!id) { hasError = true; errorMsg = 'Fråga ' + (i + 1) + ' saknar fält-ID.'; }
+      else if (ids[id]) { hasError = true; errorMsg = 'Fält-ID "' + id + '" används flera gånger.'; }
+      else { ids[id] = true; }
+      if (!label) { hasError = true; errorMsg = 'Fråga ' + (i + 1) + ' saknar etikett.'; }
+    });
+    if (hasError) { toast(errorMsg, 'error'); return; }
+
+    state.data.volunteerQuestions.forEach(function(q, i) { q.order = i + 1; });
+
+    const btn = document.getElementById('save-volunteer-questions-btn');
+    if (btn) { btn.disabled = true; btn.dataset.originalText = btn.textContent; btn.textContent = 'Sparar…'; }
+
+    try {
+      await runServer('saveVolunteerQuestions', state.token, state.data.volunteerQuestions);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
+      state.unsavedChanges.volunteerQuestions = false;
+      showSavedMsg('volunteer-questions-saved-msg');
+      toast('Volontärfrågorna är sparade. Syns publikt inom 1 minut.', 'success');
+    } catch (err) {
+      if (isAuthError(err)) { await handleAuthError(); return; }
+      toast('Kunde inte spara volontärfrågorna. Försök igen.', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Spara volontärfrågor'; }
     }
   }
 
