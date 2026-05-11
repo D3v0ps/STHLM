@@ -1721,6 +1721,198 @@ h3 { letter-spacing: -0.01em; }
 .save-bar:not(.is-clean) .save-bar__chip .dot { background: var(--warn); }
 
 /* ============================================================
+   24b. Form-fält i JS-genererad DOM (questions / exhibitors /
+        social / sports) — saknade tidigare CSS-regler vilket gjorde
+        att labels föll tillbaka på inline-rendering.
+   ============================================================ */
+
+/* Designsystem-label (används av buildSettingField, form-row m.fl.) */
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+.field-help, .help {
+  display: block;
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+
+/* form-row: vertikal stack av label + input + help */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 18px;
+  min-width: 0;
+}
+.form-row:last-child { margin-bottom: 0; }
+.form-row > label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 2px;
+}
+.form-row > input[type="text"],
+.form-row > input[type="email"],
+.form-row > input[type="tel"],
+.form-row > input[type="url"],
+.form-row > input[type="number"],
+.form-row > input[type="search"],
+.form-row > input[type="password"],
+.form-row > input.field-chip,
+.form-row > textarea,
+.form-row > select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--sm-radius-md);
+  font-size: 14px;
+  color: var(--ink);
+  font-family: var(--sm-font-body);
+  transition: border-color 120ms;
+}
+.form-row > input:focus, .form-row > textarea:focus, .form-row > select:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+.form-row > textarea { min-height: 96px; line-height: 1.5; resize: vertical; }
+.form-row > .help, .form-row > .field-help { margin-top: 4px; }
+
+/* Toggles inside form-row (Aktiv / Obligatorisk / Anmälan öppen) */
+.form-row--toggles {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-top: 8px;
+}
+.form-row--toggles label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+/* Item-kort: stack vertikalt (header + form-rows + toggles) */
+.questions-list li.question-item,
+li.exhibitor-item,
+li.social-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--sm-radius-lg);
+  box-shadow: none;
+  overflow: hidden;
+  list-style: none;
+  margin-bottom: 12px;
+}
+.question-item__header,
+.exhibitor-item__header,
+.social-item__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--line-soft);
+  margin: 0;
+}
+.question-item__header .btn,
+.exhibitor-item__header .btn,
+.social-item__header .btn { padding: 6px 12px; min-height: 32px; font-size: 12px; }
+.question-item__header .btn--danger,
+.exhibitor-item__header .btn--danger,
+.social-item__header .btn--danger { margin-left: auto; }
+.question-item .drag-handle {
+  color: var(--ink-muted);
+  font-size: 16px;
+  padding: 0 6px;
+  cursor: grab;
+  user-select: none;
+}
+.question-item .drag-handle:active { cursor: grabbing; }
+.question-item .form-row,
+.exhibitor-item .form-row,
+.social-item .form-row { padding: 0 20px; margin-bottom: 14px; }
+.question-item .form-row:first-of-type,
+.exhibitor-item .form-row:first-of-type,
+.social-item .form-row:first-of-type { margin-top: 18px; }
+.question-item .form-row:last-of-type:not(.form-row--toggles),
+.exhibitor-item .form-row:last-of-type:not(.form-row--toggles),
+.social-item .form-row:last-of-type:not(.form-row--toggles) { margin-bottom: 18px; }
+.question-item .form-row--toggles,
+.exhibitor-item .form-row--toggles,
+.social-item .form-row--toggles { padding: 14px 20px; background: var(--cream); border-top: 1px solid var(--line-soft); margin: 14px 0 0; }
+
+/* Lists wrapper */
+#questions-list, #exhibitors-list, #social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Sports-card / Social row / Exhibitor row: gemensam card-styling */
+.sports-card,
+.exhibitor-row,
+.social-row {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--sm-radius-lg);
+  padding: 24px 28px;
+  margin: 0 0 16px;
+}
+.sports-card__slug,
+.exhibitor-row__title,
+.social-row__title {
+  font-family: var(--sm-font-display);
+  font-size: 20px;
+  font-weight: 400;
+  margin: 0 0 4px;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.sports-card__slug-chip {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-muted);
+  letter-spacing: 0.02em;
+  margin: 0 0 18px;
+}
+
+/* Tomt list-state — design-systemets dashed-card-look */
+.empty-state {
+  background: var(--cream);
+  border: 1px dashed var(--line);
+  border-radius: var(--sm-radius-lg);
+  padding: 40px 24px;
+  color: var(--ink-muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ============================================================
    25. Reorder row chrome (frågor / utställare / sociala)
    ============================================================ */
 .reorder-row {
