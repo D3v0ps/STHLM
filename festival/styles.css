@@ -867,13 +867,120 @@ img, svg { display: block; max-width: 100%; }
 #form-container .field--textarea,
 #form-container .field--checkbox,
 #form-container .field--select,
+#form-container .field--multi,
+#form-container .field--radio,
 #form-container .field[data-field-id="websiteSocials"],
 #form-container .field[data-field-id="offering"],
 #form-container .field[data-field-id="standNeeds"],
 #form-container .field[data-field-id="consentAccepted"],
+#form-container .field[data-field-id="hasExperience"],
+#form-container .field[data-field-id="about"],
+#form-container .field[data-field-id="areas"],
+#form-container .field[data-field-id="shifts"],
 #form-container .form-status,
 #form-container .form-actions,
 #form-container .honeypot { grid-column: 1 / -1; }
+
+/* Volontär-CTA på huvudsidan (mellan aktiviteter och basar-form) */
+.volunteer-cta {
+  background: var(--ink);
+  color: var(--cream);
+  margin: 0 var(--side-gutter);
+  border-radius: var(--radius-xl);
+  padding: 48px 56px;
+}
+.volunteer-cta__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.volunteer-cta__text { flex: 1; min-width: 280px; }
+.volunteer-cta__title {
+  font-family: var(--font-display);
+  font-weight: 350;
+  font-size: clamp(28px, 4vw, 40px);
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  line-height: 1.1;
+  color: var(--cream);
+}
+.volunteer-cta__title em {
+  font-style: italic;
+  font-weight: 350;
+  color: var(--brass);
+}
+.volunteer-cta__lede {
+  font-size: 15px;
+  color: rgba(250, 246, 238, 0.78);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.55;
+}
+.volunteer-cta__btn {
+  background: var(--cream);
+  color: var(--ink);
+  flex-shrink: 0;
+}
+.volunteer-cta__btn:hover { background: var(--paper); }
+.volunteer-cta .eyebrow { color: var(--brass); }
+@media (max-width: 768px) {
+  .volunteer-cta { padding: 36px 28px; }
+}
+
+/* Volontär-specifika komponenter */
+.check-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 8px;
+}
+.check-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  cursor: pointer;
+  transition: border-color 120ms, background 120ms;
+}
+.check-tile:hover { border-color: var(--ink-muted); }
+.check-tile input[type="checkbox"] {
+  width: 20px; height: 20px;
+  margin: 0;
+  accent-color: var(--ink);
+  flex-shrink: 0;
+}
+.check-tile:has(input:checked) {
+  border-color: var(--ink);
+  background: var(--cream-deep);
+}
+.check-tile__body { display: flex; flex-direction: column; gap: 2px; line-height: 1.3; }
+.check-tile__label { font-size: 14px; font-weight: 500; color: var(--ink); }
+.check-tile__sub { font-size: 12px; color: var(--ink-muted); }
+
+/* Instagram-CTA i success-state */
+.success-ig {
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--cream-deep);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+.success-ig__lede {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.success-ig__cta { display: inline-flex; }
 
 .form-status {
   font-size: 13px;
