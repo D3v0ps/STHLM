@@ -1285,25 +1285,31 @@ dialog p { margin-bottom: 16px; }
   gap: 12px;
 }
 .topbar__logo {
-  width: 32px;
-  height: 36px;
+  width: 36px;
+  height: 40px;
   object-fit: contain;
 }
 .topbar__title {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  line-height: 1.15;
+  gap: 2px;
   font-weight: 400;
-  color: var(--ink);
+  color: var(--blue-deep);
 }
 .topbar__name {
-  font-family: var(--sm-font-display);
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: -0.005em;
+  color: var(--blue-deep);
 }
 .topbar__sub {
-  font-size: 11px;
-  color: var(--ink-muted);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--blue-deep);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.7;
 }
 .topbar .btn--ghost-light {
   color: var(--ink);
