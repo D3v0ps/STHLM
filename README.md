@@ -4,8 +4,8 @@ Publik landningssida + adminpanel för Stockholms Moskés sommarfestival (bazaar
 
 **Live-URL:er** (efter deploy):
 
-- 🌐 Publik: `https://karimkhalil.se/festival-bazaar/`
-- 🔒 Admin: `https://karimkhalil.se/festival-admin/` → leder till Apps Script
+- 🌐 Publik: `https://stockholmsmoske.se/festival/`
+- 🔒 Admin: `https://stockholmsmoske.se/festival-admin/` → leder till Apps Script
 
 ## Översikt
 
@@ -33,7 +33,7 @@ Browser ──HTTP──▶ One.com (statiska filer)
 ├── SPEC.md                         # Datakontrakt + designtokens (single source of truth)
 ├── README.md                       # Denna fil
 ├── TODO.md                         # Öppna punkter
-├── festival-bazaar/                   # Publik sida → SFTP till One.com
+├── festival/                   # Publik sida → SFTP till One.com
 ├── festival-admin/                   # Adminpanel (static SPA) → SFTP till One.com
 └── google-apps-script/             # Backend-källkod, kopieras manuellt till Apps Script-editorn
 ```
@@ -57,7 +57,7 @@ Följ instruktionerna i `google-apps-script/README.md` steg 1–5. Det innefatta
 
 ### Steg 2: Konfigurera frontend
 
-1. Öppna `festival-bazaar/config.js` — byt `PASTE_APPS_SCRIPT_URL_HERE` mot Web App-URL:en.
+1. Öppna `festival/config.js` — byt `PASTE_APPS_SCRIPT_URL_HERE` mot Web App-URL:en.
 2. Öppna `festival-admin/config.js` — byt `PASTE_ADMIN_WEB_APP_URL_HERE` mot samma URL (lägg till `?view=admin` på slutet).
 
 ### Steg 3: Ladda upp till One.com via SFTP
@@ -66,9 +66,9 @@ Följ instruktionerna i `google-apps-script/README.md` steg 1–5. Det innefatta
 
 #### Auto-deploy via GitHub Actions (rekommenderas)
 
-Workflow-filen `.github/workflows/deploy.yml` mirrorar `festival-bazaar/` och `festival-admin/` till One.com via SFTP. Triggers:
+Workflow-filen `.github/workflows/deploy.yml` mirrorar `festival/` och `festival-admin/` till One.com via SFTP. Triggers:
 
-- **Automatiskt:** push till `main` som rör `festival-bazaar/`, `festival-admin/` eller workflow-filen.
+- **Automatiskt:** push till `main` som rör `festival/`, `festival-admin/` eller workflow-filen.
 - **Manuellt:** GitHub → fliken `Actions` → `Deploy to One.com` → `Run workflow`.
 
 **Engångsuppsättning — lägg till fyra repository secrets:**
@@ -82,7 +82,7 @@ GitHub → repo → `Settings` → `Secrets and variables` → `Actions` → `Ne
 | `SFTP_PASSWORD` | SFTP-lösenord | Samma vy som ovan (`Visa/skapa lösenord`) |
 | `SFTP_WEBROOT` | Sökväg till webroot på servern, t.ex. `/httpd.www` eller `/<din-domän>` — UTAN trailing slash | Samma vy. One.coms standard är `/httpd.www`. |
 
-Workflow:n exkluderar `README.md`, `.gitkeep` och `.DS_Store`. Den använder `--delete`, så filer i `<webroot>/festival-bazaar/` och `<webroot>/festival-admin/` som inte finns i repot raderas vid deploy.
+Workflow:n exkluderar `README.md`, `.gitkeep` och `.DS_Store`. Den använder `--delete`, så filer i `<webroot>/festival/` och `<webroot>/festival-admin/` som inte finns i repot raderas vid deploy.
 
 #### Manuell SFTP (fallback)
 
@@ -90,7 +90,7 @@ Om Actions inte är konfigurerat eller du behöver deploya direkt:
 
 ```bash
 rsync -avz --delete --exclude README.md --exclude .gitkeep \
-  festival-bazaar/ <user>@<host>:<webroot>/festival-bazaar/
+  festival/ <user>@<host>:<webroot>/festival/
 rsync -avz --delete --exclude README.md --exclude .gitkeep \
   festival-admin/ <user>@<host>:<webroot>/festival-admin/
 ```
@@ -99,9 +99,9 @@ Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 ### Steg 4: Smoke-test
 
-1. Öppna `https://karimkhalil.se/festival-bazaar/` — ska visa hero, intro, info-kort, formulär.
+1. Öppna `https://stockholmsmoske.se/festival/` — ska visa hero, intro, info-kort, formulär.
 2. Skicka en testanmälan. Kontrollera att raden hamnar i Sheetets `Submissions`-flik.
-3. Öppna `https://karimkhalil.se/festival-admin/` → klicka `Öppna adminpanelen` → logga in.
+3. Öppna `https://stockholmsmoske.se/festival-admin/` → klicka `Öppna adminpanelen` → logga in.
 4. Gå till `Översikt` — antalsiffror ska matcha Sheetet.
 5. Ändra något i `Eventinformation`, spara, vänta 5 min eller hård-refresha publika sidan — ändringen ska synas.
 
@@ -111,7 +111,7 @@ Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 Du ska sällan behöva röra koden. Allt innehåll redigeras via adminpanelen:
 
-1. Öppna `https://karimkhalil.se/festival-admin/`
+1. Öppna `https://stockholmsmoske.se/festival-admin/`
 2. Logga in med adminlösenordet (få från Karim).
 3. Använd flikarna:
    - **Översikt** — se status, öppna/stänga formulär

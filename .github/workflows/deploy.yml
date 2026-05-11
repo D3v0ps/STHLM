@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'festival-bazaar/**'
+      - 'festival/**'
       - 'festival-admin/**'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
@@ -43,7 +43,7 @@ jobs:
             exit 1
           fi
 
-      - name: Mirror festival-bazaar/
+      - name: Mirror festival/
         env:
           SFTP_HOST: ${{ secrets.SFTP_HOST }}
           SFTP_USER: ${{ secrets.SFTP_USER }}
@@ -56,7 +56,7 @@ jobs:
           set net:timeout 30
           set net:reconnect-interval-base 10
           set mirror:set-permissions no
-          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store festival-bazaar/ "$SFTP_WEBROOT/festival-bazaar/"
+          mirror --reverse --delete --verbose --parallel=4 --exclude-glob README.md --exclude-glob .gitkeep --exclude-glob .DS_Store festival/ "$SFTP_WEBROOT/festival/"
           bye
           LFTP_EOF
 
@@ -80,6 +80,6 @@ jobs:
       - name: Summary
         run: |
           echo "### Deployed to One.com :rocket:" >> $GITHUB_STEP_SUMMARY
-          echo "- festival-bazaar/ -> \`\${SFTP_WEBROOT}/festival-bazaar/\`" >> $GITHUB_STEP_SUMMARY
+          echo "- festival/ -> \`\${SFTP_WEBROOT}/festival/\`" >> $GITHUB_STEP_SUMMARY
           echo "- festival-admin/ -> \`\${SFTP_WEBROOT}/festival-admin/\`" >> $GITHUB_STEP_SUMMARY
           echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

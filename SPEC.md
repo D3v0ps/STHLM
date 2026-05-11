@@ -10,7 +10,7 @@ Bygg en publik landningssida + adminpanel för **Stockholms Moské Festival** (b
 
 **Hybrid-arkitektur:**
 
-- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `karimkhalil.se`).
+- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `stockholmsmoske.se`).
 - **Adminpanel:** Vanilla HTML/CSS/JS static SPA på One.com (subkatalog `/festival-admin/`). Pratar med backend via fetch POST med `Content-Type: text/plain`.
 - **Backend:** Google Apps Script Web App. `doPost` dispatchar admin-actions via whitelistad mappning i `adminDispatch_`. `requireAuth_` validerar token mot CacheService för varje skyddad operation.
 - **Databas/CMS:** Google Sheets (innehåll redigerbart både via admin-UI och direkt i arket).
@@ -23,12 +23,12 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 
 | URL | Innehåll |
 |---|---|
-| `https://karimkhalil.se/festival-bazaar/` | Publik landningssida + bazaar-formulär |
-| `https://karimkhalil.se/festival-admin/` | Statisk admin-launcher (länkar till Apps Script) |
+| `https://stockholmsmoske.se/festival/` | Publik landningssida + bazaar-formulär |
+| `https://stockholmsmoske.se/festival-admin/` | Statisk admin-launcher (länkar till Apps Script) |
 | `https://script.google.com/macros/s/.../exec` | Apps Script Web App (backend) |
 | `https://script.google.com/macros/s/.../exec?view=admin` | Riktig adminpanel (HtmlService) |
-| `https://karimkhalil.se/festival-fotboll/` | Framtida (placeholder) |
-| `https://karimkhalil.se/festival-basket-3vs3/` | Framtida (placeholder) |
+| `https://stockholmsmoske.se/festival-fotboll/` | Framtida (placeholder) |
+| `https://stockholmsmoske.se/festival-basket-3vs3/` | Framtida (placeholder) |
 
 ---
 
@@ -39,7 +39,7 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 ├── README.md                              # Huvuddokumentation – sätta upp hela systemet
 ├── TODO.md                                # Öppna punkter för Yasser/Karim/Pamass
 ├── SPEC.md                                # Denna fil
-├── festival-bazaar/                          # Publika sidan (SFTP → One.com)
+├── festival/                          # Publika sidan (SFTP → One.com)
 │   ├── index.html
 │   ├── styles.css
 │   ├── script.js
@@ -433,7 +433,7 @@ UX-krav (idiotsäker checklist):
 ## 11. Acceptanskriterier (klar när ALLT nedan stämmer)
 
 **Funktionalitet:**
-- [ ] `festival-bazaar/` renderar korrekt på 375px, 768px, 1280px
+- [ ] `festival/` renderar korrekt på 375px, 768px, 1280px
 - [ ] Formuläret bygger sig dynamiskt från FormQuestions
 - [ ] Klient-side validering (required, email, phone, min-length) med felmeddelanden på svenska
 - [ ] Honeypot-fält finns och döljs korrekt (CSS + `aria-hidden`)
@@ -464,7 +464,7 @@ UX-krav (idiotsäker checklist):
 
 **Dokumentation:**
 - [ ] Huvud-README dokumenterar hela setup-flödet
-- [ ] `festival-bazaar/README.md` dokumenterar SFTP-deploy
+- [ ] `festival/README.md` dokumenterar SFTP-deploy
 - [ ] `google-apps-script/README.md` dokumenterar Apps Script-deploy
 - [ ] TODO.md listar öppna punkter
 
