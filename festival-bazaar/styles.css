@@ -422,12 +422,14 @@ img, svg { display: block; max-width: 100%; }
 .hero__title {
   font-family: var(--font-display);
   font-weight: 350;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.035em;
   font-variation-settings: "opsz" 144, "SOFT" 50;
-  line-height: 1.05;
-  font-size: clamp(72px, 14vw, 168px);
-  margin: 0 0 8px;
+  line-height: 1.02;
+  font-size: clamp(48px, 9vw, 112px);
+  margin: 0 0 12px;
   color: var(--cream);
+  text-wrap: balance;
+  max-width: 12ch;
 }
 
 .hero__subtitle {
