@@ -153,9 +153,64 @@
   function applyData(data) {
     currentData = normalizeData(data);
     renderHero(currentData.settings);
+    renderPurpose(currentData.settings);
     renderForm(currentData.questions, currentData.settings);
     renderExhibitors(currentData.exhibitors, currentData.settings);
     renderSocialPopup(currentData.socialLinks);
+    renderLinktree(currentData.socialLinks, currentData.settings);
+  }
+
+  /** Rendera Syfte-textstycket — split på blankrader till <p>. */
+  function renderPurpose(settings) {
+    var node = document.querySelector('[data-bind="purposeText"]');
+    if (!node || !settings) return;
+    var raw = settings.purposeText;
+    if (raw == null || raw === '') return; // Behåll fallback-HTML
+    var text = String(raw).replace(/\r\n/g, '\n');
+    var paragraphs = text.split(/\n\s*\n/).map(function(p) { return p.trim(); }).filter(Boolean);
+    while (node.firstChild) node.removeChild(node.firstChild);
+    paragraphs.forEach(function(p) {
+      node.appendChild(el('p', { text: p }));
+    });
+  }
+
+  /** Rendera Linktree-sektionen — socialLinks som klickbara rader + Linktree-CTA. */
+  function renderLinktree(socialLinks, settings) {
+    var list = document.getElementById('linktree-list');
+    var cta = document.getElementById('linktree-cta');
+    if (!list) return;
+
+    while (list.firstChild) list.removeChild(list.firstChild);
+
+    var links = (socialLinks || []).filter(function(s) {
+      return s && toBool(s.active) && s.url;
+    }).slice().sort(byOrder);
+
+    links.forEach(function(link) {
+      var a = el('a', {
+        class: 'linktree__link',
+        href: link.url,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        role: 'listitem'
+      });
+      a.appendChild(el('span', { class: 'linktree__link-label', text: link.label || link.platform || link.url }));
+      var meta = el('span', { class: 'linktree__link-meta' });
+      meta.appendChild(document.createTextNode((link.platform || '') + ' '));
+      meta.appendChild(el('span', { 'aria-hidden': 'true', text: '↗' }));
+      a.appendChild(meta);
+      list.appendChild(a);
+    });
+
+    if (cta) {
+      var url = settings && settings.linktreeUrl ? String(settings.linktreeUrl).trim() : '';
+      if (url) {
+        cta.setAttribute('href', url);
+        cta.hidden = false;
+      } else {
+        cta.hidden = true;
+      }
+    }
   }
 
   /** Säkerställ att data har förväntad struktur. */

@@ -1642,7 +1642,7 @@ const DEFAULT_IMPORTANT_INFO_TEXT = '• Att delta är gratis.\n• Anmälan är
 const DEFAULT_SETTINGS = [
   ['eventTitle', 'Festival', 'text', 'Eventets titel', 'Stor hero-rubrik på publika sidan.'],
   ['eventSubtitle', '— en dag för gemenskap', 'text', 'Underrubrik (kursiv)', 'Visas i kursiv mässing-färg under titeln.'],
-  ['eventDate', 'Lördag 30 maj', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
+  ['eventDate', 'Lördag 13 juni', 'text', 'Datum', 'Visas i datum/tid-bandet.'],
   ['eventTime', '12:00–19:00', 'text', 'Eventets tid', 'Festivalens totala tid.'],
   ['bazaarTime', '13:00–17:00', 'text', 'Basarens tid', 'Specifik tid för basaren.'],
   ['eventLocation', 'Stockholms Moské & Björns trädgård, Medborgarplatsen', 'text', 'Plats', 'Visas i hero och info-kort.'],
@@ -1655,8 +1655,15 @@ const DEFAULT_SETTINGS = [
   ['whoCanApplyText', DEFAULT_WHO_CAN_APPLY_TEXT, 'textarea', 'Vem kan anmäla sig?', 'Sektion om målgrupp.'],
   ['selectionText', DEFAULT_SELECTION_TEXT, 'textarea', 'Så görs urvalet', 'Sektion om urvalsprocessen.'],
   ['importantInfoText', DEFAULT_IMPORTANT_INFO_TEXT, 'textarea', 'Viktigt att känna till', 'Punktlista med villkor.'],
-  ['successMessage', 'Tack! Din intresseanmälan har skickats. Vi återkommer efter att urvalet har gåtts igenom.', 'text', 'Tack-meddelande', 'Visas efter lyckad inlämning.'],
-  ['closedMessage', 'Anmälan är stängd. Utställare publiceras här när programmet är klart.', 'text', 'Stängd-meddelande', 'Visas när registrationOpen=FALSE.']
+  ['successMessage', 'Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.', 'text', 'Tack-meddelande', 'Visas efter lyckad inlämning.'],
+  ['closedMessage', 'Anmälan är stängd. Utställare publiceras här när programmet är klart.', 'text', 'Stängd-meddelande', 'Visas när registrationOpen=FALSE.'],
+  ['purposeText', 'Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom basar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
+  ['linktreeUrl', '', 'text', 'Linktree-URL', 'Om satt visas en länk till Linktree i marknadsförings-sektionen.'],
+  ['activityBazaarText', 'Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.', 'textarea', 'Basar — beskrivning', 'Visas på basar-kortet.'],
+  ['activitySportText', 'Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.', 'textarea', 'Sport — beskrivning', 'Visas på sport-kortet.'],
+  ['activityMatText', 'Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.', 'textarea', 'Mat — beskrivning', 'Visas på mat-kortet.'],
+  ['activityKidsText', 'Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.', 'textarea', 'Barnaktiviteter — beskrivning', 'Visas på barn-kortet.'],
+  ['activityKnowledgeText', 'Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro.', 'textarea', 'Kunskapsutställningar — beskrivning', 'Visas på kunskaps-kortet.']
 ];
 
 /**

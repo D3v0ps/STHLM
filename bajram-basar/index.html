@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-  <title>Stockholms Moské Festival — Lördag 30 maj 2026</title>
-  <meta name="description" content="Festival på Stockholms Moské och Björns Trädgård vid Medborgarplatsen, lördag 30 maj 2026. Basar, öppet hus och familjeaktiviteter. Fri entré.">
+  <title>Stockholms Moské Festival — Lördag 13 juni 2026</title>
+  <meta name="description" content="Festival på Stockholms Moské och Björns Trädgård vid Medborgarplatsen, lördag 13 juni 2026. Basar, öppet hus och familjeaktiviteter. Fri entré.">
 
   <meta name="theme-color" content="#0f1e3d">
   <meta name="robots" content="index,follow">
@@ -14,14 +14,14 @@
   <meta property="og:type" content="website">
   <meta property="og:locale" content="sv_SE">
   <meta property="og:site_name" content="Stockholms Moské">
-  <meta property="og:title" content="Stockholms Moské Festival — Lördag 30 maj 2026">
+  <meta property="og:title" content="Stockholms Moské Festival — Lördag 13 juni 2026">
   <meta property="og:description" content="Festival på Stockholms Moské och Björns Trädgård. Basar, öppet hus och familjeaktiviteter. Fri entré.">
   <meta property="og:image" content="assets/og-festival.jpg">
   <meta property="og:url" content="https://stockholmsmoske.karimkhalil.se/bajram-basar/">
 
   <!-- Twitter card -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Stockholms Moské Festival — Lördag 30 maj 2026">
+  <meta name="twitter:title" content="Stockholms Moské Festival — Lördag 13 juni 2026">
   <meta name="twitter:description" content="Festival på Stockholms Moské och Björns Trädgård. Basar, öppet hus och familjeaktiviteter. Fri entré.">
   <meta name="twitter:image" content="assets/og-festival.jpg">
 
@@ -113,21 +113,36 @@
       </div>
     </section>
 
+    <!-- ───────── Syfte ───────── -->
+    <section id="syfte" class="purpose" aria-labelledby="purpose-title">
+      <div class="purpose__inner">
+        <p class="eyebrow" style="margin: 0 0 16px;">Festivalens syfte</p>
+        <h2 id="purpose-title" class="purpose__title">
+          En dag för <em>familj, möten och gemenskap</em>.
+        </h2>
+        <div class="purpose__body" data-bind="purposeText">
+          <p>Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.</p>
+          <p>Festivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.</p>
+          <p>Genom basar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ───────── Activities ───────── -->
     <section id="aktiviteter" class="activities" aria-labelledby="activities-title">
       <div class="activities__head">
         <div>
-          <p class="eyebrow" style="margin: 0 0 12px;">Tre sätt att delta</p>
+          <p class="eyebrow" style="margin: 0 0 12px;">Fem sätt att delta</p>
           <h2 id="activities-title" class="activities__title">
             Aktiviteter <em>under dagen</em>
           </h2>
         </div>
         <p class="activities__sub">
-          Tre parallella program — välj det som passar dig och din familj bäst.
+          Fem parallella program — välj det som passar dig och din familj bäst.
         </p>
       </div>
 
-      <div class="activities__grid">
+      <div class="activities__grid activities__grid--5">
         <a href="#anmal" class="activity-card activity-card--highlight">
           <svg class="activity-card__ornament" width="180" height="180" viewBox="0 0 100 100" aria-hidden="true">
             <defs>
@@ -141,7 +156,7 @@
           <div class="activity-card__body">
             <h3 class="activity-card__title">Basar</h3>
             <span class="activity-card__italic">&amp; öppet hus</span>
-            <p class="activity-card__desc">Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.</p>
+            <p class="activity-card__desc" data-bind="activityBazaarText">Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.</p>
           </div>
           <span class="activity-card__cta">
             <span>Anmäl ditt företag</span>
@@ -149,31 +164,53 @@
           </span>
         </a>
 
-        <a href="#fotboll" class="activity-card" data-future="fotboll">
+        <div class="activity-card" data-activity="sport">
           <span class="activity-card__num">02</span>
           <div class="activity-card__body">
-            <h3 class="activity-card__title">Fotboll</h3>
-            <span class="activity-card__italic">för alla åldrar</span>
-            <p class="activity-card__desc">Turnering för barn, ungdomar och vuxna. Mer information om format och åldersklasser kommer.</p>
+            <h3 class="activity-card__title">Sport</h3>
+            <span class="activity-card__italic">fotboll &amp; basket 3 mot 3</span>
+            <p class="activity-card__desc" data-bind="activitySportText">Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.</p>
           </div>
-          <span class="activity-card__cta">
-            <span>Anmäl intresse</span>
-            <span class="activity-card__cta-arrow" aria-hidden="true">→</span>
+          <span class="activity-card__cta activity-card__cta--muted">
+            <span>Spelschema kommer</span>
           </span>
-        </a>
+        </div>
 
-        <a href="#basket" class="activity-card" data-future="basket">
+        <div class="activity-card" data-activity="mat">
           <span class="activity-card__num">03</span>
           <div class="activity-card__body">
-            <h3 class="activity-card__title">Basket</h3>
-            <span class="activity-card__italic">3 mot 3</span>
-            <p class="activity-card__desc">Anmäl ditt 3-mannalag till basketturneringen på Björns Trädgård. Detaljer presenteras snart.</p>
+            <h3 class="activity-card__title">Mat</h3>
+            <span class="activity-card__italic">meny &amp; priser</span>
+            <p class="activity-card__desc" data-bind="activityMatText">Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.</p>
           </div>
-          <span class="activity-card__cta">
-            <span>Anmäl ditt lag</span>
-            <span class="activity-card__cta-arrow" aria-hidden="true">→</span>
+          <span class="activity-card__cta activity-card__cta--muted">
+            <span>Meny kommer</span>
           </span>
-        </a>
+        </div>
+
+        <div class="activity-card" data-activity="barn">
+          <span class="activity-card__num">04</span>
+          <div class="activity-card__body">
+            <h3 class="activity-card__title">Barn­aktiviteter</h3>
+            <span class="activity-card__italic">för de yngsta</span>
+            <p class="activity-card__desc" data-bind="activityKidsText">Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.</p>
+          </div>
+          <span class="activity-card__cta activity-card__cta--muted">
+            <span>Program kommer</span>
+          </span>
+        </div>
+
+        <div class="activity-card" data-activity="kunskap">
+          <span class="activity-card__num">05</span>
+          <div class="activity-card__body">
+            <h3 class="activity-card__title">Kunskaps­utställningar</h3>
+            <span class="activity-card__italic">lär dig något nytt</span>
+            <p class="activity-card__desc" data-bind="activityKnowledgeText">Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro.</p>
+          </div>
+          <span class="activity-card__cta activity-card__cta--muted">
+            <span>Program kommer</span>
+          </span>
+        </div>
       </div>
     </section>
 
@@ -295,6 +332,21 @@
             </a>
           </div>
         </div>
+      </div>
+    </section>
+
+    <!-- ───────── Linktree / följ oss ───────── -->
+    <section id="folj-oss" class="linktree" aria-labelledby="linktree-title">
+      <div class="linktree__inner">
+        <p class="eyebrow" style="margin: 0 0 16px;">Följ oss</p>
+        <h2 id="linktree-title" class="linktree__title">
+          Alla våra länkar <em>på ett ställe</em>.
+        </h2>
+        <p class="linktree__lede">Marknadsföring, schemaändringar och bilder från dagen — håll dig uppdaterad via våra kanaler.</p>
+        <div id="linktree-list" class="linktree__list" role="list"></div>
+        <a id="linktree-cta" class="btn btn-primary linktree__cta" href="#" target="_blank" rel="noopener" hidden>
+          Öppna alla länkar i Linktree <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </section>
 
