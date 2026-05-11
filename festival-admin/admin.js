@@ -388,6 +388,7 @@
   function clearToken() {
     state.token = null;
     sessionStorage.removeItem('smf_admin_token');
+    sessionStorage.removeItem('smf_admin_data');
   }
 
   // ============================================================
@@ -490,35 +491,51 @@
   // ============================================================
 
   async function loadData() {
-    showLoadingOverlay();
+    // Stale-while-revalidate: rendera cache direkt om vi har en i sessionen,
+    // kör ändå färsk fetch i bakgrunden så ändringar i Sheetet syns snabbt.
+    let cached = null;
     try {
-      state.data = await runServer('getAdminData', state.token);
+      const raw = sessionStorage.getItem('smf_admin_data');
+      if (raw) cached = JSON.parse(raw);
+    } catch (_) { /* ignore */ }
 
-      // getOverview kan saknas i vissa miljöer; ignorera fel
-      try {
-        state.overview = await runServer('getOverview', state.token);
-      } catch (_) {
-        state.overview = null;
-      }
+    if (cached) {
+      state.data = cached;
+      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
+      renderAll();
+    } else {
+      showLoadingOverlay();
+    }
+
+    try {
+      // Bara getAdminData; getOverview tas bort eftersom renderOverview
+      // beräknar samma siffror från state.data lokalt. Sparar ~1 roundtrip
+      // (1–2 s) per inloggning + sparning.
+      state.data = await runServer('getAdminData', state.token);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) { /* ignore */ }
 
       state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false };
 
-      renderOverview();
-      renderEventForm();
-      renderQuestionsList();
-      renderSubmissionsTable();
-      renderExhibitorsList();
-      renderSocialList();
-      renderSportsList();
+      renderAll();
     } catch (err) {
       if (isAuthError(err)) {
         await handleAuthError();
         return;
       }
-      toast('Kunde inte ladda data. Försök igen.', 'error');
+      if (!cached) toast('Kunde inte ladda data. Försök igen.', 'error');
     } finally {
       hideLoadingOverlay();
     }
+  }
+
+  function renderAll() {
+    renderOverview();
+    renderEventForm();
+    renderQuestionsList();
+    renderSubmissionsTable();
+    renderExhibitorsList();
+    renderSocialList();
+    renderSportsList();
   }
 
   // ============================================================
@@ -647,8 +664,7 @@
       const merged = Object.assign({}, settings, { registrationOpen: next });
       await runServer('saveSettings', state.token, merged);
       state.data.settings = merged;
-      // Uppdatera overview också
-      try { state.overview = await runServer('getOverview', state.token); } catch (_) {}
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       renderOverview();
       renderEventForm();
       toast(next ? 'Anmälan är öppen igen.' : 'Anmälan är stängd.', 'success');
@@ -927,6 +943,7 @@
     try {
       await runServer('saveSettings', state.token, settings);
       state.data.settings = settings;
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       state.unsavedChanges.event = false;
       updateSaveBar();
       updateLastSaved();
@@ -1347,6 +1364,7 @@
 
     try {
       await runServer('saveFormQuestions', state.token, state.data.questions);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       state.unsavedChanges.questions = false;
       showSavedMsg('questions-saved-msg');
       toast('Frågorna är sparade. Syns publikt inom 5 minuter.', 'success');
@@ -1953,7 +1971,7 @@
       await runServer('saveExhibitors', state.token, state.data.exhibitors);
       state.unsavedChanges.exhibitors = false;
       showSavedMsg('exhibitors-saved-msg');
-      try { state.overview = await runServer('getOverview', state.token); } catch (_) {}
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       renderOverview();
       toast('Utställarna är sparade. Syns publikt inom 5 minuter.', 'success');
     } catch (err) {
@@ -2109,6 +2127,7 @@
 
     try {
       await runServer('saveSocialLinks', state.token, state.data.socialLinks);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       state.unsavedChanges.social = false;
       showSavedMsg('social-saved-msg');
       toast('Länkarna är sparade. Syns publikt inom 5 minuter.', 'success');
@@ -2213,6 +2232,7 @@
 
     try {
       await runServer('saveSportsPages', state.token, state.data.sportsPages);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
       state.unsavedChanges.sports = false;
       showSavedMsg('sports-saved-msg');
       toast('Sport-sidorna är sparade. Syns publikt inom 5 minuter.', 'success');
