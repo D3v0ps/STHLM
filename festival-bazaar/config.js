@@ -26,7 +26,7 @@ window.APP_CONFIG = {
       successMessage: "Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.",
       closedMessage: "Anmälan är stängd. Utställare publiceras här när programmet är klart.",
       purposeText: "Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.",
-      linktreeUrl: "",
+      linktreeUrl: "https://linktr.ee/stockholmsmoske",
       activityBazaarText: "Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.",
       activitySportText: "Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.",
       activityMatText: "Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.",
