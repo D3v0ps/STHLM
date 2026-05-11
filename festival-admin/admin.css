@@ -1586,8 +1586,75 @@ h3 { letter-spacing: -0.01em; }
   line-height: 1.5;
   margin: 0;
 }
-.section-card__body { padding: 24px 28px; }
+.section-card__body { padding: 32px 36px; }
 .section-card__body--flush { padding: 0; }
+.section-card__head { padding: 24px 36px; }
+@media (max-width: 768px) {
+  .section-card__body { padding: 24px 20px; }
+  .section-card__head { padding: 20px 20px; }
+}
+
+/* Input + textarea + select i designsystemets section-cards och form-cells.
+   Saknades helt — fältens browser-default gjorde dem osynligt små. */
+.input,
+.textarea,
+.select,
+.form-cell input[type="text"],
+.form-cell input[type="email"],
+.form-cell input[type="tel"],
+.form-cell input[type="url"],
+.form-cell input[type="number"],
+.form-cell input[type="search"],
+.form-cell input[type="password"],
+.form-cell textarea,
+.form-cell select {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--sm-radius-md);
+  font-size: 15px;
+  font-family: var(--sm-font-body);
+  color: var(--ink);
+  line-height: 1.5;
+  transition: border-color 120ms, box-shadow 120ms;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.input:focus, .textarea:focus, .select:focus,
+.form-cell input:focus, .form-cell textarea:focus, .form-cell select:focus {
+  outline: none;
+  border-color: var(--brass);
+  box-shadow: 0 0 0 3px rgba(184, 168, 102, 0.18);
+}
+.input::placeholder, .textarea::placeholder,
+.form-cell input::placeholder, .form-cell textarea::placeholder {
+  color: var(--ink-muted);
+  opacity: 0.7;
+}
+
+/* Textareas: respektera rows-attributet via min-height så de aldrig blir
+   absurt små (rows=3 → ~110px, rows=4 → ~140px, rows=8 → ~220px). */
+.textarea, .form-cell textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+.textarea[rows="2"], .form-cell textarea[rows="2"] { min-height: 80px; }
+.textarea[rows="3"], .form-cell textarea[rows="3"] { min-height: 110px; }
+.textarea[rows="4"], .form-cell textarea[rows="4"] { min-height: 140px; }
+.textarea[rows="6"], .form-cell textarea[rows="6"] { min-height: 180px; }
+.textarea[rows="8"], .form-cell textarea[rows="8"] { min-height: 220px; }
+
+/* Field-label margin-bottom + larger form-grid gap för luft */
+.field-label { margin: 0 0 10px; font-size: 12px; }
+.field-help, .form-cell .field-help { margin: 8px 0 0; font-size: 13px; line-height: 1.55; }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
 
 /* Field grid (12-col system motsvarar designens Row + Field span) */
 .form-grid {
