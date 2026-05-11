@@ -10,8 +10,8 @@ Bygg en publik landningssida + adminpanel för **Stockholms Moské Festival** (b
 
 **Hybrid-arkitektur:**
 
-- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `stockholmsmoske.karimkhalil.se`).
-- **Adminpanel:** Vanilla HTML/CSS/JS static SPA på One.com (subkatalog `/bajram-admin/`). Pratar med backend via fetch POST med `Content-Type: text/plain`.
+- **Publik sida:** Vanilla HTML/CSS/JS, deployad via SFTP till One.com (subkatalog under `karimkhalil.se`).
+- **Adminpanel:** Vanilla HTML/CSS/JS static SPA på One.com (subkatalog `/festival-admin/`). Pratar med backend via fetch POST med `Content-Type: text/plain`.
 - **Backend:** Google Apps Script Web App. `doPost` dispatchar admin-actions via whitelistad mappning i `adminDispatch_`. `requireAuth_` validerar token mot CacheService för varje skyddad operation.
 - **Databas/CMS:** Google Sheets (innehåll redigerbart både via admin-UI och direkt i arket).
 
@@ -23,12 +23,12 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 
 | URL | Innehåll |
 |---|---|
-| `https://stockholmsmoske.karimkhalil.se/bajram-basar/` | Publik landningssida + bazaar-formulär |
-| `https://stockholmsmoske.karimkhalil.se/bajram-admin/` | Statisk admin-launcher (länkar till Apps Script) |
+| `https://karimkhalil.se/festival-bazaar/` | Publik landningssida + bazaar-formulär |
+| `https://karimkhalil.se/festival-admin/` | Statisk admin-launcher (länkar till Apps Script) |
 | `https://script.google.com/macros/s/.../exec` | Apps Script Web App (backend) |
 | `https://script.google.com/macros/s/.../exec?view=admin` | Riktig adminpanel (HtmlService) |
-| `https://stockholmsmoske.karimkhalil.se/bajram-fotboll/` | Framtida (placeholder) |
-| `https://stockholmsmoske.karimkhalil.se/bajram-basket-3vs3/` | Framtida (placeholder) |
+| `https://karimkhalil.se/festival-fotboll/` | Framtida (placeholder) |
+| `https://karimkhalil.se/festival-basket-3vs3/` | Framtida (placeholder) |
 
 ---
 
@@ -39,7 +39,7 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 ├── README.md                              # Huvuddokumentation – sätta upp hela systemet
 ├── TODO.md                                # Öppna punkter för Yasser/Karim/Pamass
 ├── SPEC.md                                # Denna fil
-├── bajram-basar/                          # Publika sidan (SFTP → One.com)
+├── festival-bazaar/                          # Publika sidan (SFTP → One.com)
 │   ├── index.html
 │   ├── styles.css
 │   ├── script.js
@@ -47,7 +47,7 @@ Inga build-steg, ingen Node, inga frameworks. Allt vanilla.
 │   ├── README.md                          # Hur man laddar upp via SFTP
 │   └── assets/
 │       └── .gitkeep                       # Mapp för logo, hero, pattern (tomma initialt)
-├── bajram-admin/                          # Admin-launcher (SFTP → One.com)
+├── festival-admin/                          # Admin-launcher (SFTP → One.com)
 │   ├── index.html                         # Knapp/redirect till Apps Script-admin
 │   ├── admin-launcher.css
 │   ├── config.js                          # ADMIN_WEB_APP_URL placeholder
@@ -203,8 +203,8 @@ Default-rader:
 
 | Slug | Title | Description | Active | Registration Open |
 |---|---|---|---|---|
-| `bajram-fotboll` | Anmälan till fotboll | Mer information kommer snart. | FALSE | FALSE |
-| `bajram-basket-3vs3` | Anmälan till basket 3 mot 3 | Mer information kommer snart. | FALSE | FALSE |
+| `festival-fotboll` | Anmälan till fotboll | Mer information kommer snart. | FALSE | FALSE |
+| `festival-basket-3vs3` | Anmälan till basket 3 mot 3 | Mer information kommer snart. | FALSE | FALSE |
 
 #### `AdminLogs` (Timestamp, Action, Details, Session ID)
 
@@ -433,7 +433,7 @@ UX-krav (idiotsäker checklist):
 ## 11. Acceptanskriterier (klar när ALLT nedan stämmer)
 
 **Funktionalitet:**
-- [ ] `bajram-basar/` renderar korrekt på 375px, 768px, 1280px
+- [ ] `festival-bazaar/` renderar korrekt på 375px, 768px, 1280px
 - [ ] Formuläret bygger sig dynamiskt från FormQuestions
 - [ ] Klient-side validering (required, email, phone, min-length) med felmeddelanden på svenska
 - [ ] Honeypot-fält finns och döljs korrekt (CSS + `aria-hidden`)
@@ -464,7 +464,7 @@ UX-krav (idiotsäker checklist):
 
 **Dokumentation:**
 - [ ] Huvud-README dokumenterar hela setup-flödet
-- [ ] `bajram-basar/README.md` dokumenterar SFTP-deploy
+- [ ] `festival-bazaar/README.md` dokumenterar SFTP-deploy
 - [ ] `google-apps-script/README.md` dokumenterar Apps Script-deploy
 - [ ] TODO.md listar öppna punkter
 

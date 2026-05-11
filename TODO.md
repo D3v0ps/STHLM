@@ -13,8 +13,8 @@
 - [ ] **Detaljer från Pamass om fotboll** (åldersklasser, format, datum) — innan sidan publiceras
 - [ ] **Detaljer från Pamass om basket 3v3** (åldersklasser, format) — innan sidan publiceras
 - [ ] **Foton från tidigare event** — för hero/sektioner; alternativt rena bakgrunder
-- [ ] **OG-bild 1200x630** — baserad på flyern, sparas i `bajram-basar/assets/og-festival.jpg`
-- [ ] **Logotyp** — kvadratisk + horisontell, sparas i `bajram-basar/assets/`
+- [ ] **OG-bild 1200x630** — baserad på flyern, sparas i `festival-bazaar/assets/og-festival.jpg`
+- [ ] **Logotyp** — kvadratisk + horisontell, sparas i `festival-bazaar/assets/`
 - [ ] **Favicon** — Yasser/Karim väljer (kan vara förenklat moské-monogram)
 
 ## Tekniskt – behöver göras före launch
@@ -23,8 +23,8 @@
 - [x] **Kör `setupSpreadsheet()`** för att initiera flikar
 - [x] **Kör `setupAdminPassword('...')`** med långt slumpat lösenord
 - [x] **Publicera Apps Script som Web App** (åtkomst: Alla)
-- [x] **Klistra in Web App-URL** i `bajram-basar/config.js` och `bajram-admin/config.js`
-- [ ] **Beställ subdomän eller subkatalog** på One.com (rekommendation: subkatalog `/bajram-basar/` och `/bajram-admin/`)
+- [x] **Klistra in Web App-URL** i `festival-bazaar/config.js` och `festival-admin/config.js`
+- [ ] **Beställ subdomän eller subkatalog** på One.com (rekommendation: subkatalog `/festival-bazaar/` och `/festival-admin/`)
 - [ ] **Lägg till GitHub Secrets** för SFTP-deploy: `SFTP_HOST`, `SFTP_USER`, `SFTP_PASSWORD`, `SFTP_WEBROOT` (se README §Steg 3)
 - [ ] **Första deployen** — pusha till `main` eller kör workflow manuellt (Actions → `Deploy to One.com` → `Run workflow`)
 - [ ] **Smoke-test:** skicka testanmälan, godkänn i admin, byt formulär av/på, verifiera utställarvy

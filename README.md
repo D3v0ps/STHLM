@@ -4,8 +4,8 @@ Publik landningssida + adminpanel för Stockholms Moskés sommarfestival (bazaar
 
 **Live-URL:er** (efter deploy):
 
-- 🌐 Publik: `https://stockholmsmoske.karimkhalil.se/bajram-basar/`
-- 🔒 Admin: `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → leder till Apps Script
+- 🌐 Publik: `https://karimkhalil.se/festival-bazaar/`
+- 🔒 Admin: `https://karimkhalil.se/festival-admin/` → leder till Apps Script
 
 ## Översikt
 
@@ -33,8 +33,8 @@ Browser ──HTTP──▶ One.com (statiska filer)
 ├── SPEC.md                         # Datakontrakt + designtokens (single source of truth)
 ├── README.md                       # Denna fil
 ├── TODO.md                         # Öppna punkter
-├── bajram-basar/                   # Publik sida → SFTP till One.com
-├── bajram-admin/                   # Adminpanel (static SPA) → SFTP till One.com
+├── festival-bazaar/                   # Publik sida → SFTP till One.com
+├── festival-admin/                   # Adminpanel (static SPA) → SFTP till One.com
 └── google-apps-script/             # Backend-källkod, kopieras manuellt till Apps Script-editorn
 ```
 
@@ -57,8 +57,8 @@ Följ instruktionerna i `google-apps-script/README.md` steg 1–5. Det innefatta
 
 ### Steg 2: Konfigurera frontend
 
-1. Öppna `bajram-basar/config.js` — byt `PASTE_APPS_SCRIPT_URL_HERE` mot Web App-URL:en.
-2. Öppna `bajram-admin/config.js` — byt `PASTE_ADMIN_WEB_APP_URL_HERE` mot samma URL (lägg till `?view=admin` på slutet).
+1. Öppna `festival-bazaar/config.js` — byt `PASTE_APPS_SCRIPT_URL_HERE` mot Web App-URL:en.
+2. Öppna `festival-admin/config.js` — byt `PASTE_ADMIN_WEB_APP_URL_HERE` mot samma URL (lägg till `?view=admin` på slutet).
 
 ### Steg 3: Ladda upp till One.com via SFTP
 
@@ -66,9 +66,9 @@ Följ instruktionerna i `google-apps-script/README.md` steg 1–5. Det innefatta
 
 #### Auto-deploy via GitHub Actions (rekommenderas)
 
-Workflow-filen `.github/workflows/deploy.yml` mirrorar `bajram-basar/` och `bajram-admin/` till One.com via SFTP. Triggers:
+Workflow-filen `.github/workflows/deploy.yml` mirrorar `festival-bazaar/` och `festival-admin/` till One.com via SFTP. Triggers:
 
-- **Automatiskt:** push till `main` som rör `bajram-basar/`, `bajram-admin/` eller workflow-filen.
+- **Automatiskt:** push till `main` som rör `festival-bazaar/`, `festival-admin/` eller workflow-filen.
 - **Manuellt:** GitHub → fliken `Actions` → `Deploy to One.com` → `Run workflow`.
 
 **Engångsuppsättning — lägg till fyra repository secrets:**
@@ -82,7 +82,7 @@ GitHub → repo → `Settings` → `Secrets and variables` → `Actions` → `Ne
 | `SFTP_PASSWORD` | SFTP-lösenord | Samma vy som ovan (`Visa/skapa lösenord`) |
 | `SFTP_WEBROOT` | Sökväg till webroot på servern, t.ex. `/httpd.www` eller `/<din-domän>` — UTAN trailing slash | Samma vy. One.coms standard är `/httpd.www`. |
 
-Workflow:n exkluderar `README.md`, `.gitkeep` och `.DS_Store`. Den använder `--delete`, så filer i `<webroot>/bajram-basar/` och `<webroot>/bajram-admin/` som inte finns i repot raderas vid deploy.
+Workflow:n exkluderar `README.md`, `.gitkeep` och `.DS_Store`. Den använder `--delete`, så filer i `<webroot>/festival-bazaar/` och `<webroot>/festival-admin/` som inte finns i repot raderas vid deploy.
 
 #### Manuell SFTP (fallback)
 
@@ -90,18 +90,18 @@ Om Actions inte är konfigurerat eller du behöver deploya direkt:
 
 ```bash
 rsync -avz --delete --exclude README.md --exclude .gitkeep \
-  bajram-basar/ <user>@<host>:<webroot>/bajram-basar/
+  festival-bazaar/ <user>@<host>:<webroot>/festival-bazaar/
 rsync -avz --delete --exclude README.md --exclude .gitkeep \
-  bajram-admin/ <user>@<host>:<webroot>/bajram-admin/
+  festival-admin/ <user>@<host>:<webroot>/festival-admin/
 ```
 
 Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 ### Steg 4: Smoke-test
 
-1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-basar/` — ska visa hero, intro, info-kort, formulär.
+1. Öppna `https://karimkhalil.se/festival-bazaar/` — ska visa hero, intro, info-kort, formulär.
 2. Skicka en testanmälan. Kontrollera att raden hamnar i Sheetets `Submissions`-flik.
-3. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/` → klicka `Öppna adminpanelen` → logga in.
+3. Öppna `https://karimkhalil.se/festival-admin/` → klicka `Öppna adminpanelen` → logga in.
 4. Gå till `Översikt` — antalsiffror ska matcha Sheetet.
 5. Ändra något i `Eventinformation`, spara, vänta 5 min eller hård-refresha publika sidan — ändringen ska synas.
 
@@ -111,7 +111,7 @@ Eller använd valfri SFTP-klient (Cyberduck, FileZilla, Transmit).
 
 Du ska sällan behöva röra koden. Allt innehåll redigeras via adminpanelen:
 
-1. Öppna `https://stockholmsmoske.karimkhalil.se/bajram-admin/`
+1. Öppna `https://karimkhalil.se/festival-admin/`
 2. Logga in med adminlösenordet (få från Karim).
 3. Använd flikarna:
    - **Översikt** — se status, öppna/stänga formulär
@@ -160,7 +160,7 @@ Du sätter upp systemet och underhåller koden. Se `google-apps-script/README.md
 ## Underhåll på sikt
 
 - Sheetet och Apps Script-projektet ägs av ett konto som flera personer har access till (rekommenderas: skapa ett Google-grupp-konto eller dela explicit med backuppersoner).
-- Vid återkommande arrangemang: duplicera Sheetet, koppla nytt Apps Script-projekt, deploya på ny subkatalog (`/bajram-2027/`). Gamla året arkiveras.
+- Vid återkommande arrangemang: duplicera Sheetet, koppla nytt Apps Script-projekt, deploya på ny subkatalog (`/festival-2027/`). Gamla året arkiveras.
 - Koden ligger i ett git-repo. Branch-strategi: feature-branches → main. Inga long-running PR:er.
 
 ## Kontakt
