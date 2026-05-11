@@ -23,6 +23,7 @@ const SHEET_NAMES = {
   SOCIAL_LINKS: 'SocialLinks',
   SPORTS_PAGES: 'SportsPages',
   VOLUNTEERS: 'VolunteerSubmissions',
+  VOLUNTEER_QUESTIONS: 'VolunteerQuestions',
   ADMIN_LOGS: 'AdminLogs'
 };
 
@@ -42,6 +43,7 @@ const SHEET_HEADERS = {
   SocialLinks: ['Order', 'Platform', 'Label', 'URL', 'Active'],
   SportsPages: ['Slug', 'Title', 'Description', 'Active', 'Registration Open'],
   VolunteerSubmissions: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About', 'Internal Notes'],
+  VolunteerQuestions: ['Order', 'Field ID', 'Label', 'Helper Text', 'Placeholder', 'Type', 'Required', 'Active', 'Options'],
   AdminLogs: ['Timestamp', 'Action', 'Details', 'Session ID']
 };
 
@@ -356,6 +358,7 @@ function buildPublicDataPayload_() {
   const exhibitors = readApprovedExhibitors_();
   const socialLinks = readActiveSocialLinks_();
   const sportsPages = readSportsPages_();
+  const volunteerQuestions = readVolunteerQuestions_().filter(function (q) { return q.active === true; });
   return {
     ok: true,
     data: {
@@ -363,7 +366,8 @@ function buildPublicDataPayload_() {
       questions: questions,
       exhibitors: exhibitors,
       socialLinks: socialLinks,
-      sportsPages: sportsPages
+      sportsPages: sportsPages,
+      volunteerQuestions: volunteerQuestions
     }
   };
 }
@@ -452,6 +456,8 @@ function adminDispatch_(action, body) {
       return updateVolunteerStatus(args[0], args[1], args[2], args[3]);
     case 'exportVolunteersCsv':
       return exportVolunteersCsv(args[0]);
+    case 'saveVolunteerQuestions':
+      return saveVolunteerQuestions(args[0], args[1]);
     default:
       return { ok: false, error: 'unknown_admin_action' };
   }
@@ -561,27 +567,63 @@ function handleVolunteerSubmit_(body) {
     return { ok: true };
   }
 
-  // Validering (server-side fallback; klienten gör mest jobbet)
-  const name = String(data.name || '').trim();
-  const phone = String(data.phone || '').trim();
-  const birthDate = String(data.birthDate || '').trim();
-  const hasExperience = data.hasExperience === true || data.hasExperience === 'ja' || data.hasExperience === 'true';
-  const areasRaw = data.areas;
-  const areas = Array.isArray(areasRaw) ? areasRaw : (areasRaw ? [String(areasRaw)] : []);
-  const shiftsRaw = data.shifts;
-  const shifts = Array.isArray(shiftsRaw) ? shiftsRaw : (shiftsRaw ? [String(shiftsRaw)] : []);
-  const about = String(data.about || '').trim();
-
+  // Validera mot aktiva volontärfrågor (dynamiskt schema, samma logik som
+  // för bazaar-formuläret).
+  const questions = readVolunteerQuestions_().filter(function (q) { return q.active === true; });
   const errors = {};
-  if (!name) errors.name = 'required';
-  if (!phone) errors.phone = 'required';
-  if (!birthDate || !/^\d{6}$/.test(birthDate)) errors.birthDate = 'invalid_format';
-  if (areas.length === 0) errors.areas = 'pick_at_least_one';
-  if (shifts.length === 0) errors.shifts = 'pick_at_least_one';
-  if (!about || about.length < 10) errors.about = 'too_short';
+
+  function asArray(v) {
+    if (Array.isArray(v)) return v.map(function (x) { return String(x).trim(); }).filter(Boolean);
+    if (v == null || v === '') return [];
+    return [String(v).trim()];
+  }
+
+  questions.forEach(function (q) {
+    const fid = q.fieldId;
+    const required = q.required === true;
+    const raw = data[fid];
+
+    if (q.type === 'multicheck') {
+      const arr = asArray(raw);
+      if (required && arr.length === 0) errors[fid] = 'pick_at_least_one';
+      return;
+    }
+    if (q.type === 'radio') {
+      const v = String(raw == null ? '' : raw).trim();
+      if (required && !v) errors[fid] = 'required';
+      return;
+    }
+    // text/email/tel/textarea/checkbox
+    const v = String(raw == null ? '' : raw).trim();
+    if (required && !v) { errors[fid] = 'required'; return; }
+    if (fid === 'birthDate' && v && !/^\d{6}$/.test(v)) errors[fid] = 'invalid_format';
+    if (fid === 'about' && required && v.length < 10) errors[fid] = 'too_short';
+  });
 
   if (Object.keys(errors).length > 0) {
     return { ok: false, error: 'validation_failed', details: errors };
+  }
+
+  // Plocka ut välkända fält till deras dedikerade kolumner. Övriga
+  // fält (om admin lagt till nya i framtiden) faller in i About-kolumnen
+  // som en del av JSON-strängen — säkrar att inget tappas bort utan
+  // schemaändring.
+  const name = String(data.name || '').trim();
+  const phone = String(data.phone || '').trim();
+  const birthDate = String(data.birthDate || '').trim();
+  const hasExperience = String(data.hasExperience || '').trim();
+  const areas = asArray(data.areas).join(', ');
+  const shifts = asArray(data.shifts).join(', ');
+  let about = String(data.about || '').trim();
+
+  // Eventuella okända fält bevaras som extra info under About.
+  const knownIds = { name: 1, phone: 1, birthDate: 1, hasExperience: 1, about: 1, areas: 1, shifts: 1, kontakttid: 1 };
+  const extras = {};
+  Object.keys(data).forEach(function (k) {
+    if (!knownIds[k]) extras[k] = data[k];
+  });
+  if (Object.keys(extras).length) {
+    about += '\n\n— Extra fält —\n' + JSON.stringify(extras, null, 2);
   }
 
   const id = Utilities.getUuid();
@@ -594,9 +636,9 @@ function handleVolunteerSubmit_(body) {
     name,
     phone,
     birthDate,
-    hasExperience ? 'ja' : 'nej',
-    areas.join(', '),
-    shifts.join(', '),
+    hasExperience || 'nej',
+    areas,
+    shifts,
     about,
     ''
   ]);
@@ -913,6 +955,32 @@ function readQuestions_() {
 }
 
 /**
+ * Läser VolunteerQuestions-fliken. Samma schema som FormQuestions men för
+ * volontärformuläret. Stödjer extra type-värden: 'radio' (Options = lista
+ * av "value|label,...") och 'multicheck' (samma options-format).
+ *
+ * @return {Array<Object>}
+ */
+function readVolunteerQuestions_() {
+  const rows = readSheetAsObjects_(SHEET_NAMES.VOLUNTEER_QUESTIONS);
+  const cleaned = rows.map(function (r) {
+    return {
+      order: Number(r.order) || 0,
+      fieldId: String(r.fieldId || '').trim(),
+      label: String(r.label || ''),
+      helperText: String(r.helperText || ''),
+      placeholder: String(r.placeholder || ''),
+      type: String(r.type || 'text').toLowerCase(),
+      required: r.required === true,
+      active: r.active === true,
+      options: r.options ? String(r.options).split(',').map(function (s) { return s.trim(); }).filter(Boolean) : []
+    };
+  });
+  cleaned.sort(function (a, b) { return a.order - b.order; });
+  return cleaned;
+}
+
+/**
  * Läser Exhibitors-fliken — endast publicerade. Sorterat efter order.
  *
  * @return {Array<Object>}
@@ -996,7 +1064,8 @@ function getAdminData(token) {
         exhibitors: readAllExhibitors_(),
         socialLinks: readAllSocialLinks_(),
         sportsPages: readSportsPages_(),
-        volunteers: readAllVolunteers_()
+        volunteers: readAllVolunteers_(),
+        volunteerQuestions: readVolunteerQuestions_()
       }
     };
   });
@@ -1130,6 +1199,50 @@ function saveFormQuestions(token, questionsArr) {
     });
     writeSheetFromObjects_(SHEET_NAMES.FORM_QUESTIONS, normalized, SHEET_HEADERS.FormQuestions);
     logAdminAction_('save_form_questions', { count: normalized.length }, token);
+    return { ok: true };
+  });
+}
+
+/**
+ * Admin: skriver över hela VolunteerQuestions-fliken.
+ *
+ * @param {string} token
+ * @param {Array<Object>} questionsArr
+ * @return {Object}
+ */
+function saveVolunteerQuestions(token, questionsArr) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    if (!Array.isArray(questionsArr)) {
+      return { ok: false, error: 'invalid_input' };
+    }
+    const seen = {};
+    for (let i = 0; i < questionsArr.length; i++) {
+      const q = questionsArr[i] || {};
+      const fid = String(q.fieldId || '').trim();
+      if (!fid) {
+        return { ok: false, error: 'validation_failed', details: { index: i, field: 'fieldId', message: 'Field ID krävs.' } };
+      }
+      if (seen[fid]) {
+        return { ok: false, error: 'validation_failed', details: { index: i, field: 'fieldId', message: 'Field ID måste vara unikt: ' + fid } };
+      }
+      seen[fid] = true;
+    }
+    const normalized = questionsArr.map(function (q, idx) {
+      return {
+        order: Number(q.order) || (idx + 1),
+        fieldId: String(q.fieldId || '').trim(),
+        label: String(q.label || ''),
+        helperText: String(q.helperText || ''),
+        placeholder: String(q.placeholder || ''),
+        type: String(q.type || 'text').toLowerCase(),
+        required: q.required === true,
+        active: q.active === true,
+        options: Array.isArray(q.options) ? q.options.join(', ') : String(q.options || '')
+      };
+    });
+    writeSheetFromObjects_(SHEET_NAMES.VOLUNTEER_QUESTIONS, normalized, SHEET_HEADERS.VolunteerQuestions);
+    logAdminAction_('save_volunteer_questions', { count: normalized.length }, token);
     return { ok: true };
   });
 }
@@ -1693,7 +1806,17 @@ function setupSpreadsheet() {
       addDropdownValidation_(sheet, 'Status', ['new', 'reviewed', 'approved', 'rejected', 'contacted']);
     });
 
-    // 8. AdminLogs
+    // 8. VolunteerQuestions (seedas med 7 default-frågor)
+    ensureSheet_(ss, SHEET_NAMES.VOLUNTEER_QUESTIONS, SHEET_HEADERS.VolunteerQuestions, created, updated, function (sheet) {
+      if (sheet.getLastRow() < 2) {
+        sheet.getRange(2, 1, DEFAULT_VOLUNTEER_QUESTIONS.length, SHEET_HEADERS.VolunteerQuestions.length)
+          .setValues(DEFAULT_VOLUNTEER_QUESTIONS);
+      }
+      addBooleanValidation_(sheet, ['Required', 'Active']);
+      addDropdownValidation_(sheet, 'Type', ['text', 'email', 'tel', 'textarea', 'checkbox', 'select', 'radio', 'multicheck']);
+    });
+
+    // 9. AdminLogs
     ensureSheet_(ss, SHEET_NAMES.ADMIN_LOGS, SHEET_HEADERS.AdminLogs, created, updated);
 
     logAdminAction_('setup_spreadsheet', { created: created, updated: updated }, null);
@@ -1875,4 +1998,24 @@ const DEFAULT_SOCIAL_LINKS = [
 const DEFAULT_SPORTS_PAGES = [
   ['festival-fotboll', 'Anmälan till fotboll', 'Mer information kommer snart.', 'FALSE', 'FALSE'],
   ['festival-basket-3vs3', 'Anmälan till basket 3 mot 3', 'Mer information kommer snart.', 'FALSE', 'FALSE']
+];
+
+/**
+ * Default volontärfrågor. Samma 9-kolumn-schema som FormQuestions men för
+ * volontärformuläret. fieldId mappar till specifika kolumner i
+ * VolunteerSubmissions-fliken; ändra inte fieldId om Sheet-data ska bevaras.
+ *
+ * Types:
+ *   text/email/tel/textarea = standard
+ *   radio = enkelt val (Options-fältet: "value|label, value|label, ...")
+ *   multicheck = flera val (samma Options-format)
+ */
+const DEFAULT_VOLUNTEER_QUESTIONS = [
+  [1, 'name', 'Namn och efternamn', '', 'För- och efternamn', 'text', 'TRUE', 'TRUE', ''],
+  [2, 'phone', 'Telefonnummer', '', '+46 70 123 45 67', 'tel', 'TRUE', 'TRUE', ''],
+  [3, 'birthDate', 'Födelsedatum (ÅÅMMDD)', 'Sex siffror — t.ex. 980415 för 15 april 1998.', 'ÅÅMMDD', 'text', 'TRUE', 'TRUE', ''],
+  [4, 'hasExperience', 'Tidigare volontärerfarenhet i moskén', '', '', 'radio', 'TRUE', 'TRUE', 'ja|Ja, nej|Nej'],
+  [5, 'about', 'Berätta kort om dig själv', 'Vad gör du till vardags? Något särskilt vi bör veta?', '', 'textarea', 'TRUE', 'TRUE', ''],
+  [6, 'areas', 'Områden du vill hjälpa till med', 'Välj ett eller flera.', '', 'multicheck', 'TRUE', 'TRUE', 'reception|Reception & välkomna, mat|Mat & fika, barn|Barn & familj, sakerhet|Säkerhet & ordning, bazaar|Bazaar-stöd, stadning|Städning & rivning'],
+  [7, 'shifts', 'Pass du kan hjälpa till med', 'Välj ett eller flera.', '', 'multicheck', 'TRUE', 'TRUE', 'forenoon|Förmiddag (10:00–15:00), afternoon|Eftermiddag (15:00–20:00)']
 ];
