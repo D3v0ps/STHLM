@@ -25,11 +25,14 @@
    */
   const EVENT_SECTIONS = [
     { id: 'identity', title: 'Eventets identitet', subtitle: 'Texten som dominerar publika sidans hero-sektion.' },
+    { id: 'purpose', title: 'Festivalens syfte', subtitle: 'Lång beskrivning av festivalen som visas under hero-sektionen.' },
     { id: 'dateplace', title: 'Datum, tid & plats', subtitle: 'Visas i hero-strippen och i info-blocket längre ner.' },
     { id: 'visitors', title: 'Förväntade besökare', subtitle: 'Siffrorna visas som info till anmälare så de förstår skalan på eventet.' },
     { id: 'visibility', title: 'Anmälan & synlighet', subtitle: 'Slå av/på funktioner på publika sidan utan att behöva röra något annat.' },
+    { id: 'activities', title: 'Aktiviteter', subtitle: 'En textruta per aktivitetskort. Varje kommitté uppdaterar sin egen ruta inför festivalen.' },
     { id: 'descriptions', title: 'Basarens beskrivningar', subtitle: 'Texter som visas tillsammans med anmälningsformuläret.' },
-    { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' }
+    { id: 'messages', title: 'Bekräftelse & statusmeddelanden', subtitle: 'Texter som visas för anmälaren beroende på status.' },
+    { id: 'marketing', title: 'Marknadsföring', subtitle: 'Länkar och kanaler där festivalen syns utåt.' }
   ];
 
   const SETTINGS_FIELDS = [
@@ -40,8 +43,11 @@
     { key: 'introText',        label: 'Introtext',                        type: 'textarea', section: 'identity',    span: 12,
       help: 'Inledande beskrivning under hero-rubriken. Cirka 1–2 meningar.', rows: 3 },
 
+    { key: 'purposeText',      label: 'Syfte-text',                       type: 'textarea', section: 'purpose',     span: 12,
+      help: 'Använd blankrad mellan stycken. Visas på den publika sidan strax under hero-sektionen.', rows: 8 },
+
     { key: 'eventDate',        label: 'Datum (visning)',                  type: 'text',     section: 'dateplace',   span: 4,
-      help: 'T.ex. "Lördag 30 maj". Skriv som du vill att besökaren ska läsa det.' },
+      help: 'T.ex. "Lördag 13 juni". Skriv som du vill att besökaren ska läsa det.' },
     { key: 'eventTime',        label: 'Tid (hela eventet)',               type: 'text',     section: 'dateplace',   span: 4,
       help: 'T.ex. "12:00–19:00".' },
     { key: 'bazaarTime',       label: 'Basarens tid',                     type: 'text',     section: 'dateplace',   span: 4,
@@ -61,6 +67,17 @@
     { key: 'heroButtonText',   label: 'Knapptext (primär CTA)',           type: 'text',     section: 'visibility',  span: 12,
       help: 'Texten på den stora knappen i hero-sektionen.' },
 
+    { key: 'activityBazaarText',    label: 'Basar — beskrivning',                  type: 'textarea', section: 'activities', span: 12,
+      help: 'Visas på basar-kortet på publika sidan.', rows: 3 },
+    { key: 'activitySportText',     label: 'Sport — beskrivning',                  type: 'textarea', section: 'activities', span: 12,
+      help: 'Visas på sport-kortet (fotboll och basket).', rows: 3 },
+    { key: 'activityMatText',       label: 'Mat — beskrivning',                    type: 'textarea', section: 'activities', span: 12,
+      help: 'Meny och priser publiceras närmare festivalen.', rows: 3 },
+    { key: 'activityKidsText',      label: 'Barnaktiviteter — beskrivning',        type: 'textarea', section: 'activities', span: 12,
+      help: 'Program och ledare för de yngsta.', rows: 3 },
+    { key: 'activityKnowledgeText', label: 'Kunskapsutställningar — beskrivning',  type: 'textarea', section: 'activities', span: 12,
+      help: 'Utställningar och kortföredrag under festivalen.', rows: 3 },
+
     { key: 'whoCanApplyText',  label: 'Vem kan anmäla sig?',              type: 'textarea', section: 'descriptions', span: 12,
       help: 'Förklaring av vem som får ansöka.', rows: 3 },
     { key: 'selectionText',    label: 'Så görs urvalet',                  type: 'textarea', section: 'descriptions', span: 12,
@@ -71,7 +88,10 @@
     { key: 'successMessage',   label: 'Tackmeddelande efter anmälan',     type: 'text',     section: 'messages',    span: 12,
       help: 'Visas när anmälan har skickats.' },
     { key: 'closedMessage',    label: 'Meddelande när anmälan är stängd', type: 'text',     section: 'messages',    span: 12,
-      help: 'Visas ovanför utställarlistan när anmälan är avstängd.' }
+      help: 'Visas ovanför utställarlistan när anmälan är avstängd.' },
+
+    { key: 'linktreeUrl',      label: 'Linktree-URL',                     type: 'text',     section: 'marketing',   span: 12,
+      help: 'Lämna tomt om ingen Linktree finns. Annars visas en "Öppna alla länkar i Linktree"-knapp i sektionen Följ oss.' }
   ];
 
   const QUESTION_TYPES = [

@@ -10,7 +10,7 @@ window.APP_CONFIG = {
     settings: {
       eventTitle: "Festival",
       eventSubtitle: "— en dag för gemenskap",
-      eventDate: "Lördag 30 maj",
+      eventDate: "Lördag 13 juni",
       eventTime: "12:00–19:00",
       bazaarTime: "13:00–17:00",
       eventLocation: "Stockholms Moské",
@@ -24,7 +24,14 @@ window.APP_CONFIG = {
       selectionText: "Urvalet kommer att göras baserat på hur relevant ditt erbjudande är för besökarna samt hur genomförbart det är. Ju mer information du lämnar om vad du planerar att sälja eller presentera, desto enklare blir bedömningen. Vi hör av oss efter att urvalsprocessen är klar.",
       importantInfoText: "• Att delta är gratis.\n• Anmälan är bindande – vid sen avanmälan kan en avgift debiteras.\n• Varje deltagare ansvarar för sin egen plats.\n• Varje deltagare ansvarar för städning efter avslutat evenemang.\n• Bazaren är öppen mellan kl. 13:00–17:00; festivalen pågår 12:00–19:00.",
       successMessage: "Tack! Din intresseanmälan har skickats. Vi återkommer när urvalet är klart.",
-      closedMessage: "Anmälan är stängd. Utställare publiceras här när programmet är klart."
+      closedMessage: "Anmälan är stängd. Utställare publiceras här när programmet är klart.",
+      purposeText: "Stockholms Moskéfestival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom basar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – där människor möts i en öppen, familjevänlig och inkluderande miljö.",
+      linktreeUrl: "",
+      activityBazaarText: "Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.",
+      activitySportText: "Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.",
+      activityMatText: "Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.",
+      activityKidsText: "Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.",
+      activityKnowledgeText: "Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro."
     },
     questions: [
       {
