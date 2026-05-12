@@ -530,8 +530,9 @@
     var parent = form.parentNode;
     if (!parent) return;
     var success = el('div', { class: 'success-state', role: 'status', 'aria-live': 'polite' });
-    success.appendChild(el('h3', { text: 'Tack' + (name ? ', ' + String(name).split(' ')[0] : '') + '!' }));
+    success.appendChild(el('h3', { text: 'Jazaka allahu kheir kheir' + (name ? ', ' + String(name).split(' ')[0] : '') + '!' }));
     success.appendChild(el('p', { text: 'Din intresseanmälan är mottagen. Vi återkommer inom någon vecka med besked om pass och områden.' }));
+    success.appendChild(el('p', { class: 'success-state__dua', text: 'Må Allah belöna dig!' }));
 
     var iaPanel = el('div', { class: 'success-ig' });
     iaPanel.appendChild(el('p', { class: 'success-ig__lede', text: 'Vi behöver fler följare — följ Stockholms Moské på Instagram och håll dig uppdaterad om festivalen!' }));
