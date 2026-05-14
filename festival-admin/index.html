@@ -105,6 +105,11 @@
           <span class="tab-nav__label">Volontärfrågor</span>
         </button>
 
+        <button class="tab-nav__btn" data-tab="bazaar-faq" type="button" id="tab-bazaar-faq" aria-selected="false">
+          <span class="tab-nav__icon" aria-hidden="true">❓</span>
+          <span class="tab-nav__label">Bazaar-FAQ</span>
+        </button>
+
         <p class="tab-nav__group-label">Inställningar</p>
         <button class="tab-nav__btn" data-tab="social" type="button" id="tab-social" aria-selected="false">
           <span class="tab-nav__icon" aria-hidden="true">⌖</span>
@@ -349,6 +354,25 @@
           <div class="form-actions">
             <button id="save-volunteer-questions-btn" class="btn btn--primary">Spara volontärfrågor</button>
             <span id="volunteer-questions-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
+          </div>
+        </section>
+
+        <!-- ---------- BAZAAR FAQ ---------- -->
+        <section data-tab-panel="bazaar-faq" id="panel-bazaar-faq" tabindex="0" hidden>
+          <div class="page-header">
+            <p class="page-header__crumbs">Innehåll → Bazaar → Vanliga frågor</p>
+            <div class="page-header__row">
+              <div>
+                <h1 class="page-header__title">Bazaar-FAQ</h1>
+                <p class="page-header__sub">Frågor och svar som visas under bazaaranmälan på festivalsidan. Lägg svar i varje fråga — tomma svar visas inte.</p>
+              </div>
+            </div>
+          </div>
+          <ul id="bazaar-faq-list" class="questions-list"></ul>
+          <button id="add-bazaar-faq-btn" class="btn btn-add">+ Ny fråga</button>
+          <div class="form-actions">
+            <button id="save-bazaar-faq-btn" class="btn btn--primary">Spara FAQ</button>
+            <span id="bazaar-faq-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
         </section>
 

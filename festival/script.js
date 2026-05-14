@@ -158,16 +158,24 @@
     renderExhibitors(currentData.exhibitors, currentData.settings);
     renderSocialPopup(currentData.socialLinks);
     renderLinktree(currentData.socialLinks, currentData.settings);
+    renderBazaarFaq(currentData.bazaarFaq);
   }
 
   /** Rendera Syfte-textstycket — split på blankrader till <p>. */
   function renderPurpose(settings) {
-    var node = document.querySelector('[data-bind="purposeText"]');
-    if (!node || !settings) return;
-    var raw = settings.purposeText;
-    if (raw == null || raw === '') return; // Behåll fallback-HTML
+    if (!settings) return;
+    renderMultiParagraph('purposeText', settings.purposeText);
+    renderMultiParagraph('whoCanApplyText', settings.whoCanApplyText);
+  }
+
+  /** Generisk multi-paragraph renderer för data-bind-noder. */
+  function renderMultiParagraph(key, raw) {
+    var node = document.querySelector('[data-bind="' + key + '"]');
+    if (!node) return;
+    if (raw == null || raw === '') return;
     var text = String(raw).replace(/\r\n/g, '\n');
     var paragraphs = text.split(/\n\s*\n/).map(function(p) { return p.trim(); }).filter(Boolean);
+    if (paragraphs.length === 0) return;
     while (node.firstChild) node.removeChild(node.firstChild);
     paragraphs.forEach(function(p) {
       node.appendChild(el('p', { text: p }));
@@ -213,6 +221,38 @@
     }
   }
 
+  /** Rendera Bazaar-FAQ som <details>/<summary>-accordions under formuläret. */
+  function renderBazaarFaq(faq) {
+    var wrap = document.getElementById('bazaar-faq');
+    var list = document.getElementById('bazaar-faq-list');
+    if (!wrap || !list) return;
+
+    var visible = (faq || []).filter(function (q) {
+      return q && toBool(q.active) && trim(q.question) && trim(q.answer);
+    }).slice().sort(byOrder);
+
+    while (list.firstChild) list.removeChild(list.firstChild);
+
+    if (visible.length === 0) {
+      wrap.hidden = true;
+      return;
+    }
+    wrap.hidden = false;
+
+    visible.forEach(function (q) {
+      var d = el('details', { class: 'faq-item' });
+      d.appendChild(el('summary', { class: 'faq-item__q', text: trim(q.question) }));
+      var ansWrap = el('div', { class: 'faq-item__a' });
+      var paragraphs = trim(q.answer).replace(/\r\n/g, '\n').split(/\n\s*\n/);
+      paragraphs.forEach(function (p) {
+        var pt = p.trim();
+        if (pt) ansWrap.appendChild(el('p', { text: pt }));
+      });
+      d.appendChild(ansWrap);
+      list.appendChild(d);
+    });
+  }
+
   /** Säkerställ att data har förväntad struktur. */
   function normalizeData(data) {
     var d = data || {};
@@ -221,7 +261,8 @@
       questions: Array.isArray(d.questions) ? d.questions.slice() : [],
       exhibitors: Array.isArray(d.exhibitors) ? d.exhibitors.slice() : [],
       socialLinks: Array.isArray(d.socialLinks) ? d.socialLinks.slice() : [],
-      sportsPages: Array.isArray(d.sportsPages) ? d.sportsPages.slice() : []
+      sportsPages: Array.isArray(d.sportsPages) ? d.sportsPages.slice() : [],
+      bazaarFaq: Array.isArray(d.bazaarFaq) ? d.bazaarFaq.slice() : []
     };
   }
 
@@ -296,6 +337,11 @@
 
       if (key === 'importantInfoText') {
         renderImportantInfo(node, value);
+        return;
+      }
+
+      // Multi-paragraph keys handled separately av renderPurpose/renderMultiParagraph.
+      if (key === 'purposeText' || key === 'whoCanApplyText') {
         return;
       }
 

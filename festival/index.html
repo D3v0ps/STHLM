@@ -252,16 +252,25 @@
           <h2 id="form-title" class="form-section__title">
             Anmäl ditt <em>stånd</em> till bazaaren
           </h2>
-          <p class="form-section__lede" data-bind="whoCanApplyText">
-            Vi förväntar oss cirka 130 barn och 200 vuxna besökare. Bazaren är öppen mellan 13:00 och 17:00. Varje deltagare ansvarar för sin plats inklusive städning.
-          </p>
+          <div class="form-section__lede" data-bind="whoCanApplyText">
+            <p>Bazaren är öppen för företagare, kreatörer, föreningar och andra som vill sälja eller presentera produkter och tjänster som passar festivalens besökare och familjer.</p>
+            <p>Det finns ingen avgift för att boka ett stånd. Istället tillfaller 10 % av försäljningen under festivaldagen Stockholms Moské som bidrag till festivalens verksamhet och arrangemang.</p>
+            <p>I formuläret ber vi dig beskriva vad du planerar att erbjuda samt vilken typ av stånd eller plats du behöver.</p>
+          </div>
           <div class="form-section__notes">
             <p class="form-section__notes-title">Viktigt att känna till</p>
-            <ul>
-              <li>Att delta är gratis</li>
-              <li>Anmälan är bindande</li>
-              <li>Sen avanmälan kan medföra en avgift</li>
-            </ul>
+            <div data-bind="importantInfoText" class="form-section__notes-body">
+              <ul>
+                <li>Att boka ett stånd är kostnadsfritt.</li>
+                <li>Anmälan är bindande efter bekräftad plats.</li>
+                <li>Sen avanmälan eller utebliven närvaro kan medföra en avgift.</li>
+                <li>Sista anmälningsdag: söndag 17 maj.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="form-section__faq" id="bazaar-faq" hidden>
+            <p class="form-section__notes-title">Vanliga frågor</p>
+            <div id="bazaar-faq-list" class="faq-list"></div>
           </div>
         </div>
 

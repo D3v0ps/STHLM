@@ -828,6 +828,55 @@ img, svg { display: block; max-width: 100%; }
   color: var(--brass);
 }
 
+.form-section__faq {
+  border-top: 1px solid var(--line);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+.faq-list { display: flex; flex-direction: column; gap: 8px; }
+.faq-item {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  overflow: hidden;
+  transition: border-color 160ms;
+}
+.faq-item[open] { border-color: var(--brass); }
+.faq-item__q {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--ink);
+  position: relative;
+  padding-right: 40px;
+}
+.faq-item__q::-webkit-details-marker { display: none; }
+.faq-item__q::after {
+  content: '+';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--brass);
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 1;
+  transition: transform 160ms;
+}
+.faq-item[open] .faq-item__q::after {
+  content: '–';
+}
+.faq-item__a {
+  padding: 0 16px 14px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+}
+.faq-item__a p { margin: 0 0 10px; }
+.faq-item__a p:last-child { margin-bottom: 0; }
+
 .form-card {
   background: var(--paper);
   border: 1px solid var(--line);

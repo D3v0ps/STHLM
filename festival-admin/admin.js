@@ -245,6 +245,12 @@
     const saveVolQBtn = document.getElementById('save-volunteer-questions-btn');
     if (saveVolQBtn) saveVolQBtn.addEventListener('click', handleVolunteerQuestionsSave);
 
+    const addFaqBtn = document.getElementById('add-bazaar-faq-btn');
+    if (addFaqBtn) addFaqBtn.addEventListener('click', handleAddBazaarFaq);
+
+    const saveFaqBtn = document.getElementById('save-bazaar-faq-btn');
+    if (saveFaqBtn) saveFaqBtn.addEventListener('click', handleBazaarFaqSave);
+
     const addExhBtn = document.getElementById('add-exhibitor-btn');
     if (addExhBtn) addExhBtn.addEventListener('click', handleAddExhibitor);
 
@@ -494,7 +500,7 @@
     clearToken();
     state.data = null;
     state.overview = null;
-    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
+    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false, bazaarFaq: false };
     showLogin();
   }
 
@@ -519,7 +525,7 @@
     clearToken();
     state.data = null;
     state.overview = null;
-    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
+    state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false, bazaarFaq: false };
     showLogin();
   }
 
@@ -538,7 +544,7 @@
 
     if (cached) {
       state.data = cached;
-      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
+      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false, bazaarFaq: false };
       renderAll();
     } else {
       showLoadingOverlay();
@@ -551,7 +557,7 @@
       state.data = await runServer('getAdminData', state.token);
       try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) { /* ignore */ }
 
-      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false };
+      state.unsavedChanges = { event: false, questions: false, exhibitors: false, social: false, sports: false, volunteerQuestions: false, bazaarFaq: false };
 
       renderAll();
     } catch (err) {
@@ -575,6 +581,7 @@
     renderSportsList();
     renderVolunteersTable();
     renderVolunteerQuestionsList();
+    renderBazaarFaqList();
   }
 
   // ============================================================
@@ -1657,6 +1664,164 @@
       toast('Kunde inte spara volontärfrågorna. Försök igen.', 'error');
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Spara volontärfrågor'; }
+    }
+  }
+
+  // ============================================================
+  // BAZAAR-FAQ — admin-redigerare (Q&A som visas under bazaaranmälan)
+  // ============================================================
+
+  function renderBazaarFaqList() {
+    const list = document.getElementById('bazaar-faq-list');
+    if (!list) return;
+    list.innerHTML = '';
+    if (!state.data) return;
+    if (!state.data.bazaarFaq) state.data.bazaarFaq = [];
+    const faq = state.data.bazaarFaq.slice().sort(function(a, b) {
+      return (a.order || 0) - (b.order || 0);
+    });
+    if (faq.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'empty-state';
+      empty.textContent = 'Inga FAQ-frågor än. Klicka på "+ Ny fråga" eller kör setupSpreadsheet() i Apps Script.';
+      list.appendChild(empty);
+      return;
+    }
+    faq.forEach(function(q, idx) {
+      list.appendChild(buildBazaarFaqItem(q, idx, faq.length));
+    });
+  }
+
+  function buildBazaarFaqItem(q, idx, total) {
+    const li = document.createElement('li');
+    li.className = 'question-item';
+
+    const header = document.createElement('div');
+    header.className = 'question-item__header';
+    const upBtn = document.createElement('button');
+    upBtn.type = 'button';
+    upBtn.className = 'btn btn--small btn--ghost';
+    upBtn.textContent = 'Flytta upp';
+    upBtn.disabled = idx === 0;
+    upBtn.addEventListener('click', function() { moveBazaarFaq(idx, idx - 1); });
+    header.appendChild(upBtn);
+
+    const downBtn = document.createElement('button');
+    downBtn.type = 'button';
+    downBtn.className = 'btn btn--small btn--ghost';
+    downBtn.textContent = 'Flytta ned';
+    downBtn.disabled = idx === total - 1;
+    downBtn.addEventListener('click', function() { moveBazaarFaq(idx, idx + 1); });
+    header.appendChild(downBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'btn btn--small btn--danger';
+    delBtn.textContent = 'Ta bort';
+    delBtn.addEventListener('click', function() { handleDeleteBazaarFaq(idx); });
+    header.appendChild(delBtn);
+    li.appendChild(header);
+
+    // Question
+    li.appendChild(buildTextInputRow('Fråga', q.question || '', function(v) {
+      q.question = v;
+      state.unsavedChanges.bazaarFaq = true;
+    }));
+
+    // Answer (textarea)
+    const answerRow = document.createElement('div');
+    answerRow.className = 'form-row';
+    const answerLabel = document.createElement('label');
+    answerLabel.textContent = 'Svar (visas under frågan, kan vara flera meningar)';
+    const answerTa = document.createElement('textarea');
+    answerTa.rows = 4;
+    answerTa.value = q.answer || '';
+    answerTa.placeholder = 'Skriv svaret här…';
+    answerTa.addEventListener('input', function() {
+      q.answer = answerTa.value;
+      state.unsavedChanges.bazaarFaq = true;
+    });
+    answerRow.appendChild(answerLabel);
+    answerRow.appendChild(answerTa);
+    li.appendChild(answerRow);
+
+    // Active toggle
+    const toggleRow = document.createElement('div');
+    toggleRow.className = 'form-row form-row--toggles';
+    toggleRow.appendChild(buildToggle('Aktiv (visas på sidan)', q.active !== false, function(checked) {
+      q.active = checked;
+      state.unsavedChanges.bazaarFaq = true;
+    }));
+    li.appendChild(toggleRow);
+
+    return li;
+  }
+
+  function moveBazaarFaq(fromIdx, toIdx) {
+    if (!state.data || !state.data.bazaarFaq) return;
+    const arr = state.data.bazaarFaq;
+    if (fromIdx < 0 || toIdx < 0 || fromIdx >= arr.length || toIdx >= arr.length || fromIdx === toIdx) return;
+    const item = arr.splice(fromIdx, 1)[0];
+    arr.splice(toIdx, 0, item);
+    arr.forEach(function(q, i) { q.order = i + 1; });
+    state.unsavedChanges.bazaarFaq = true;
+    renderBazaarFaqList();
+  }
+
+  function handleAddBazaarFaq() {
+    if (!state.data) return;
+    if (!state.data.bazaarFaq) state.data.bazaarFaq = [];
+    state.data.bazaarFaq.push({
+      order: state.data.bazaarFaq.length + 1,
+      question: 'Ny fråga',
+      answer: '',
+      active: true
+    });
+    state.unsavedChanges.bazaarFaq = true;
+    renderBazaarFaqList();
+  }
+
+  async function handleDeleteBazaarFaq(idx) {
+    if (!state.data || !state.data.bazaarFaq) return;
+    const q = state.data.bazaarFaq[idx];
+    if (!q) return;
+    const ok = await confirmDialog(
+      'Ta bort frågan "' + (q.question || 'Ny fråga') + '"? Detta tas bort på publika sidan vid nästa sparning.',
+      'Ta bort',
+      true
+    );
+    if (!ok) return;
+    state.data.bazaarFaq.splice(idx, 1);
+    state.data.bazaarFaq.forEach(function(q, i) { q.order = i + 1; });
+    state.unsavedChanges.bazaarFaq = true;
+    renderBazaarFaqList();
+  }
+
+  async function handleBazaarFaqSave() {
+    if (!state.data || !state.data.bazaarFaq) return;
+    let hasError = false;
+    let errorMsg = '';
+    state.data.bazaarFaq.forEach(function(q, i) {
+      if (!(q.question || '').trim()) { hasError = true; errorMsg = 'Rad ' + (i + 1) + ' saknar fråga.'; }
+    });
+    if (hasError) { toast(errorMsg, 'error'); return; }
+
+    state.data.bazaarFaq.forEach(function(q, i) { q.order = i + 1; });
+
+    const btn = document.getElementById('save-bazaar-faq-btn');
+    if (btn) { btn.disabled = true; btn.dataset.originalText = btn.textContent; btn.textContent = 'Sparar…'; }
+
+    try {
+      await runServer('saveBazaarFaq', state.token, state.data.bazaarFaq);
+      try { sessionStorage.setItem('smf_admin_data', JSON.stringify(state.data)); } catch (_) {}
+      state.unsavedChanges.bazaarFaq = false;
+      showSavedMsg('bazaar-faq-saved-msg');
+      toast('FAQ är sparad. Syns publikt inom 1 minut.', 'success');
+    } catch (err) {
+      if (isAuthError(err)) { await handleAuthError(); return; }
+      toast('Kunde inte spara FAQ. Försök igen.', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.originalText || 'Spara FAQ'; }
     }
   }
 
