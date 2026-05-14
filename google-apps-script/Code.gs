@@ -24,6 +24,7 @@ const SHEET_NAMES = {
   SPORTS_PAGES: 'SportsPages',
   VOLUNTEERS: 'VolunteerSubmissions',
   VOLUNTEER_QUESTIONS: 'VolunteerQuestions',
+  BAZAAR_FAQ: 'BazaarFAQ',
   ADMIN_LOGS: 'AdminLogs'
 };
 
@@ -44,6 +45,7 @@ const SHEET_HEADERS = {
   SportsPages: ['Slug', 'Title', 'Description', 'Active', 'Registration Open'],
   VolunteerSubmissions: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About', 'Internal Notes'],
   VolunteerQuestions: ['Order', 'Field ID', 'Label', 'Helper Text', 'Placeholder', 'Type', 'Required', 'Active', 'Options'],
+  BazaarFAQ: ['Order', 'Question', 'Answer', 'Active'],
   AdminLogs: ['Timestamp', 'Action', 'Details', 'Session ID']
 };
 
@@ -359,6 +361,7 @@ function buildPublicDataPayload_() {
   const socialLinks = readActiveSocialLinks_();
   const sportsPages = readSportsPages_();
   const volunteerQuestions = readVolunteerQuestions_().filter(function (q) { return q.active === true; });
+  const bazaarFaq = readBazaarFaq_().filter(function (q) { return q.active === true; });
   return {
     ok: true,
     data: {
@@ -367,7 +370,8 @@ function buildPublicDataPayload_() {
       exhibitors: exhibitors,
       socialLinks: socialLinks,
       sportsPages: sportsPages,
-      volunteerQuestions: volunteerQuestions
+      volunteerQuestions: volunteerQuestions,
+      bazaarFaq: bazaarFaq
     }
   };
 }
@@ -458,6 +462,8 @@ function adminDispatch_(action, body) {
       return exportVolunteersCsv(args[0]);
     case 'saveVolunteerQuestions':
       return saveVolunteerQuestions(args[0], args[1]);
+    case 'saveBazaarFaq':
+      return saveBazaarFaq(args[0], args[1]);
     default:
       return { ok: false, error: 'unknown_admin_action' };
   }
@@ -981,6 +987,26 @@ function readVolunteerQuestions_() {
 }
 
 /**
+ * Läser BazaarFAQ-fliken. Returnerar array av { order, question, answer, active }
+ * sorterat på order.
+ *
+ * @return {Array<Object>}
+ */
+function readBazaarFaq_() {
+  const rows = readSheetAsObjects_(SHEET_NAMES.BAZAAR_FAQ);
+  const cleaned = rows.map(function (r) {
+    return {
+      order: Number(r.order) || 0,
+      question: String(r.question || '').trim(),
+      answer: String(r.answer || '').trim(),
+      active: r.active === true
+    };
+  }).filter(function (r) { return r.question; });
+  cleaned.sort(function (a, b) { return a.order - b.order; });
+  return cleaned;
+}
+
+/**
  * Läser Exhibitors-fliken — endast publicerade. Sorterat efter order.
  *
  * @return {Array<Object>}
@@ -1065,7 +1091,8 @@ function getAdminData(token) {
         socialLinks: readAllSocialLinks_(),
         sportsPages: readSportsPages_(),
         volunteers: readAllVolunteers_(),
-        volunteerQuestions: readVolunteerQuestions_()
+        volunteerQuestions: readVolunteerQuestions_(),
+        bazaarFaq: readBazaarFaq_()
       }
     };
   });
@@ -1243,6 +1270,34 @@ function saveVolunteerQuestions(token, questionsArr) {
     });
     writeSheetFromObjects_(SHEET_NAMES.VOLUNTEER_QUESTIONS, normalized, SHEET_HEADERS.VolunteerQuestions);
     logAdminAction_('save_volunteer_questions', { count: normalized.length }, token);
+    return { ok: true };
+  });
+}
+
+/**
+ * Admin: skriver över hela BazaarFAQ-fliken. Tar { order, question, answer,
+ * active } per rad.
+ *
+ * @param {string} token
+ * @param {Array<Object>} faqArr
+ * @return {Object}
+ */
+function saveBazaarFaq(token, faqArr) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    if (!Array.isArray(faqArr)) {
+      return { ok: false, error: 'invalid_input' };
+    }
+    const normalized = faqArr.map(function (q, idx) {
+      return {
+        order: Number(q.order) || (idx + 1),
+        question: String(q.question || '').trim(),
+        answer: String(q.answer || '').trim(),
+        active: q.active === true
+      };
+    }).filter(function (q) { return q.question; });
+    writeSheetFromObjects_(SHEET_NAMES.BAZAAR_FAQ, normalized, SHEET_HEADERS.BazaarFAQ);
+    logAdminAction_('save_bazaar_faq', { count: normalized.length }, token);
     return { ok: true };
   });
 }
@@ -1816,7 +1871,16 @@ function setupSpreadsheet() {
       addDropdownValidation_(sheet, 'Type', ['text', 'email', 'tel', 'textarea', 'checkbox', 'select', 'radio', 'multicheck']);
     });
 
-    // 9. AdminLogs
+    // 9. BazaarFAQ (seedas med Ghassan's frågor — svar fylls i av admin)
+    ensureSheet_(ss, SHEET_NAMES.BAZAAR_FAQ, SHEET_HEADERS.BazaarFAQ, created, updated, function (sheet) {
+      if (sheet.getLastRow() < 2) {
+        sheet.getRange(2, 1, DEFAULT_BAZAAR_FAQ.length, SHEET_HEADERS.BazaarFAQ.length)
+          .setValues(DEFAULT_BAZAAR_FAQ);
+      }
+      addBooleanValidation_(sheet, ['Active']);
+    });
+
+    // 10. AdminLogs
     ensureSheet_(ss, SHEET_NAMES.ADMIN_LOGS, SHEET_HEADERS.AdminLogs, created, updated);
 
     logAdminAction_('setup_spreadsheet', { created: created, updated: updated }, null);
@@ -2018,4 +2082,19 @@ const DEFAULT_VOLUNTEER_QUESTIONS = [
   [5, 'about', 'Berätta kort om dig själv', 'Vad gör du till vardags? Något särskilt vi bör veta?', '', 'textarea', 'TRUE', 'TRUE', ''],
   [6, 'areas', 'Områden du vill hjälpa till med', 'Välj ett eller flera.', '', 'multicheck', 'TRUE', 'TRUE', 'reception|Reception & välkomna, mat|Mat & fika, barn|Barn & familj, sakerhet|Säkerhet & ordning, bazaar|Bazaar-stöd, stadning|Städning & rivning'],
   [7, 'shifts', 'Pass du kan hjälpa till med', 'Välj ett eller flera.', '', 'multicheck', 'TRUE', 'TRUE', 'forenoon|Förmiddag (10:00–15:00), afternoon|Eftermiddag (15:00–20:00)']
+];
+
+/**
+ * Default BazaarFAQ — seedas med Ghassan's frågor. Svar fylls i av admin via
+ * /festival-admin/. Kolumner: [Order, Question, Answer, Active].
+ */
+const DEFAULT_BAZAAR_FAQ = [
+  [1, 'Vad ingår i ståndet?', '', 'TRUE'],
+  [2, 'Behöver jag ta med eget bord?', '', 'TRUE'],
+  [3, 'Får man sälja mat?', '', 'TRUE'],
+  [4, 'Hur fungerar 10 %?', '', 'TRUE'],
+  [5, 'Hur funkar 10 % för företag som bara står med info och inte säljer?', '', 'TRUE'],
+  [6, 'Finns el?', '', 'TRUE'],
+  [7, 'När får man besked?', '', 'TRUE'],
+  [8, 'Hur sker betalning?', '', 'TRUE']
 ];
