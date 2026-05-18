@@ -161,14 +161,20 @@
     var yearEl = document.getElementById('footer-year');
     if (yearEl) yearEl.textContent = String(new Date().getFullYear());
 
-    // Stale-while-revalidate: rendera cache direkt, hämta nytt i bakgrunden.
+    // Rendera direkt från cache eller fallback så att formuläret syns
+    // även i in-app-browsers (Messenger, Instagram) som ibland blockerar
+    // JSONP. Refresha sen i bakgrunden från live-datan.
     var cached = readCache();
-    if (cached) applyData(cached);
+    var fb = fallbackData();
+    var initial = cached || fb;
+    var hasInitialQuestions = initial && Array.isArray(initial.volunteerQuestions) && initial.volunteerQuestions.length > 0;
+    if (hasInitialQuestions) applyData(initial);
     else renderLoading();
 
     fetchPublicData(function (err, data) {
       if (err || !data) {
-        if (!cached) applyData(fallbackData());
+        // Fall tillbaka på fallback OM vi inte redan har något renderat.
+        if (!hasInitialQuestions) applyData(fb);
         return;
       }
       writeCache(data);

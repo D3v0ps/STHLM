@@ -25,6 +25,7 @@ const SHEET_NAMES = {
   VOLUNTEERS: 'VolunteerSubmissions',
   VOLUNTEER_QUESTIONS: 'VolunteerQuestions',
   BAZAAR_FAQ: 'BazaarFAQ',
+  FOOTBALL: 'FootballRegistrations',
   ADMIN_LOGS: 'AdminLogs'
 };
 
@@ -46,6 +47,7 @@ const SHEET_HEADERS = {
   VolunteerSubmissions: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About', 'Internal Notes'],
   VolunteerQuestions: ['Order', 'Field ID', 'Label', 'Helper Text', 'Placeholder', 'Type', 'Required', 'Active', 'Options'],
   BazaarFAQ: ['Order', 'Question', 'Answer', 'Active'],
+  FootballRegistrations: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'Email', 'Team Name', 'Consent', 'Internal Notes'],
   AdminLogs: ['Timestamp', 'Action', 'Details', 'Session ID']
 };
 
@@ -401,6 +403,10 @@ function doPost(e) {
       return jsonResponse_(handleVolunteerSubmit_(body));
     }
 
+    if (action === 'submitFootball') {
+      return jsonResponse_(handleFootballSubmit_(body));
+    }
+
     if (adminAction) {
       return jsonResponse_(adminDispatch_(adminAction, body));
     }
@@ -650,6 +656,61 @@ function handleVolunteerSubmit_(body) {
   ]);
 
   logAdminAction_('volunteer_submitted', { id: id, name: name }, null);
+  return { ok: true, data: { id: id } };
+}
+
+/**
+ * Hanterar anmälan till fotbollsturneringen. Skriver till
+ * FootballRegistrations-fliken. Minimal schema med fast set av fält.
+ *
+ * @param {Object} body  Förväntar { action: 'submitFootball', data: { ... } }
+ * @return {Object}
+ */
+function handleFootballSubmit_(body) {
+  const data = (body && body.data) || {};
+
+  // Honeypot
+  const honeypot = data.kontakttid;
+  if (honeypot && String(honeypot).trim() !== '') {
+    logAdminAction_('spam_blocked', { formType: 'football', reason: 'honeypot_filled' }, null);
+    return { ok: true };
+  }
+
+  const name = String(data.name || '').trim();
+  const phone = String(data.phone || '').trim();
+  const email = String(data.email || '').trim();
+  const teamName = String(data.teamName || '').trim();
+  const consent = data.consentAccepted === true || data.consentAccepted === 'true';
+
+  const errors = {};
+  if (!name) errors.name = 'required';
+  if (!phone) errors.phone = 'required';
+  else if (!PHONE_REGEX.test(phone)) errors.phone = 'invalid_phone';
+  if (!email) errors.email = 'required';
+  else if (!EMAIL_REGEX.test(email)) errors.email = 'invalid_email';
+  if (!teamName) errors.teamName = 'required';
+  if (!consent) errors.consentAccepted = 'must_accept';
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, error: 'validation_failed', details: errors };
+  }
+
+  const id = Utilities.getUuid();
+  const timestamp = new Date().toISOString();
+  const sheet = getSheet_(SHEET_NAMES.FOOTBALL);
+  sheet.appendRow([
+    id,
+    timestamp,
+    'new',
+    name,
+    phone,
+    email,
+    teamName,
+    consent ? 'TRUE' : 'FALSE',
+    ''
+  ]);
+
+  logAdminAction_('football_submitted', { id: id, teamName: teamName }, null);
   return { ok: true, data: { id: id } };
 }
 
@@ -1880,7 +1941,12 @@ function setupSpreadsheet() {
       addBooleanValidation_(sheet, ['Active']);
     });
 
-    // 10. AdminLogs
+    // 10. FootballRegistrations (tom + headers)
+    ensureSheet_(ss, SHEET_NAMES.FOOTBALL, SHEET_HEADERS.FootballRegistrations, created, updated, function (sheet) {
+      addDropdownValidation_(sheet, 'Status', ['new', 'confirmed', 'paid', 'rejected', 'waitlist']);
+    });
+
+    // 11. AdminLogs
     ensureSheet_(ss, SHEET_NAMES.ADMIN_LOGS, SHEET_HEADERS.AdminLogs, created, updated);
 
     logAdminAction_('setup_spreadsheet', { created: created, updated: updated }, null);
