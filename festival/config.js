@@ -28,7 +28,7 @@ window.APP_CONFIG = {
       purposeText: "Stockholms Moské Festival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – i en öppen, familjevänlig och inkluderande miljö där människor möts.",
       linktreeUrl: "https://linktr.ee/stockholmsmoske",
       activityBazaarText: "Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.",
-      activitySportText: "Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.",
+      activitySportText: "Fotbollsturnering för ålder 15+ (födda 2011 eller tidigare). 5v5, max 6 spelare per lag. 500 kr per lag — 1:a-pris 6 000 kr i presentkort. Sista anmälningsdag 6 juni.",
       activityMatText: "Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.",
       activityKidsText: "Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.",
       activityKnowledgeText: "Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro."
@@ -134,6 +134,16 @@ window.APP_CONFIG = {
     sportsPages: [
       { slug: "festival-fotboll", title: "Anmälan till fotboll", description: "Mer information kommer snart.", active: false, registrationOpen: false },
       { slug: "festival-basket-3vs3", title: "Anmälan till basket 3 mot 3", description: "Mer information kommer snart.", active: false, registrationOpen: false }
-    ]
+    ],
+    volunteerQuestions: [
+      { order: 1, fieldId: "name", label: "Namn och efternamn", helperText: "", placeholder: "För- och efternamn", type: "text", required: true, active: true, options: [] },
+      { order: 2, fieldId: "phone", label: "Telefonnummer", helperText: "", placeholder: "+46 70 123 45 67", type: "tel", required: true, active: true, options: [] },
+      { order: 3, fieldId: "birthDate", label: "Födelsedatum (ÅÅMMDD)", helperText: "Sex siffror — t.ex. 980415 för 15 april 1998.", placeholder: "ÅÅMMDD", type: "text", required: true, active: true, options: [] },
+      { order: 4, fieldId: "hasExperience", label: "Tidigare volontärerfarenhet i moskén", helperText: "", placeholder: "", type: "radio", required: true, active: true, options: ["ja|Ja", "nej|Nej"] },
+      { order: 5, fieldId: "about", label: "Berätta kort om dig själv", helperText: "Vad gör du till vardags? Något särskilt vi bör veta?", placeholder: "", type: "textarea", required: true, active: true, options: [] },
+      { order: 6, fieldId: "areas", label: "Områden du vill hjälpa till med", helperText: "Välj ett eller flera.", placeholder: "", type: "multicheck", required: true, active: true, options: ["reception|Reception & välkomna", "mat|Mat & fika", "barn|Barn & familj", "sakerhet|Säkerhet & ordning", "bazaar|Bazaar-stöd", "stadning|Städning & rivning"] },
+      { order: 7, fieldId: "shifts", label: "Pass du kan hjälpa till med", helperText: "Välj ett eller flera.", placeholder: "", type: "multicheck", required: true, active: true, options: ["forenoon|Förmiddag (10:00–15:00)", "afternoon|Eftermiddag (15:00–20:00)"] }
+    ],
+    bazaarFaq: []
   }
 };
