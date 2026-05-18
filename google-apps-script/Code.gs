@@ -2055,6 +2055,182 @@ function setupAdminPassword(password) {
   }
 }
 
+/**
+ * Engångsåterställning för volontäranmälningar där Field ID i
+ * VolunteerQuestions tillfälligt var fraga_1..fraga_N i stället för de
+ * semantiska namnen (name, phone, birthDate, hasExperience, about, areas,
+ * shifts). Sådana inlämningar dumpade all data som JSON i About-kolumnen.
+ *
+ * Funktionen parsar JSON-blocket under "— Extra fält —" och flyttar
+ * värdena till dedikerade kolumner. Idempotent: rader som redan har Name
+ * ifyllt eller saknar JSON-block hoppas över.
+ *
+ * Kör från Apps Script-editorn:
+ *   previewVolunteerRecovery()   — loggar vad som skulle ändras, skriver inget
+ *   recoverVolunteerSubmissions() — utför återställningen
+ *
+ * Mapping (matchar default-frågornas ordning):
+ *   fraga_1 → Name
+ *   fraga_2 → Phone
+ *   fraga_3 → BirthDate
+ *   fraga_4 → HasExperience
+ *   fraga_5 → About
+ *   fraga_6 → Areas
+ *   fraga_7 → Shifts
+ */
+const VOLUNTEER_RECOVERY_MAP = {
+  fraga_1: 'name',
+  fraga_2: 'phone',
+  fraga_3: 'birthDate',
+  fraga_4: 'hasExperience',
+  fraga_5: 'about',
+  fraga_6: 'areas',
+  fraga_7: 'shifts'
+};
+
+const VOLUNTEER_RECOVERY_MARKER = '— Extra fält —';
+
+function previewVolunteerRecovery() {
+  return runVolunteerRecovery_(true);
+}
+
+function recoverVolunteerSubmissions() {
+  return runVolunteerRecovery_(false);
+}
+
+function runVolunteerRecovery_(dryRun) {
+  const sheet = getSheet_(SHEET_NAMES.VOLUNTEERS);
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) {
+    Logger.log('Inga rader att gå igenom.');
+    return { ok: true, recovered: 0, skipped: 0, dryRun: !!dryRun };
+  }
+
+  const headers = values[0].map(function (h) { return String(h).trim(); });
+  const col = {};
+  headers.forEach(function (h, i) { col[h] = i; });
+
+  const required = ['Name', 'Phone', 'BirthDate', 'HasExperience', 'Areas', 'Shifts', 'About'];
+  for (let i = 0; i < required.length; i++) {
+    if (col[required[i]] === undefined) {
+      throw new Error('VolunteerSubmissions saknar kolumn: ' + required[i]);
+    }
+  }
+
+  let recovered = 0;
+  let skipped = 0;
+  const log = [];
+
+  for (let r = 1; r < values.length; r++) {
+    const row = values[r];
+    const sheetRowNum = r + 1; // 1-indexerad rad i sheeten
+    const existingName = String(row[col.Name] || '').trim();
+    const about = String(row[col.About] || '');
+
+    const markerIdx = about.indexOf(VOLUNTEER_RECOVERY_MARKER);
+    if (markerIdx === -1) {
+      log.push('Rad ' + sheetRowNum + ': hoppar över (ingen "— Extra fält —"-markör).');
+      skipped++;
+      continue;
+    }
+    if (existingName) {
+      log.push('Rad ' + sheetRowNum + ': hoppar över (Name redan ifyllt: "' + existingName + '").');
+      skipped++;
+      continue;
+    }
+
+    const beforeMarker = about.substring(0, markerIdx).trim();
+    const jsonPart = about.substring(markerIdx + VOLUNTEER_RECOVERY_MARKER.length).trim();
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonPart);
+    } catch (e) {
+      log.push('Rad ' + sheetRowNum + ': hoppar över (kunde inte parsa JSON: ' + e + ').');
+      skipped++;
+      continue;
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      log.push('Rad ' + sheetRowNum + ': hoppar över (JSON är inte objekt).');
+      skipped++;
+      continue;
+    }
+
+    // Bygg upp nya cellvärden per logisk fältnyckel.
+    const next = {
+      name: '',
+      phone: '',
+      birthDate: '',
+      hasExperience: '',
+      about: '',
+      areas: '',
+      shifts: ''
+    };
+    const recoveredKeys = [];
+
+    Object.keys(parsed).forEach(function (k) {
+      const targetKey = VOLUNTEER_RECOVERY_MAP[k];
+      if (!targetKey) return; // okänd nyckel — lämnar kvar i JSON-blocket
+      const v = parsed[k];
+      let strVal;
+      if (Array.isArray(v)) strVal = v.map(String).map(function (s) { return s.trim(); }).filter(Boolean).join(', ');
+      else if (v == null) strVal = '';
+      else strVal = String(v).trim();
+      if (!strVal) return;
+      next[targetKey] = strVal;
+      recoveredKeys.push(k + '→' + targetKey);
+    });
+
+    if (recoveredKeys.length === 0) {
+      log.push('Rad ' + sheetRowNum + ': hoppar över (JSON innehöll inga kända fraga_N-nycklar).');
+      skipped++;
+      continue;
+    }
+
+    // About: behåll text före markören om den finns, annars använd fraga_5.
+    let newAbout;
+    if (beforeMarker) {
+      newAbout = beforeMarker;
+    } else if (next.about) {
+      newAbout = next.about;
+    } else {
+      newAbout = '';
+    }
+
+    log.push(
+      'Rad ' + sheetRowNum + ': återställer (' + recoveredKeys.join(', ') + ').'
+    );
+
+    if (!dryRun) {
+      const updates = [
+        [col.Name, next.name],
+        [col.Phone, next.phone],
+        [col.BirthDate, next.birthDate],
+        [col.HasExperience, next.hasExperience || 'nej'],
+        [col.Areas, next.areas],
+        [col.Shifts, next.shifts],
+        [col.About, newAbout]
+      ];
+      updates.forEach(function (u) {
+        const c = u[0];
+        const value = u[1];
+        // 1-indexerad kolumn för setValue
+        sheet.getRange(sheetRowNum, c + 1).setValue(value);
+      });
+    }
+    recovered++;
+  }
+
+  log.forEach(function (line) { Logger.log(line); });
+  Logger.log(
+    (dryRun ? 'DRY-RUN klar.' : 'Återställning klar.') +
+    ' Återställda rader: ' + recovered + '. Hoppade över: ' + skipped + '.'
+  );
+  if (!dryRun && recovered > 0) {
+    logAdminAction_('volunteer_recovery', { recovered: recovered, skipped: skipped }, null);
+  }
+  return { ok: true, dryRun: !!dryRun, recovered: recovered, skipped: skipped };
+}
+
 // =============================================================================
 // SECTION 9 — DEFAULT-DATA
 // =============================================================================
