@@ -561,10 +561,51 @@ function handleSubmit_(body) {
   return { ok: true, data: { id: id } };
 }
 
+/** Kända semantiska roller för volontäranmälan. Dessa motsvarar dedikerade
+ *  kolumner i VolunteerSubmissions-fliken. */
+const VOLUNTEER_ROLES = ['name', 'phone', 'birthDate', 'hasExperience', 'about', 'areas', 'shifts'];
+
+/** Label-mönster för automatisk roll-detektion (när Field ID är fraga_N
+ *  eller annat ovedertaget värde). Första matchen vinner. */
+const VOLUNTEER_LABEL_PATTERNS = [
+  { role: 'name',          re: /\b(namn|name)\b/i },
+  { role: 'phone',         re: /telefon|mobil|phone/i },
+  { role: 'birthDate',     re: /f[öo]delse|birth\s*date|birthdate/i },
+  { role: 'hasExperience', re: /erfarenhet|experience|tidigare\s+volont/i },
+  { role: 'about',         re: /ber[äa]tta|om\s+dig|about/i },
+  { role: 'areas',         re: /omr[åa]den?|areas?/i },
+  { role: 'shifts',        re: /\bpass\b|shifts?/i }
+];
+
+/**
+ * Returnerar den semantiska rollen för en volontärfråga.
+ * Prioriterar Field ID om det redan är en känd roll, faller sedan tillbaka
+ * på label-heuristik. Returnerar tom sträng om frågan inte matchar någon roll.
+ *
+ * @param {Object} q  Fråga med { fieldId, label, type }.
+ * @return {string}
+ */
+function inferSemanticVolunteerRole_(q) {
+  const fid = String((q && q.fieldId) || '').trim();
+  if (VOLUNTEER_ROLES.indexOf(fid) !== -1) return fid;
+  const label = String((q && q.label) || '').trim();
+  if (!label) return '';
+  for (let i = 0; i < VOLUNTEER_LABEL_PATTERNS.length; i++) {
+    if (VOLUNTEER_LABEL_PATTERNS[i].re.test(label)) {
+      return VOLUNTEER_LABEL_PATTERNS[i].role;
+    }
+  }
+  return '';
+}
+
 /**
  * Hanterar volontäranmälan från publika sidan. Skriver till
  * VolunteerSubmissions-fliken. Skild från bazaar-submit eftersom
  * datamodellen är annorlunda (egna kolumner, ingen FormQuestions-koppling).
+ *
+ * Mappar inkommande data till dedikerade kolumner via semantiska roller —
+ * det innebär att även om Field ID i VolunteerQuestions-fliken är felaktigt
+ * (t.ex. fraga_N) hamnar data i rätt kolumn så länge labeln är begriplig.
  *
  * @param {Object} body  Förväntar { action: 'submitVolunteer', data: { ... } }
  * @return {Object}
@@ -579,10 +620,7 @@ function handleVolunteerSubmit_(body) {
     return { ok: true };
   }
 
-  // Validera mot aktiva volontärfrågor (dynamiskt schema, samma logik som
-  // för bazaar-formuläret).
   const questions = readVolunteerQuestions_().filter(function (q) { return q.active === true; });
-  const errors = {};
 
   function asArray(v) {
     if (Array.isArray(v)) return v.map(function (x) { return String(x).trim(); }).filter(Boolean);
@@ -590,8 +628,25 @@ function handleVolunteerSubmit_(body) {
     return [String(v).trim()];
   }
 
+  // Bygg semantic-role → fieldId-karta. Varje roll får högst en fråga
+  // (första matchen vinner) så vi inte krockar mellan två likalika labels.
+  const roleToFieldId = {};
+  const fieldIdToRole = {};
+  questions.forEach(function (q) {
+    const role = inferSemanticVolunteerRole_(q);
+    if (!role) return;
+    if (roleToFieldId[role]) return;
+    roleToFieldId[role] = q.fieldId;
+    fieldIdToRole[q.fieldId] = role;
+  });
+
+  // Validera. Specialvalidering (birthDate-format, about-minlängd) baseras
+  // på rollen, inte på Field ID, så fel sheet-konfiguration inte stänger
+  // av valideringen.
+  const errors = {};
   questions.forEach(function (q) {
     const fid = q.fieldId;
+    const role = fieldIdToRole[fid] || '';
     const required = q.required === true;
     const raw = data[fid];
 
@@ -608,34 +663,45 @@ function handleVolunteerSubmit_(body) {
     // text/email/tel/textarea/checkbox
     const v = String(raw == null ? '' : raw).trim();
     if (required && !v) { errors[fid] = 'required'; return; }
-    if (fid === 'birthDate' && v && !/^\d{6}$/.test(v)) errors[fid] = 'invalid_format';
-    if (fid === 'about' && required && v.length < 10) errors[fid] = 'too_short';
+    if (role === 'birthDate' && v && !/^\d{6}$/.test(v)) errors[fid] = 'invalid_format';
+    if (role === 'about' && required && v.length < 10) errors[fid] = 'too_short';
   });
 
   if (Object.keys(errors).length > 0) {
     return { ok: false, error: 'validation_failed', details: errors };
   }
 
-  // Plocka ut välkända fält till deras dedikerade kolumner. Övriga
-  // fält (om admin lagt till nya i framtiden) faller in i About-kolumnen
-  // som en del av JSON-strängen — säkrar att inget tappas bort utan
-  // schemaändring.
-  const name = String(data.name || '').trim();
-  const phone = String(data.phone || '').trim();
-  const birthDate = String(data.birthDate || '').trim();
-  const hasExperience = String(data.hasExperience || '').trim();
-  const areas = asArray(data.areas).join(', ');
-  const shifts = asArray(data.shifts).join(', ');
-  let about = String(data.about || '').trim();
+  function pickByRole(role) {
+    // Direktnyckel vinner om frågan har semantisk Field ID.
+    if (data[role] != null && data[role] !== '') return data[role];
+    const mappedFid = roleToFieldId[role];
+    if (mappedFid && data[mappedFid] != null) return data[mappedFid];
+    return '';
+  }
 
-  // Eventuella okända fält bevaras som extra info under About.
-  const knownIds = { name: 1, phone: 1, birthDate: 1, hasExperience: 1, about: 1, areas: 1, shifts: 1, kontakttid: 1 };
+  const name = String(pickByRole('name') || '').trim();
+  const phone = String(pickByRole('phone') || '').trim();
+  const birthDate = String(pickByRole('birthDate') || '').trim();
+  const hasExperience = String(pickByRole('hasExperience') || '').trim();
+  const areas = asArray(pickByRole('areas')).join(', ');
+  const shifts = asArray(pickByRole('shifts')).join(', ');
+  let about = String(pickByRole('about') || '').trim();
+
+  // Eventuella fält som varken är roll-mappade eller honeypot bevaras som
+  // extra info under About. Hoppar även över Field IDs som redan är
+  // mappade till en roll så vi inte dubbel-skriver datan.
+  const honeypotKeys = { kontakttid: 1 };
+  const roleKeys = {};
+  VOLUNTEER_ROLES.forEach(function (r) { roleKeys[r] = 1; });
   const extras = {};
   Object.keys(data).forEach(function (k) {
-    if (!knownIds[k]) extras[k] = data[k];
+    if (honeypotKeys[k]) return;
+    if (roleKeys[k]) return;
+    if (fieldIdToRole[k]) return;
+    extras[k] = data[k];
   });
   if (Object.keys(extras).length) {
-    about += '\n\n— Extra fält —\n' + JSON.stringify(extras, null, 2);
+    about += (about ? '\n\n' : '') + '— Extra fält —\n' + JSON.stringify(extras, null, 2);
   }
 
   const id = Utilities.getUuid();
@@ -1304,9 +1370,30 @@ function saveVolunteerQuestions(token, questionsArr) {
     if (!Array.isArray(questionsArr)) {
       return { ok: false, error: 'invalid_input' };
     }
+
+    // Steg 1: auto-rename fraga_N → semantiskt namn när labeln matchar.
+    // Skyddar mot stale-state-buggen där admin-panelens minne skriver över
+    // sheeten med fraga_N även om labeln tydligt är t.ex. "Telefonnummer".
+    const autoRenamed = [];
+    const usedRoles = {};
+    const candidates = questionsArr.map(function (q) {
+      const orig = String((q && q.fieldId) || '').trim();
+      const role = inferSemanticVolunteerRole_(q || {});
+      let next = orig;
+      if (orig && /^fraga_\d+$/.test(orig) && role && !usedRoles[role]) {
+        next = role;
+        autoRenamed.push({ from: orig, to: role, label: String((q && q.label) || '') });
+      }
+      if (next && VOLUNTEER_ROLES.indexOf(next) !== -1) {
+        usedRoles[next] = true;
+      }
+      return Object.assign({}, q || {}, { fieldId: next });
+    });
+
+    // Steg 2: vanlig validering (Field ID krävs och unikt).
     const seen = {};
-    for (let i = 0; i < questionsArr.length; i++) {
-      const q = questionsArr[i] || {};
+    for (let i = 0; i < candidates.length; i++) {
+      const q = candidates[i] || {};
       const fid = String(q.fieldId || '').trim();
       if (!fid) {
         return { ok: false, error: 'validation_failed', details: { index: i, field: 'fieldId', message: 'Field ID krävs.' } };
@@ -1316,7 +1403,8 @@ function saveVolunteerQuestions(token, questionsArr) {
       }
       seen[fid] = true;
     }
-    const normalized = questionsArr.map(function (q, idx) {
+
+    const normalized = candidates.map(function (q, idx) {
       return {
         order: Number(q.order) || (idx + 1),
         fieldId: String(q.fieldId || '').trim(),
@@ -1330,8 +1418,8 @@ function saveVolunteerQuestions(token, questionsArr) {
       };
     });
     writeSheetFromObjects_(SHEET_NAMES.VOLUNTEER_QUESTIONS, normalized, SHEET_HEADERS.VolunteerQuestions);
-    logAdminAction_('save_volunteer_questions', { count: normalized.length }, token);
-    return { ok: true };
+    logAdminAction_('save_volunteer_questions', { count: normalized.length, autoRenamed: autoRenamed }, token);
+    return { ok: true, autoRenamed: autoRenamed };
   });
 }
 
@@ -2096,6 +2184,91 @@ function previewVolunteerRecovery() {
 
 function recoverVolunteerSubmissions() {
   return runVolunteerRecovery_(false);
+}
+
+/**
+ * Engångsstädning för VolunteerQuestions-fliken. Hittar rader där Field ID
+ * är fraga_N men labeln matchar en känd semantisk roll (Namn, Telefon, …)
+ * och döper om Field ID till det semantiska namnet. Lämnar rader vars
+ * Field ID redan är semantiskt eller vars label inte matchar någon roll
+ * orörda.
+ *
+ * Kör från Apps Script-editorn:
+ *   previewVolunteerQuestionFieldIdFix()    — loggar, skriver inget
+ *   fixVolunteerQuestionFieldIds()          — utför ombenämningen
+ */
+function previewVolunteerQuestionFieldIdFix() {
+  return runVolunteerFieldIdFix_(true);
+}
+
+function fixVolunteerQuestionFieldIds() {
+  return runVolunteerFieldIdFix_(false);
+}
+
+function runVolunteerFieldIdFix_(dryRun) {
+  const sheet = getSheet_(SHEET_NAMES.VOLUNTEER_QUESTIONS);
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) {
+    Logger.log('VolunteerQuestions: inga rader att gå igenom.');
+    return { ok: true, dryRun: !!dryRun, renamed: 0, skipped: 0 };
+  }
+  const headers = values[0].map(function (h) { return String(h).trim(); });
+  const fieldIdCol = headers.indexOf('Field ID');
+  const labelCol = headers.indexOf('Label');
+  if (fieldIdCol === -1 || labelCol === -1) {
+    throw new Error('VolunteerQuestions saknar kolumn "Field ID" eller "Label".');
+  }
+
+  // Samla alla nuvarande Field IDs (vi får inte skapa duplikat).
+  const used = {};
+  for (let r = 1; r < values.length; r++) {
+    const fid = String(values[r][fieldIdCol] || '').trim();
+    if (fid) used[fid] = true;
+  }
+
+  let renamed = 0;
+  let skipped = 0;
+  const log = [];
+
+  for (let r = 1; r < values.length; r++) {
+    const sheetRowNum = r + 1;
+    const fid = String(values[r][fieldIdCol] || '').trim();
+    const label = String(values[r][labelCol] || '').trim();
+
+    if (!/^fraga_\d+$/.test(fid)) {
+      log.push('Rad ' + sheetRowNum + ': hoppar (Field ID är inte fraga_N: "' + fid + '").');
+      skipped++;
+      continue;
+    }
+    const role = inferSemanticVolunteerRole_({ fieldId: fid, label: label });
+    if (!role || role === fid) {
+      log.push('Rad ' + sheetRowNum + ': hoppar (label matchar ingen känd roll: "' + label + '").');
+      skipped++;
+      continue;
+    }
+    if (used[role]) {
+      log.push('Rad ' + sheetRowNum + ': hoppar (roll "' + role + '" är redan upptagen av en annan rad).');
+      skipped++;
+      continue;
+    }
+    log.push('Rad ' + sheetRowNum + ': "' + fid + '" → "' + role + '" (label: "' + label + '").');
+    if (!dryRun) {
+      sheet.getRange(sheetRowNum, fieldIdCol + 1).setValue(role);
+    }
+    delete used[fid];
+    used[role] = true;
+    renamed++;
+  }
+
+  log.forEach(function (line) { Logger.log(line); });
+  Logger.log(
+    (dryRun ? 'DRY-RUN klar.' : 'Field ID-fix klar.') +
+    ' Ombenämnda: ' + renamed + '. Hoppade över: ' + skipped + '.'
+  );
+  if (!dryRun && renamed > 0) {
+    logAdminAction_('volunteer_field_id_fix', { renamed: renamed, skipped: skipped }, null);
+  }
+  return { ok: true, dryRun: !!dryRun, renamed: renamed, skipped: skipped };
 }
 
 function runVolunteerRecovery_(dryRun) {
