@@ -876,6 +876,9 @@ img, svg { display: block; max-width: 100%; }
 }
 .faq-item__a p { margin: 0 0 10px; }
 .faq-item__a p:last-child { margin-bottom: 0; }
+.faq-item__a ul { margin: 0; padding-left: 18px; }
+.faq-item__a li { margin-bottom: 6px; }
+.faq-item__a li:last-child { margin-bottom: 0; }
 
 .form-card {
   background: var(--paper);
