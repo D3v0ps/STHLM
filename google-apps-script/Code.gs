@@ -566,9 +566,11 @@ function handleSubmit_(body) {
 const VOLUNTEER_ROLES = ['name', 'phone', 'birthDate', 'hasExperience', 'about', 'areas', 'shifts'];
 
 /** Label-mönster för automatisk roll-detektion (när Field ID är fraga_N
- *  eller annat ovedertaget värde). Första matchen vinner. */
+ *  eller annat ovedertaget värde). Första matchen vinner. Notera: name
+ *  använder inte \b för att fånga sammansatta ord som "Efternamn",
+ *  "För- och efternamn", "Förnamn", "Mellannamn". */
 const VOLUNTEER_LABEL_PATTERNS = [
-  { role: 'name',          re: /\b(namn|name)\b/i },
+  { role: 'name',          re: /namn|name/i },
   { role: 'phone',         re: /telefon|mobil|phone/i },
   { role: 'birthDate',     re: /f[öo]delse|birth\s*date|birthdate/i },
   { role: 'hasExperience', re: /erfarenhet|experience|tidigare\s+volont/i },
