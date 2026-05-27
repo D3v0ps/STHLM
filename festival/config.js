@@ -29,6 +29,7 @@ window.APP_CONFIG = {
       linktreeUrl: "https://linktr.ee/stockholmsmoske",
       activityBazaarText: "Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.",
       activitySportText: "Fotbollsturnering för ålder 15+ (födda 2011 eller tidigare). 5v5, max 6 spelare per lag. 500 kr per lag — 1:a-pris 6 000 kr i presentkort. Sista anmälningsdag 6 juni.",
+      activityBasketText: "3x3-basket för ålder 15+ (födda 2011 eller tidigare). Max 4 spelare per lag. 400 kr per lag — 1:a-pris 4 000 kr i presentkort. Sista anmälningsdag 10 juni.",
       activityMatText: "Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.",
       activityKidsText: "Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.",
       activityKnowledgeText: "Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro."

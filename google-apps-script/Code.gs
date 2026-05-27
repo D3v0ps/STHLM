@@ -26,6 +26,7 @@ const SHEET_NAMES = {
   VOLUNTEER_QUESTIONS: 'VolunteerQuestions',
   BAZAAR_FAQ: 'BazaarFAQ',
   FOOTBALL: 'FootballRegistrations',
+  BASKETBALL: 'BasketRegistrations',
   ADMIN_LOGS: 'AdminLogs'
 };
 
@@ -48,6 +49,7 @@ const SHEET_HEADERS = {
   VolunteerQuestions: ['Order', 'Field ID', 'Label', 'Helper Text', 'Placeholder', 'Type', 'Required', 'Active', 'Options'],
   BazaarFAQ: ['Order', 'Question', 'Answer', 'Active'],
   FootballRegistrations: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'Email', 'Team Name', 'Consent', 'Internal Notes'],
+  BasketRegistrations: ['ID', 'Timestamp', 'Status', 'Name', 'Phone', 'Email', 'Team Name', 'Consent', 'Internal Notes'],
   AdminLogs: ['Timestamp', 'Action', 'Details', 'Session ID']
 };
 
@@ -405,6 +407,10 @@ function doPost(e) {
 
     if (action === 'submitFootball') {
       return jsonResponse_(handleFootballSubmit_(body));
+    }
+
+    if (action === 'submitBasket') {
+      return jsonResponse_(handleBasketSubmit_(body));
     }
 
     if (adminAction) {
@@ -779,6 +785,60 @@ function handleFootballSubmit_(body) {
   ]);
 
   logAdminAction_('football_submitted', { id: id, teamName: teamName }, null);
+  return { ok: true, data: { id: id } };
+}
+
+/**
+ * Hanterar anmälan till basket 3x3-turneringen. Samma fältschema som
+ * fotboll men skriver till BasketRegistrations-fliken.
+ *
+ * @param {Object} body  Förväntar { action: 'submitBasket', data: { ... } }
+ * @return {Object}
+ */
+function handleBasketSubmit_(body) {
+  const data = (body && body.data) || {};
+
+  const honeypot = data.kontakttid;
+  if (honeypot && String(honeypot).trim() !== '') {
+    logAdminAction_('spam_blocked', { formType: 'basket', reason: 'honeypot_filled' }, null);
+    return { ok: true };
+  }
+
+  const name = String(data.name || '').trim();
+  const phone = String(data.phone || '').trim();
+  const email = String(data.email || '').trim();
+  const teamName = String(data.teamName || '').trim();
+  const consent = data.consentAccepted === true || data.consentAccepted === 'true';
+
+  const errors = {};
+  if (!name) errors.name = 'required';
+  if (!phone) errors.phone = 'required';
+  else if (!PHONE_REGEX.test(phone)) errors.phone = 'invalid_phone';
+  if (!email) errors.email = 'required';
+  else if (!EMAIL_REGEX.test(email)) errors.email = 'invalid_email';
+  if (!teamName) errors.teamName = 'required';
+  if (!consent) errors.consentAccepted = 'must_accept';
+
+  if (Object.keys(errors).length > 0) {
+    return { ok: false, error: 'validation_failed', details: errors };
+  }
+
+  const id = Utilities.getUuid();
+  const timestamp = new Date().toISOString();
+  const sheet = getSheet_(SHEET_NAMES.BASKETBALL);
+  sheet.appendRow([
+    id,
+    timestamp,
+    'new',
+    name,
+    phone,
+    email,
+    teamName,
+    consent ? 'TRUE' : 'FALSE',
+    ''
+  ]);
+
+  logAdminAction_('basket_submitted', { id: id, teamName: teamName }, null);
   return { ok: true, data: { id: id } };
 }
 
@@ -2036,7 +2096,12 @@ function setupSpreadsheet() {
       addDropdownValidation_(sheet, 'Status', ['new', 'confirmed', 'paid', 'rejected', 'waitlist']);
     });
 
-    // 11. AdminLogs
+    // 11. BasketRegistrations (tom + headers)
+    ensureSheet_(ss, SHEET_NAMES.BASKETBALL, SHEET_HEADERS.BasketRegistrations, created, updated, function (sheet) {
+      addDropdownValidation_(sheet, 'Status', ['new', 'confirmed', 'paid', 'rejected', 'waitlist']);
+    });
+
+    // 12. AdminLogs
     ensureSheet_(ss, SHEET_NAMES.ADMIN_LOGS, SHEET_HEADERS.AdminLogs, created, updated);
 
     logAdminAction_('setup_spreadsheet', { created: created, updated: updated }, null);
@@ -2442,7 +2507,8 @@ const DEFAULT_SETTINGS = [
   ['purposeText', 'Stockholms Moské Festival är en årlig familje- och gemenskapsfestival som arrangeras av Stockholms Moské för att samla människor i alla åldrar kring gemenskap, glädje, kultur och aktiviteter.\n\nFestivalen skapar en trygg och välkomnande mötesplats där familjer, ungdomar och besökare kan umgås, lära känna varandra och delta i aktiviteter för både barn och vuxna.\n\nGenom bazaar, sportturneringar, barnaktiviteter, mat, fika och kunskapsutställningar vill festivalen stärka gemenskapen i samhället och skapa positiva minnen för hela familjen – i en öppen, familjevänlig och inkluderande miljö där människor möts.', 'textarea', 'Syfte', 'Långt stycke som beskriver festivalens syfte.'],
   ['linktreeUrl', 'https://linktr.ee/stockholmsmoske', 'text', 'Linktree-URL', 'Om satt visas en länk till Linktree i marknadsförings-sektionen.'],
   ['activityBazaarText', 'Sälj eller presentera produkter och tjänster vid ett stånd. Begränsade platser — urval baseras på relevans.', 'textarea', 'Bazaar — beskrivning', 'Visas på bazaar-kortet.'],
-  ['activitySportText', 'Fotbollsturnering för alla åldrar samt basket 3 mot 3. Spelschema publiceras närmare festivalen.', 'textarea', 'Sport — beskrivning', 'Visas på sport-kortet.'],
+  ['activitySportText', 'Fotbollsturnering för ålder 15+ (födda 2011 eller tidigare). 5v5, max 6 spelare per lag. 500 kr per lag — 1:a-pris 6 000 kr i presentkort. Sista anmälningsdag 6 juni.', 'textarea', 'Fotboll — beskrivning', 'Visas på fotbolls-kortet.'],
+  ['activityBasketText', '3x3-basket för ålder 15+ (födda 2011 eller tidigare). Max 4 spelare per lag. 400 kr per lag — 1:a-pris 4 000 kr i presentkort. Sista anmälningsdag 10 juni.', 'textarea', 'Basket — beskrivning', 'Visas på basket-kortet.'],
   ['activityMatText', 'Mat, fika och tilltugg från lokala kockar och bagerier. Meny och priser uppdateras inom kort.', 'textarea', 'Mat — beskrivning', 'Visas på mat-kortet.'],
   ['activityKidsText', 'Lek, pyssel och familjeaktiviteter för de yngsta. Ansvariga ledare på plats hela dagen.', 'textarea', 'Barnaktiviteter — beskrivning', 'Visas på barn-kortet.'],
   ['activityKnowledgeText', 'Utställningar och kortföredrag som introducerar besökare till moskéns verksamhet, historia och tro.', 'textarea', 'Kunskapsutställningar — beskrivning', 'Visas på kunskaps-kortet.']
