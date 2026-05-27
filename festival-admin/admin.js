@@ -3000,8 +3000,7 @@
     const btn = document.getElementById('load-football-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Laddar…'; }
     try {
-      const res = await runServer('getFootballRegistrations', state.token);
-      state.footballRegs = res.data || [];
+      state.footballRegs = await runServer('getFootballRegistrations', state.token) || [];
       renderSportRegTable('football', state.footballRegs);
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
@@ -3015,8 +3014,7 @@
     const btn = document.getElementById('load-basket-btn');
     if (btn) { btn.disabled = true; btn.textContent = 'Laddar…'; }
     try {
-      const res = await runServer('getBasketRegistrations', state.token);
-      state.basketRegs = res.data || [];
+      state.basketRegs = await runServer('getBasketRegistrations', state.token) || [];
       renderSportRegTable('basket', state.basketRegs);
     } catch (err) {
       if (isAuthError(err)) { await handleAuthError(); return; }
