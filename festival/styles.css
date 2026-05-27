@@ -550,19 +550,16 @@ img, svg { display: block; max-width: 100%; }
   max-width: 1100px;
   margin: 0 auto;
 }
-/* 5-kort rutnät: 5 i rad på bred desktop, 2-3 på tablet, 1 på mobil */
-.activities__grid--5 {
-  grid-template-columns: repeat(5, 1fr);
-  max-width: 1280px;
-}
-@media (max-width: 1200px) {
-  .activities__grid--5 { grid-template-columns: repeat(3, 1fr); max-width: 1100px; }
+/* 6-kort rutnät: 3×2 på desktop, 2×3 på tablet, 1 på mobil */
+.activities__grid--6 {
+  grid-template-columns: repeat(3, 1fr);
+  max-width: 1100px;
 }
 @media (max-width: 900px) {
-  .activities__grid--5 { grid-template-columns: repeat(2, 1fr); }
+  .activities__grid--6 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 600px) {
-  .activities__grid--5 { grid-template-columns: 1fr; }
+  .activities__grid--6 { grid-template-columns: 1fr; }
 }
 .activity-card__cta--muted {
   color: var(--ink-muted);
