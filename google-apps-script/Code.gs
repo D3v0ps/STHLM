@@ -472,6 +472,14 @@ function adminDispatch_(action, body) {
       return updateVolunteerStatus(args[0], args[1], args[2], args[3]);
     case 'exportVolunteersCsv':
       return exportVolunteersCsv(args[0]);
+    case 'getFootballRegistrations':
+      return getFootballRegistrations(args[0]);
+    case 'updateFootballStatus':
+      return updateFootballStatus(args[0], args[1], args[2], args[3]);
+    case 'getBasketRegistrations':
+      return getBasketRegistrations(args[0]);
+    case 'updateBasketStatus':
+      return updateBasketStatus(args[0], args[1], args[2], args[3]);
     case 'saveVolunteerQuestions':
       return saveVolunteerQuestions(args[0], args[1]);
     case 'saveBazaarFaq':
@@ -1903,6 +1911,74 @@ function exportVolunteersCsv(token) {
     const csv = lines.join('\r\n');
     logAdminAction_('export_volunteers_csv', { count: volunteers.length }, token);
     return { ok: true, data: csv };
+  });
+}
+
+// ============================================================
+// FOTBOLLS- OCH BASKET-REGISTRERINGAR (admin-API)
+// ============================================================
+
+function readAllFootball_() {
+  return readSheetAsObjects_(SHEET_NAMES.FOOTBALL).map(function (r) {
+    return {
+      id: r.id || '', timestamp: r.timestamp || '', status: r.status || 'new',
+      name: r.name || '', phone: r.phone || '', email: r.email || '',
+      teamName: r.teamName || '', consent: r.consent || '',
+      internalNotes: r.internalNotes || ''
+    };
+  });
+}
+
+function readAllBasket_() {
+  return readSheetAsObjects_(SHEET_NAMES.BASKETBALL).map(function (r) {
+    return {
+      id: r.id || '', timestamp: r.timestamp || '', status: r.status || 'new',
+      name: r.name || '', phone: r.phone || '', email: r.email || '',
+      teamName: r.teamName || '', consent: r.consent || '',
+      internalNotes: r.internalNotes || ''
+    };
+  });
+}
+
+function getFootballRegistrations(token) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    return { ok: true, data: readAllFootball_() };
+  });
+}
+
+function getBasketRegistrations(token) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    return { ok: true, data: readAllBasket_() };
+  });
+}
+
+function updateFootballStatus(token, regId, status, notes) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    var allowed = ['new', 'confirmed', 'paid', 'rejected', 'waitlist'];
+    if (allowed.indexOf(status) === -1) return { ok: false, error: 'invalid_status' };
+    var updates = { 'Status': status };
+    if (notes !== undefined && notes !== null) updates['Internal Notes'] = String(notes);
+    var ok = updateRowByMatch_(SHEET_NAMES.FOOTBALL, 'ID', regId, updates);
+    if (!ok) return { ok: false, error: 'not_found' };
+    logAdminAction_('update_football_status', { id: regId, status: status }, token);
+    return { ok: true };
+  });
+}
+
+function updateBasketStatus(token, regId, status, notes) {
+  return safeAdminCall_(function () {
+    requireAuth_(token);
+    var allowed = ['new', 'confirmed', 'paid', 'rejected', 'waitlist'];
+    if (allowed.indexOf(status) === -1) return { ok: false, error: 'invalid_status' };
+    var updates = { 'Status': status };
+    if (notes !== undefined && notes !== null) updates['Internal Notes'] = String(notes);
+    var ok = updateRowByMatch_(SHEET_NAMES.BASKETBALL, 'ID', regId, updates);
+    if (!ok) return { ok: false, error: 'not_found' };
+    logAdminAction_('update_basket_status', { id: regId, status: status }, token);
+    return { ok: true };
   });
 }
 

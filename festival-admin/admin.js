@@ -266,6 +266,11 @@
     const saveSportsBtn = document.getElementById('save-sports-btn');
     if (saveSportsBtn) saveSportsBtn.addEventListener('click', handleSportsSave);
 
+    const loadFootballBtn = document.getElementById('load-football-btn');
+    if (loadFootballBtn) loadFootballBtn.addEventListener('click', loadFootballRegistrations);
+    const loadBasketBtn = document.getElementById('load-basket-btn');
+    if (loadBasketBtn) loadBasketBtn.addEventListener('click', loadBasketRegistrations);
+
     // Submissions filter pills (Alla / Nya / Granskar / Godkända / Kontaktade / Nekade)
     document.querySelectorAll('.filter-tab').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -2982,6 +2987,213 @@
         btn.textContent = btn.dataset.originalText || 'Spara ändringar';
       }
     }
+  }
+
+  // ============================================================
+  // SPORT-REGISTRERINGAR (fotboll + basket)
+  // ============================================================
+
+  state.footballRegs = null;
+  state.basketRegs = null;
+
+  async function loadFootballRegistrations() {
+    const btn = document.getElementById('load-football-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Laddar…'; }
+    try {
+      const res = await runServer('getFootballRegistrations', state.token);
+      state.footballRegs = res.data || [];
+      renderSportRegTable('football', state.footballRegs);
+    } catch (err) {
+      if (isAuthError(err)) { await handleAuthError(); return; }
+      toast('Kunde inte ladda fotbollsanmälningar.', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Ladda anmälningar'; }
+    }
+  }
+
+  async function loadBasketRegistrations() {
+    const btn = document.getElementById('load-basket-btn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Laddar…'; }
+    try {
+      const res = await runServer('getBasketRegistrations', state.token);
+      state.basketRegs = res.data || [];
+      renderSportRegTable('basket', state.basketRegs);
+    } catch (err) {
+      if (isAuthError(err)) { await handleAuthError(); return; }
+      toast('Kunde inte ladda basketanmälningar.', 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = 'Ladda anmälningar'; }
+    }
+  }
+
+  var SPORT_STATUS_LABELS = {
+    new: 'Ny', confirmed: 'Bekräftad', paid: 'Betald', rejected: 'Nekad', waitlist: 'Väntelista'
+  };
+
+  function renderSportRegTable(sport, regs) {
+    var tbody = document.getElementById(sport + '-tbody');
+    var table = document.getElementById(sport + '-table');
+    var sub = document.getElementById(sport + '-subtitle');
+    if (!tbody || !table) return;
+
+    table.hidden = false;
+    tbody.innerHTML = '';
+
+    var label = sport === 'football' ? 'fotbollsanmälningar' : 'basketanmälningar';
+    if (sub) sub.textContent = regs.length + ' ' + label + ' totalt.';
+
+    if (regs.length === 0) {
+      var tr = document.createElement('tr');
+      var td = document.createElement('td');
+      td.colSpan = 7;
+      td.className = 'empty-state';
+      td.textContent = 'Inga anmälningar ännu.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+
+    regs.sort(function(a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+
+    regs.forEach(function(r) {
+      var tr = document.createElement('tr');
+
+      var dateTd = document.createElement('td');
+      dateTd.dataset.label = 'Datum';
+      dateTd.textContent = formatDateTime(r.timestamp);
+      tr.appendChild(dateTd);
+
+      var teamTd = document.createElement('td');
+      teamTd.dataset.label = 'Lagnamn';
+      teamTd.textContent = r.teamName || '–';
+      tr.appendChild(teamTd);
+
+      var nameTd = document.createElement('td');
+      nameTd.dataset.label = 'Kontaktperson';
+      nameTd.textContent = r.name || '–';
+      tr.appendChild(nameTd);
+
+      var phoneTd = document.createElement('td');
+      phoneTd.dataset.label = 'Telefon';
+      phoneTd.textContent = r.phone || '–';
+      tr.appendChild(phoneTd);
+
+      var emailTd = document.createElement('td');
+      emailTd.dataset.label = 'E-post';
+      emailTd.textContent = r.email || '–';
+      tr.appendChild(emailTd);
+
+      var statusTd = document.createElement('td');
+      statusTd.dataset.label = 'Status';
+      statusTd.appendChild(buildStatusChip(r.status || 'new'));
+      tr.appendChild(statusTd);
+
+      var actTd = document.createElement('td');
+      var viewBtn = document.createElement('button');
+      viewBtn.type = 'button';
+      viewBtn.className = 'btn btn--small';
+      viewBtn.textContent = 'Öppna';
+      viewBtn.addEventListener('click', function() { openSportRegDetail(sport, r.id); });
+      actTd.appendChild(viewBtn);
+      tr.appendChild(actTd);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  function findSportReg(sport, id) {
+    var list = sport === 'football' ? state.footballRegs : state.basketRegs;
+    return (list || []).filter(function(r) { return r.id === id; })[0];
+  }
+
+  function openSportRegDetail(sport, id) {
+    var r = findSportReg(sport, id);
+    if (!r) return;
+    var dlg = document.getElementById('sport-reg-detail');
+    var content = document.getElementById('sport-reg-detail-content');
+    if (!dlg || !content) return;
+    content.innerHTML = '';
+
+    var typeLabel = sport === 'football' ? 'Fotbollsanmälan' : 'Basketanmälan';
+    var updateAction = sport === 'football' ? 'updateFootballStatus' : 'updateBasketStatus';
+
+    var head = document.createElement('div');
+    head.style.padding = '24px 28px 16px';
+    head.innerHTML = '<p class="eyebrow" style="margin: 0 0 8px;">' + escape(typeLabel) + '</p>' +
+      '<h3 style="font-family: var(--sm-font-display); font-size: 24px; margin: 0 0 4px;">' + escape(r.teamName || '–') + '</h3>' +
+      '<p style="margin: 0; font-size: 12px; color: var(--ink-muted);">Inkommen: ' + escape(formatDateTime(r.timestamp)) + '</p>';
+    content.appendChild(head);
+
+    var body = document.createElement('div');
+    body.style.padding = '8px 28px 24px';
+    body.appendChild(detailRow('Lagnamn', r.teamName));
+    body.appendChild(detailRow('Kontaktperson', r.name));
+    body.appendChild(detailRow('Telefon', r.phone, 'tel:' + (r.phone || '')));
+    body.appendChild(detailRow('E-post', r.email, 'mailto:' + (r.email || '')));
+    content.appendChild(body);
+
+    var footer = document.createElement('div');
+    footer.style.cssText = 'padding: 20px 28px; border-top: 1px solid var(--line); background: var(--cream); display: grid; grid-template-columns: 1fr 1fr; gap: 16px;';
+
+    var statusWrap = document.createElement('div');
+    statusWrap.innerHTML = '<label class="field-label" for="sport-reg-status">Status</label>';
+    var statusSel = document.createElement('select');
+    statusSel.id = 'sport-reg-status';
+    statusSel.className = 'select';
+    ['new', 'confirmed', 'paid', 'rejected', 'waitlist'].forEach(function(s) {
+      var o = document.createElement('option');
+      o.value = s;
+      o.textContent = SPORT_STATUS_LABELS[s] || s;
+      if ((r.status || 'new') === s) o.selected = true;
+      statusSel.appendChild(o);
+    });
+    statusWrap.appendChild(statusSel);
+    footer.appendChild(statusWrap);
+
+    var notesWrap = document.createElement('div');
+    notesWrap.innerHTML = '<label class="field-label" for="sport-reg-notes">Interna anteckningar</label>';
+    var notesArea = document.createElement('textarea');
+    notesArea.id = 'sport-reg-notes';
+    notesArea.className = 'textarea';
+    notesArea.rows = 2;
+    notesArea.value = r.internalNotes || '';
+    notesWrap.appendChild(notesArea);
+    footer.appendChild(notesWrap);
+    content.appendChild(footer);
+
+    var actions = document.createElement('div');
+    actions.style.cssText = 'padding: 16px 28px 24px; background: var(--cream); display: flex; justify-content: flex-end; gap: 10px; border-bottom-left-radius: var(--sm-radius-lg); border-bottom-right-radius: var(--sm-radius-lg);';
+    var cancelBtn = document.createElement('button');
+    cancelBtn.type = 'button';
+    cancelBtn.className = 'btn btn-ghost';
+    cancelBtn.textContent = 'Stäng';
+    cancelBtn.addEventListener('click', function() { dlg.close(); });
+    var saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'btn btn--primary';
+    saveBtn.textContent = 'Spara ändringar';
+    saveBtn.addEventListener('click', async function() {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Sparar…';
+      try {
+        await runServer(updateAction, state.token, r.id, statusSel.value, notesArea.value);
+        r.status = statusSel.value;
+        r.internalNotes = notesArea.value;
+        dlg.close();
+        renderSportRegTable(sport, sport === 'football' ? state.footballRegs : state.basketRegs);
+        toast(typeLabel + ' uppdaterad.', 'success');
+      } catch (err) {
+        if (isAuthError(err)) { await handleAuthError(); return; }
+        toast('Kunde inte spara. Försök igen.', 'error');
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Spara ändringar';
+      }
+    });
+    actions.appendChild(cancelBtn);
+    actions.appendChild(saveBtn);
+    content.appendChild(actions);
+
+    try { dlg.showModal(); } catch (_) { dlg.setAttribute('open', ''); }
   }
 
   // ============================================================

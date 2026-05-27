@@ -298,7 +298,46 @@
             <button id="save-sports-btn" class="btn btn--primary">Spara sport-sidor</button>
             <span id="sports-saved-msg" class="saved-msg" role="status" aria-live="polite" hidden>✓ Sparat</span>
           </div>
+
+          <!-- Fotbolls-anmälningar -->
+          <div style="margin-top: 48px;">
+            <div class="page-header__row">
+              <div>
+                <h2 style="font-family: var(--sm-font-display); font-size: 22px; margin: 0 0 4px;">Fotbollsanmälningar</h2>
+                <p class="page-header__sub" id="football-subtitle">Laddar…</p>
+              </div>
+              <button id="load-football-btn" class="btn btn-ghost">Ladda anmälningar</button>
+            </div>
+            <table id="football-table" class="data-table" hidden>
+              <thead>
+                <tr><th>Datum</th><th>Lagnamn</th><th>Kontaktperson</th><th>Telefon</th><th>E-post</th><th>Status</th><th><span class="visually-hidden">Åtgärder</span></th></tr>
+              </thead>
+              <tbody id="football-tbody"></tbody>
+            </table>
+          </div>
+
+          <!-- Basket-anmälningar -->
+          <div style="margin-top: 48px;">
+            <div class="page-header__row">
+              <div>
+                <h2 style="font-family: var(--sm-font-display); font-size: 22px; margin: 0 0 4px;">Basketanmälningar</h2>
+                <p class="page-header__sub" id="basket-subtitle">Laddar…</p>
+              </div>
+              <button id="load-basket-btn" class="btn btn-ghost">Ladda anmälningar</button>
+            </div>
+            <table id="basket-table" class="data-table" hidden>
+              <thead>
+                <tr><th>Datum</th><th>Lagnamn</th><th>Kontaktperson</th><th>Telefon</th><th>E-post</th><th>Status</th><th><span class="visually-hidden">Åtgärder</span></th></tr>
+              </thead>
+              <tbody id="basket-tbody"></tbody>
+            </table>
+          </div>
         </section>
+
+        <!-- Sport-registrering detaljdialog -->
+        <dialog id="sport-reg-detail" class="dialog">
+          <div id="sport-reg-detail-content"></div>
+        </dialog>
 
         <!-- ---------- VOLONTÄRER ---------- -->
         <section data-tab-panel="volunteers" id="panel-volunteers" tabindex="0" hidden>
