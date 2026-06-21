@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
-  <meta name="x-apple-disable-message-reformatting" content="true">
 
   <title>Stockholms Moské Festival 2026 — Inställd</title>
   <meta name="description" content="Stockholms Moské Festival genomförs inte 2026. Vår ambition är att återkomma nästa år, insha'Allah.">
@@ -19,20 +18,77 @@
   <meta property="og:description" content="Stockholms Moské Festival genomförs inte 2026. Vår ambition är att återkomma nästa år, insha'Allah.">
   <meta property="og:url" content="https://stockholmsmoske.se/festival/">
 
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&family=Inter:wght@400;500;600&display=swap">
 
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-  <link rel="alternate icon" href="assets/favicon.ico">
-
-  <link rel="stylesheet" href="styles.css">
-
   <style>
-    /* Enkel layout för informationssidan — återanvänder hero-färger
-       men centrerat och utan ornament. */
+    :root {
+      --ink: #0f1e3d;
+      --ink-muted: #6b7280;
+      --cream: #faf6ee;
+      --paper: #ffffff;
+      --brass: #b89968;
+      --line: rgba(15, 30, 61, 0.12);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .site-header {
+      display: flex;
+      align-items: center;
+      padding: 24px 32px;
+      border-bottom: 1px solid var(--line);
+    }
+    .site-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .site-logo__mark {
+      width: 44px;
+      height: auto;
+    }
+    .site-logo__text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+    .site-logo__name {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    .site-logo__sub {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+
+    /* Main info card */
     .info-page {
-      min-height: calc(100vh - 80px);
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -44,26 +100,29 @@
       text-align: center;
     }
     .info-card__eyebrow {
-      font-family: var(--sm-font-body, 'Inter', sans-serif);
       font-size: 12px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--brass, #b89968);
+      color: var(--brass);
       margin: 0 0 24px;
+      font-weight: 500;
     }
     .info-card__title {
-      font-family: var(--sm-font-display, 'Fraunces', serif);
+      font-family: 'Fraunces', serif;
       font-size: clamp(32px, 5vw, 52px);
       line-height: 1.15;
-      color: var(--ink, #0f1e3d);
+      color: var(--ink);
       margin: 0 0 32px;
       font-weight: 400;
     }
+    .info-card__title em {
+      font-style: italic;
+      color: var(--brass);
+    }
     .info-card__body {
-      font-family: var(--sm-font-body, 'Inter', sans-serif);
       font-size: 17px;
       line-height: 1.7;
-      color: var(--ink, #0f1e3d);
+      color: var(--ink);
       margin: 0 0 28px;
     }
     .info-card__body p {
@@ -75,16 +134,15 @@
     .info-card__divider {
       width: 60px;
       height: 1px;
-      background: var(--brass, #b89968);
+      background: var(--brass);
       opacity: 0.5;
       margin: 40px auto;
       border: 0;
     }
     .info-card__contact {
-      font-family: var(--sm-font-body, 'Inter', sans-serif);
       font-size: 16px;
       line-height: 1.7;
-      color: var(--ink, #0f1e3d);
+      color: var(--ink);
     }
     .info-card__contact p {
       margin: 0 0 14px;
@@ -93,30 +151,58 @@
       font-weight: 600;
     }
     .info-card__contact a {
-      color: var(--brass, #b89968);
+      color: var(--brass);
       text-decoration: none;
       font-weight: 500;
       border-bottom: 1px solid currentColor;
     }
     .info-card__contact a:hover {
-      color: var(--ink, #0f1e3d);
+      color: var(--ink);
     }
     .info-card__dua {
-      font-family: var(--sm-font-display, 'Fraunces', serif);
+      font-family: 'Fraunces', serif;
       font-style: italic;
       font-size: 18px;
-      color: var(--brass, #b89968);
+      color: var(--brass);
       margin-top: 40px;
+    }
+
+    /* Footer */
+    .site-footer {
+      padding: 24px 32px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+      color: var(--ink-muted);
+    }
+    .site-footer__inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .site-footer a {
+      color: var(--brass);
+      text-decoration: none;
+    }
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+      .site-header { padding: 20px; }
+      .info-page { padding: 60px 20px; }
+      .info-card__body { font-size: 16px; }
+      .site-footer__inner { flex-direction: column; align-items: center; text-align: center; }
     }
   </style>
 </head>
 <body>
 
-  <a href="#main-content" class="skip-link">Hoppa till innehåll</a>
-
   <header class="site-header" role="banner">
     <a class="site-logo" href="https://stockholmsmoske.se" aria-label="Stockholms Moské – startsida">
-      <img src="assets/logo.png" alt="" class="site-logo__mark" width="44" height="48">
+      <img src="logo.svg" alt="" class="site-logo__mark" width="44" height="48">
       <span class="site-logo__text">
         <span class="site-logo__name">Islamiska Förbundet</span>
         <span class="site-logo__sub">Stockholms Moské</span>
@@ -124,7 +210,7 @@
     </a>
   </header>
 
-  <main id="main-content" class="info-page">
+  <main class="info-page">
     <div class="info-card">
       <p class="info-card__eyebrow">Viktig information</p>
       <h1 class="info-card__title">
@@ -165,11 +251,9 @@
 
   <footer class="site-footer" role="contentinfo">
     <div class="site-footer__inner">
-      <div class="site-footer__row">
-        <div>&copy; <span id="footer-year">2026</span> Stockholms Moské &middot; Islamiska Förbundet</div>
-        <div class="site-footer__links">
-          <a href="https://stockholmsmoske.se">Tillbaka till stockholmsmoske.se</a>
-        </div>
+      <div>&copy; <span id="footer-year">2026</span> Stockholms Moské &middot; Islamiska Förbundet</div>
+      <div>
+        <a href="https://stockholmsmoske.se">Tillbaka till stockholmsmoske.se</a>
       </div>
     </div>
   </footer>
